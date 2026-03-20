@@ -2,24 +2,26 @@
 
 import { useState } from "react";
 
+const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || "";
+
 export default function WaitlistForm() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "duplicate" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!FORMSPREE_ID) return;
     setStatus("loading");
 
     try {
-      const res = await fetch("/api/waitlist", {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
 
       if (res.ok) {
-        setStatus(data.message === "already_subscribed" ? "duplicate" : "success");
+        setStatus("success");
         setEmail("");
       } else {
         setStatus("error");
@@ -40,7 +42,7 @@ export default function WaitlistForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto">
+    <div id="waitlist" className="max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <input
           type="email"
@@ -52,16 +54,13 @@ export default function WaitlistForm() {
         />
         <button
           type="submit"
-          disabled={status === "loading"}
+          disabled={status === "loading" || !FORMSPREE_ID}
           className="bg-emerald-700 text-white px-7 py-4 rounded-full font-semibold hover:bg-emerald-800 transition-colors disabled:opacity-60 whitespace-nowrap shadow-sm"
         >
           {status === "loading" ? "Joining..." : "Join waitlist →"}
         </button>
       </form>
 
-      {status === "duplicate" && (
-        <p className="text-center text-stone-500 text-sm mt-3">You&apos;re already on the list — we&apos;ll be in touch! 👋</p>
-      )}
       {status === "error" && (
         <p className="text-center text-red-500 text-sm mt-3">Something went wrong. Please try again.</p>
       )}

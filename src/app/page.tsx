@@ -91,9 +91,9 @@ export default function Home() {
             <ul className="space-y-3 text-stone-700 mb-8">
               {freeTier.map(f => <li key={f} className="flex items-center gap-2"><span className="text-emerald-600">✓</span>{f}</li>)}
             </ul>
-            <Link href="/signup" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors">
-              Get started
-            </Link>
+            <a href="#waitlist" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors">
+              Join Waitlist
+            </a>
           </div>
           {/* Premium */}
           <div className="bg-emerald-700 text-white rounded-2xl p-8 shadow-md">
@@ -103,9 +103,9 @@ export default function Home() {
             <ul className="space-y-3 text-emerald-50 mb-8">
               {premiumTier.map(f => <li key={f} className="flex items-center gap-2"><span className="text-emerald-300">✓</span>{f}</li>)}
             </ul>
-            <Link href="/signup?plan=premium" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors">
-              Start free trial
-            </Link>
+            <a href="#waitlist" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors">
+              Join Waitlist
+            </a>
           </div>
         </div>
       </section>
