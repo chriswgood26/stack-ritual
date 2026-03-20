@@ -1,65 +1,204 @@
-import Image from "next/image";
+import Link from "next/link";
+import WaitlistForm from "@/components/WaitlistForm";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans">
+
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-8 py-5 max-w-6xl mx-auto">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🌿</span>
+          <span className="text-xl font-bold tracking-tight">Stack Ritual</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="flex items-center gap-6 text-sm font-medium text-stone-600">
+          <Link href="#features" className="hover:text-stone-900 transition-colors">Features</Link>
+          <Link href="#how-it-works" className="hover:text-stone-900 transition-colors">How it works</Link>
+          <Link href="#pricing" className="hover:text-stone-900 transition-colors">Pricing</Link>
+          <Link href="#waitlist" className="bg-emerald-700 text-white px-4 py-2 rounded-full hover:bg-emerald-800 transition-colors">
+            Join waitlist
+          </Link>
         </div>
-      </main>
+      </nav>
+
+      {/* Hero */}
+      <section className="max-w-4xl mx-auto px-8 pt-20 pb-24 text-center">
+        <div className="inline-block bg-emerald-100 text-emerald-800 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+          Your complete optimization ritual
+        </div>
+        <h1 className="text-5xl font-bold tracking-tight leading-tight mb-6 text-stone-900">
+          Know your stack.<br />
+          <span className="text-emerald-700">Own your health.</span>
+        </h1>
+        <p className="text-xl text-stone-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Research supplements, build your personal stack, get smart timing recommendations,
+          and share a clean summary with your doctor — all in one place.
+        </p>
+        <WaitlistForm />
+      </section>
+
+      {/* Social proof strip */}
+      <div className="bg-emerald-700 text-white py-4 text-center text-sm font-medium">
+        Trusted by biohackers, longevity enthusiasts, and health-conscious adults 40+
+      </div>
+
+      {/* Features */}
+      <section id="features" className="max-w-6xl mx-auto px-8 py-24">
+        <h2 className="text-3xl font-bold text-center mb-4">Everything your stack needs</h2>
+        <p className="text-stone-600 text-center mb-16 max-w-xl mx-auto">
+          Stop piecing together information from a dozen websites. Stack Ritual brings it all together.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((f) => (
+            <div key={f.title} className="bg-white rounded-2xl p-8 shadow-sm border border-stone-100">
+              <div className="text-4xl mb-4">{f.icon}</div>
+              <h3 className="text-xl font-semibold mb-3">{f.title}</h3>
+              <p className="text-stone-600 leading-relaxed">{f.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how-it-works" className="bg-white py-24">
+        <div className="max-w-4xl mx-auto px-8">
+          <h2 className="text-3xl font-bold text-center mb-4">How it works</h2>
+          <p className="text-stone-600 text-center mb-16">Three steps to a smarter stack</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {steps.map((step, i) => (
+              <div key={step.title} className="text-center">
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                  {i + 1}
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                <p className="text-stone-600 leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="max-w-5xl mx-auto px-8 py-24">
+        <h2 className="text-3xl font-bold text-center mb-4">Simple pricing</h2>
+        <p className="text-stone-600 text-center mb-16">Start free. Upgrade when you're ready.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          {/* Free */}
+          <div className="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
+            <h3 className="text-xl font-bold mb-1">Free</h3>
+            <div className="text-4xl font-bold mb-1">$0</div>
+            <p className="text-stone-500 text-sm mb-6">Forever free</p>
+            <ul className="space-y-3 text-stone-700 mb-8">
+              {freeTier.map(f => <li key={f} className="flex items-center gap-2"><span className="text-emerald-600">✓</span>{f}</li>)}
+            </ul>
+            <Link href="/signup" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors">
+              Get started
+            </Link>
+          </div>
+          {/* Premium */}
+          <div className="bg-emerald-700 text-white rounded-2xl p-8 shadow-md">
+            <h3 className="text-xl font-bold mb-1">Premium</h3>
+            <div className="text-4xl font-bold mb-1">$9.99<span className="text-lg font-normal opacity-75">/mo</span></div>
+            <p className="text-emerald-200 text-sm mb-6">or $79/year — save 34%</p>
+            <ul className="space-y-3 text-emerald-50 mb-8">
+              {premiumTier.map(f => <li key={f} className="flex items-center gap-2"><span className="text-emerald-300">✓</span>{f}</li>)}
+            </ul>
+            <Link href="/signup?plan=premium" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors">
+              Start free trial
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-stone-900 text-white py-20 text-center px-8">
+        <h2 className="text-3xl font-bold mb-4">Ready to optimize your ritual?</h2>
+        <p className="text-stone-400 mb-10 text-lg">Be first to know when Stack Ritual launches.</p>
+        <div className="max-w-md mx-auto">
+          <WaitlistForm />
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="max-w-6xl mx-auto px-8 py-10 flex items-center justify-between text-stone-500 text-sm">
+        <div className="flex items-center gap-2">
+          <span>🌿</span>
+          <span className="font-semibold text-stone-700">Stack Ritual</span>
+        </div>
+        <p>© 2026 Stack Ritual. All rights reserved.</p>
+        <div className="flex gap-6">
+          <Link href="/privacy" className="hover:text-stone-700 transition-colors">Privacy</Link>
+          <Link href="/terms" className="hover:text-stone-700 transition-colors">Terms</Link>
+        </div>
+      </footer>
+
     </div>
   );
 }
+
+const features = [
+  {
+    icon: "🔬",
+    title: "Research Library",
+    description: "Clear, evidence-based info on hundreds of supplements. Benefits, side effects, interactions, and dosage — in plain English.",
+  },
+  {
+    icon: "🧱",
+    title: "My Stack Builder",
+    description: "Build your personal supplement and wellness stack. See everything at a glance — what you're taking and exactly what it's doing for you.",
+  },
+  {
+    icon: "⏱️",
+    title: "Smart Timing Engine",
+    description: "Know when to take what. We analyze your full stack and build a daily schedule that maximizes absorption and avoids conflicts.",
+  },
+  {
+    icon: "🖨️",
+    title: "Print & Share",
+    description: "Generate a clean, one-page summary of your stack to share with your doctor, coach, or anyone who needs to know what you're taking.",
+  },
+  {
+    icon: "🧘",
+    title: "Rituals & Activities",
+    description: "Your stack isn't just supplements. Add cold plunges, sauna, fasting, red light therapy, and more to your complete daily ritual.",
+  },
+  {
+    icon: "💬",
+    title: "Community Experiences",
+    description: "See what real people report from their stacks. Community-sourced effectiveness data alongside clinical evidence.",
+  },
+];
+
+const steps = [
+  {
+    title: "Search & research",
+    description: "Look up any supplement and get clear, trustworthy info on what it does, side effects, and how it fits with other things you're taking.",
+  },
+  {
+    title: "Build your stack",
+    description: "Add your supplements, doses, and wellness rituals. Stack Ritual builds your personalized daily schedule automatically.",
+  },
+  {
+    title: "Track & share",
+    description: "See your stack at a glance, log how it's working, and print a clean summary to share with your healthcare provider.",
+  },
+];
+
+const freeTier = [
+  "Up to 5 supplements",
+  "Basic research library",
+  "Stack builder",
+  "Print & share summary",
+  "Affiliate buy links",
+];
+
+const premiumTier = [
+  "Everything in Free",
+  "Unlimited supplements",
+  "Smart timing engine",
+  "Interactions checker",
+  "Daily reminders",
+  "Community experiences",
+  "Rituals & activities tracker",
+  "Advanced research data",
+];
