@@ -54,8 +54,8 @@ export default function ShareExperienceButton({ supplements }: { supplements: Su
       </button>
 
       {open && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center p-4 pb-20">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 space-y-4 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-stone-900 text-lg">Share your experience</h2>
               <button onClick={() => setOpen(false)} className="text-stone-400 hover:text-stone-700 text-xl">✕</button>
