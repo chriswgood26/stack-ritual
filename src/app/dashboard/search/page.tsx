@@ -1,82 +1,16 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
+import { supabase } from "@/lib/supabase";
 
 const categories = [
-  { label: "Vitamins", icon: "☀️" },
-  { label: "Minerals", icon: "🪨" },
-  { label: "Nootropics", icon: "🧠" },
-  { label: "Adaptogens", icon: "🌿" },
-  { label: "Longevity", icon: "⏳" },
-  { label: "Sleep", icon: "🌙" },
-  { label: "Gut Health", icon: "🦠" },
-  { label: "Rituals", icon: "🧘" },
-];
-
-const popular = [
-  {
-    name: "Vitamin D3",
-    category: "Vitamins",
-    icon: "☀️",
-    tagline: "The sunshine vitamin — immune, mood & bone health",
-    evidence: "strong",
-    inStack: true,
-  },
-  {
-    name: "Magnesium Glycinate",
-    category: "Minerals",
-    icon: "🪨",
-    tagline: "Sleep quality, muscle recovery & stress relief",
-    evidence: "strong",
-    inStack: true,
-  },
-  {
-    name: "Omega-3",
-    category: "Vitamins",
-    icon: "🐟",
-    tagline: "Heart, brain & inflammation support",
-    evidence: "strong",
-    inStack: true,
-  },
-  {
-    name: "Ashwagandha",
-    category: "Adaptogens",
-    icon: "🌿",
-    tagline: "Cortisol control, stress resilience & testosterone",
-    evidence: "moderate",
-    inStack: true,
-  },
-  {
-    name: "NMN",
-    category: "Longevity",
-    icon: "⏳",
-    tagline: "NAD+ precursor — energy & cellular aging",
-    evidence: "moderate",
-    inStack: false,
-  },
-  {
-    name: "Lions Mane",
-    category: "Nootropics",
-    icon: "🧠",
-    tagline: "Nerve growth, focus & memory",
-    evidence: "moderate",
-    inStack: true,
-  },
-  {
-    name: "Berberine",
-    category: "Minerals",
-    icon: "🌱",
-    tagline: "Blood sugar regulation & metabolic health",
-    evidence: "strong",
-    inStack: false,
-  },
-  {
-    name: "CoQ10",
-    category: "Longevity",
-    icon: "⚡",
-    tagline: "Mitochondrial energy & heart health",
-    evidence: "strong",
-    inStack: false,
-  },
+  { label: "Vitamins", icon: "☀️", value: "vitamins" },
+  { label: "Minerals", icon: "🪨", value: "minerals" },
+  { label: "Nootropics", icon: "🧠", value: "nootropics" },
+  { label: "Adaptogens", icon: "🌿", value: "adaptogens" },
+  { label: "Longevity", icon: "⏳", value: "longevity" },
+  { label: "Sleep", icon: "🌙", value: "sleep" },
+  { label: "Gut Health", icon: "🦠", value: "gut-health" },
+  { label: "Rituals", icon: "🧘", value: "ritual" },
 ];
 
 const evidenceColor: Record<string, string> = {
@@ -85,15 +19,20 @@ const evidenceColor: Record<string, string> = {
   limited: "bg-stone-100 text-stone-500",
 };
 
-export default function SearchPage() {
+export default async function SearchPage() {
+  const { data: supplements, error } = await supabase
+    .from("supplements")
+    .select("id, name, slug, category, icon, tagline, evidence_level")
+    .order("name");
+
+  if (error) console.error("Supabase error:", error.message);
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
       {/* Top Nav */}
       <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center gap-3 sticky top-0 z-10">
-        <Link href="/dashboard" className="text-stone-400 hover:text-stone-700 transition-colors">
-          ←
-        </Link>
+        <Link href="/dashboard" className="text-stone-400 hover:text-stone-700 transition-colors">←</Link>
         <span className="font-bold text-stone-900 tracking-tight">Research</span>
       </nav>
 
@@ -122,31 +61,28 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* Popular supplements */}
+        {/* Supplements from DB */}
         <div>
-          <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Popular supplements</h2>
+          <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
+            All supplements ({supplements?.length ?? 0})
+          </h2>
           <div className="space-y-2">
-            {popular.map(supp => (
+            {supplements?.map(supp => (
               <Link
-                key={supp.name}
-                href={`/dashboard/search/${supp.name.toLowerCase().replace(/\s+/g, "-")}`}
+                key={supp.id}
+                href={`/dashboard/search/${supp.slug}`}
                 className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3 hover:border-emerald-300 transition-colors block"
               >
                 <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
                   {supp.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-stone-900 text-sm">{supp.name}</span>
-                    {supp.inStack && (
-                      <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-medium">In stack</span>
-                    )}
-                  </div>
+                  <div className="font-semibold text-stone-900 text-sm">{supp.name}</div>
                   <p className="text-xs text-stone-500 mt-0.5 truncate">{supp.tagline}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${evidenceColor[supp.evidence]}`}>
-                    {supp.evidence}
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>
+                    {supp.evidence_level}
                   </span>
                   <span className="text-stone-300 text-sm">›</span>
                 </div>
