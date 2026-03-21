@@ -187,9 +187,9 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
           <span className="text-xl">🧱</span>
           <span className="text-xs">My Stack</span>
         </Link>
-        <Link href="/dashboard/community" className="flex flex-col items-center gap-0.5 text-stone-400">
+        <Link href="/dashboard/experiences" className="flex flex-col items-center gap-0.5 text-stone-400">
           <span className="text-xl">💬</span>
-          <span className="text-xs">Community</span>
+          <span className="text-xs">Experiences</span>
         </Link>
         <Link href="/dashboard/profile" className="flex flex-col items-center gap-0.5 text-stone-400">
           <span className="text-xl">👤</span>
