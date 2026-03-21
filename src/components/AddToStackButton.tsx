@@ -82,12 +82,23 @@ export default function AddToStackButton({ supplementId, supplementName, default
             className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
           >
             <option value="">Select timing...</option>
-            <option value="morning-fasted">Morning — Fasted</option>
-            <option value="morning-food">Morning — With Food</option>
-            <option value="afternoon">Afternoon</option>
-            <option value="evening">Evening</option>
-            <option value="bedtime">Bedtime</option>
-            <option value="split">Split Dose (AM + PM)</option>
+            <optgroup label="Daily">
+              <option value="morning-fasted">Morning — Fasted</option>
+              <option value="morning-food">Morning — With Food</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="evening">Evening</option>
+              <option value="bedtime">Bedtime</option>
+              <option value="split">Split Dose (AM + PM)</option>
+            </optgroup>
+            <optgroup label="Less than daily">
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Twice a week</option>
+              <option value="3x-week">3x per week</option>
+              <option value="monthly">Monthly</option>
+              <option value="cycle-5-2">Cycle — 5 days on, 2 off</option>
+              <option value="cycle-8-2w">Cycle — 8 weeks on, 2 weeks off</option>
+              <option value="as-needed">As needed</option>
+            </optgroup>
           </select>
         </div>
 
