@@ -91,6 +91,13 @@ export default function AddToStackButton({ supplementId, supplementName, default
               <option value="bedtime">Bedtime</option>
               <option value="split">Split Dose (AM + PM)</option>
             </optgroup>
+            <optgroup label="Multiple times daily">
+              <option value="2x-daily">2x Daily (AM + PM)</option>
+              <option value="2x-with-meals">2x Daily with Meals</option>
+              <option value="3x-daily">3x Daily (AM, Midday, PM)</option>
+              <option value="3x-with-meals">3x Daily with Meals</option>
+              <option value="4x-daily">4x Daily</option>
+            </optgroup>
             <optgroup label="Less than daily">
               <option value="weekly">Weekly</option>
               <option value="biweekly">Twice a week</option>

@@ -24,6 +24,13 @@ const timingOptions = [
     { value: "bedtime", label: "Bedtime" },
     { value: "split", label: "Split Dose (AM + PM)" },
   ]},
+  { group: "Multiple times daily", options: [
+    { value: "2x-daily", label: "2x Daily (AM + PM)" },
+    { value: "2x-with-meals", label: "2x Daily with Meals" },
+    { value: "3x-daily", label: "3x Daily (AM, Midday, PM)" },
+    { value: "3x-with-meals", label: "3x Daily with Meals" },
+    { value: "4x-daily", label: "4x Daily" },
+  ]},
   { group: "Less than daily", options: [
     { value: "weekly", label: "Weekly" },
     { value: "biweekly", label: "Twice a week" },
