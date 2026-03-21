@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
+import AddCustomSupplement from "@/components/AddCustomSupplement";
 
 const stackItems = [
   { name: "Vitamin D3", dose: "5,000 IU", frequency: "Daily", timing: "Morning with food", category: "supplement", icon: "☀️", brand: "Thorne" },
@@ -134,13 +135,16 @@ export default function MyStackPage() {
           </div>
         </div>
 
-        {/* Add more */}
+        {/* Add from database */}
         <Link
           href="/dashboard/search"
-          className="flex items-center justify-center gap-2 bg-white border-2 border-dashed border-stone-200 rounded-2xl py-4 text-stone-500 hover:border-emerald-400 hover:text-emerald-700 transition-colors font-medium text-sm"
+          className="flex items-center justify-center gap-2 bg-emerald-700 text-white rounded-2xl py-4 font-medium text-sm hover:bg-emerald-800 transition-colors"
         >
-          + Add supplement or ritual
+          🔬 Search supplement database
         </Link>
+
+        {/* Add custom */}
+        <AddCustomSupplement />
 
         <Disclaimer compact />
       </div>
