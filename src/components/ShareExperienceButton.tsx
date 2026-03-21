@@ -37,7 +37,7 @@ export default function ShareExperienceButton({ supplements }: { supplements: Su
       setTimeout(() => {
         setOpen(false);
         setStatus("idle");
-        setForm({ supplement_id: "", rating: 5, title: "", body: "", duration_weeks: "" });
+        setForm({ supplement_id: "", rating: 5, title: "", body: "", duration_weeks: "", purchased_from: "" });
         router.refresh();
       }, 1500);
     } else {
