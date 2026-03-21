@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
+import AddToStackButton from "@/components/AddToStackButton";
 import { supabase } from "@/lib/supabase";
 
 const evidenceColor: Record<string, string> = {
@@ -78,9 +79,12 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
         </div>
 
         {/* Add to stack button */}
-        <button className="w-full bg-emerald-700 text-white py-3.5 rounded-2xl font-semibold hover:bg-emerald-800 transition-colors flex items-center justify-center gap-2 shadow-sm">
-          + Add to my stack
-        </button>
+        <AddToStackButton
+          supplementId={supp.id}
+          supplementName={supp.name}
+          defaultTiming={supp.timing_recommendation}
+          defaultDose={supp.dose_recommendation}
+        />
 
         {/* Timing & Dose */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
