@@ -63,8 +63,8 @@ export default function PrintPage() {
       </div>
 
       {/* Printable content */}
-      <div className="max-w-2xl mx-auto px-4 pb-16 print:px-0 print:max-w-full print:pb-0">
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 print:shadow-none print:border-none print:rounded-none">
+      <div className="max-w-2xl mx-auto px-4 pb-16 print:px-0 print:max-w-full print:pb-0 print:pt-0">
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 print:shadow-none print:border-none print:rounded-none print:p-0">
 
           {/* Header */}
           <div className="flex items-start justify-between mb-6 pb-6 border-b border-stone-200">
@@ -142,7 +142,8 @@ export default function PrintPage() {
       <style>{`
         @media print {
           body { background: white; }
-          @page { margin: 1in; }
+          @page { margin: 0.5in; }
+          nav, .print\\:hidden { display: none !important; }
         }
       `}</style>
 
