@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    console.error("Supabase error:", error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Supabase stack/add error:", JSON.stringify(error));
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
   }
 
   return NextResponse.json({ message: "added", item: data }, { status: 201 });

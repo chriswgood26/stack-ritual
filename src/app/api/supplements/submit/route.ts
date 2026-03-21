@@ -66,7 +66,8 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Submit error:", JSON.stringify(error));
+    return NextResponse.json({ error: error.message, details: error }, { status: 500 });
   }
 
   // Also add directly to user's stack as a custom item
