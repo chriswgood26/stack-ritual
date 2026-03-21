@@ -1,5 +1,6 @@
 import Link from "next/link";
 import WaitlistForm from "@/components/WaitlistForm";
+import Disclaimer from "@/components/Disclaimer";
 
 export default function Home() {
   return (
@@ -118,6 +119,16 @@ export default function Home() {
           <WaitlistForm />
         </div>
       </section>
+
+      {/* Disclaimer */}
+      <div className="max-w-3xl mx-auto px-8 py-8">
+        <Disclaimer />
+      </div>
+
+      {/* Disclaimer */}
+      <div className="max-w-3xl mx-auto px-8 py-8">
+        <Disclaimer />
+      </div>
 
       {/* Footer */}
       <footer className="max-w-6xl mx-auto px-8 py-10 flex items-center justify-between text-stone-500 text-sm">

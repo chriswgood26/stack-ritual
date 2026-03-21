@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Disclaimer from "@/components/Disclaimer";
 
 const timeSlots = [
   {
@@ -162,6 +163,11 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mt-6 mb-2">
+          <Disclaimer compact />
         </div>
 
         <div className="h-8" />
