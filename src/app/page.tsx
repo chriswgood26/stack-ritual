@@ -125,11 +125,6 @@ export default function Home() {
         <Disclaimer />
       </div>
 
-      {/* Disclaimer */}
-      <div className="max-w-3xl mx-auto px-8 py-8">
-        <Disclaimer />
-      </div>
-
       {/* Footer */}
       <footer className="max-w-6xl mx-auto px-8 py-10 flex items-center justify-between text-stone-500 text-sm">
         <div className="flex items-center gap-2">
