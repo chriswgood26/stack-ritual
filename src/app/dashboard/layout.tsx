@@ -6,11 +6,14 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const { userId } = await auth();
 
-  if (!session?.userId) {
+  if (!userId) {
     redirect("/sign-in");
   }
 
   return <>{children}</>;
 }
+
+// Force dynamic rendering — never cache this layout
+export const dynamic = "force-dynamic";
