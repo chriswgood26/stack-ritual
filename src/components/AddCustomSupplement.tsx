@@ -59,6 +59,7 @@ export default function AddCustomSupplement() {
     dose: "",
     timing: "",
     brand: "",
+    purchasedFrom: "",
     isRitual: false,
   });
 
@@ -79,7 +80,7 @@ export default function AddCustomSupplement() {
     const res = await fetch("/api/supplements/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, purchased_from: form.purchasedFrom }),
     });
     const data = await res.json();
 
@@ -116,7 +117,7 @@ export default function AddCustomSupplement() {
         <div className="text-3xl mb-2">🎉</div>
         <p className="font-semibold text-emerald-800">Submitted for review!</p>
         <p className="text-emerald-700 text-sm mt-1">We&apos;ll add it to the database soon. It&apos;s been added to your stack in the meantime.</p>
-        <button onClick={() => { setShowForm(false); setStep("search"); setQuery(""); setForm({ name: "", category: "other", icon: "💊", tagline: "", dose: "", timing: "", brand: "", isRitual: false }); }}
+        <button onClick={() => { setShowForm(false); setStep("search"); setQuery(""); setForm({ name: "", category: "other", icon: "💊", tagline: "", dose: "", timing: "", brand: "", purchasedFrom: "", isRitual: false }); }}
           className="mt-4 text-emerald-700 text-sm font-medium underline">
           Add another
         </button>
@@ -237,6 +238,13 @@ export default function AddCustomSupplement() {
                 placeholder="e.g. Thorne"
                 className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased (optional)</label>
+            <input type="text" value={form.purchasedFrom} onChange={e => setForm(f => ({ ...f, purchasedFrom: e.target.value }))}
+              placeholder="e.g. Amazon, iHerb, Whole Foods, Costco"
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
 
           <div>

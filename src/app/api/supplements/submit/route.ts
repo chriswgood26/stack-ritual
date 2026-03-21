@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { name, category, icon, tagline, dose, timing, brand } = body;
+  const { name, category, icon, tagline, dose, timing, brand, purchased_from } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "Name required" }, { status: 400 });
@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       dose: dose || null,
       timing: timing || null,
       brand: brand || null,
+      purchased_from: purchased_from || null,
       status: "pending",
     })
     .select()
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
     dose: dose || null,
     timing: timing || null,
     brand: brand || null,
+    purchased_from: purchased_from || null,
     notes: tagline || null,
     is_active: true,
   });

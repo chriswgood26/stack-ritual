@@ -16,6 +16,7 @@ export default function AddToStackButton({ supplementId, supplementName, default
   const [dose, setDose] = useState(defaultDose || "");
   const [timing, setTiming] = useState(defaultTiming || "");
   const [brand, setBrand] = useState("");
+  const [purchasedFrom, setPurchasedFrom] = useState("");
   const router = useRouter();
 
   async function handleAdd() {
@@ -24,7 +25,7 @@ export default function AddToStackButton({ supplementId, supplementName, default
       const res = await fetch("/api/stack/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ supplement_id: supplementId, dose, timing, brand }),
+        body: JSON.stringify({ supplement_id: supplementId, dose, timing, brand, purchased_from: purchasedFrom }),
       });
       const data = await res.json();
 
@@ -110,6 +111,17 @@ export default function AddToStackButton({ supplementId, supplementName, default
             onChange={e => setBrand(e.target.value)}
             placeholder="e.g. Thorne, Life Extension"
             className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased (optional)</label>
+          <input
+            type="text"
+            value={purchasedFrom}
+            onChange={e => setPurchasedFrom(e.target.value)}
+            placeholder="e.g. Amazon, iHerb, Whole Foods"
+            className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { supplement_id, dose, timing, frequency_type, brand, notes } = body;
+  const { supplement_id, dose, timing, frequency_type, brand, notes, purchased_from } = body;
 
   if (!supplement_id) {
     return NextResponse.json({ error: "supplement_id required" }, { status: 400 });
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       timing: timing || null,
       frequency_type: frequency_type || "daily",
       brand: brand || null,
+      purchased_from: purchased_from || null,
       notes: notes || null,
       is_active: true,
     })
