@@ -141,7 +141,7 @@ export default function AddCustomSupplement() {
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search our database first..."
-              className="w-full border border-stone-200 rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full border border-stone-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               autoFocus
             />
           </div>
@@ -211,14 +211,14 @@ export default function AddCustomSupplement() {
             <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Name *</label>
             <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
               placeholder={form.isRitual ? "e.g. Cold Plunge, Sauna" : "e.g. Turmeric, Probiotics"}
-              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
 
           {!form.isRitual && (
             <div>
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Category</label>
               <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white capitalize">
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white capitalize">
                 {categories.map(c => <option key={c} value={c}>{c.replace("-", " ")}</option>)}
               </select>
             </div>
@@ -229,20 +229,20 @@ export default function AddCustomSupplement() {
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose / Duration</label>
               <input type="text" value={form.dose} onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
                 placeholder={form.isRitual ? "e.g. 10 min" : "e.g. 500mg"}
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand (optional)</label>
               <input type="text" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
                 placeholder="e.g. Thorne"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
 
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">When to take</label>
             <select value={form.timing} onChange={e => setForm(f => ({ ...f, timing: e.target.value }))}
-              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
               <option value="">Select timing...</option>
               {timingOptions.map(g => (
                 <optgroup key={g.group} label={g.group}>
@@ -257,7 +257,7 @@ export default function AddCustomSupplement() {
             <textarea value={form.tagline} onChange={e => setForm(f => ({ ...f, tagline: e.target.value }))}
               placeholder="Why do you take this? What does it do for you?"
               rows={2}
-              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none" />
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none" />
           </div>
 
           <div className="flex gap-3">
