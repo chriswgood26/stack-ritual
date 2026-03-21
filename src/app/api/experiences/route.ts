@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { supplement_id, custom_supplement_name, rating, title, body: experienceBody, duration_weeks } = body;
+  const { supplement_id, custom_supplement_name, rating, title, body: experienceBody, duration_weeks, purchased_from } = body;
 
   if (!rating || !experienceBody?.trim()) {
     return NextResponse.json({ error: "Rating and experience text required" }, { status: 400 });
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       title: title?.trim() || null,
       body: experienceBody.trim(),
       duration_weeks: duration_weeks ? parseInt(duration_weeks) : null,
+      purchased_from: purchased_from?.trim() || null,
     })
     .select()
     .single();

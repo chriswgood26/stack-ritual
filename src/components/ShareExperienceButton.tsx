@@ -18,6 +18,7 @@ export default function ShareExperienceButton({ supplements }: { supplements: Su
     title: "",
     body: "",
     duration_weeks: "",
+    purchased_from: "",
   });
   const router = useRouter();
 
@@ -141,6 +142,18 @@ export default function ShareExperienceButton({ supplements }: { supplements: Su
                     <option value="26">6 months</option>
                     <option value="52">1 year+</option>
                   </select>
+                </div>
+
+                {/* Where purchased */}
+                <div>
+                  <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased (optional)</label>
+                  <input
+                    type="text"
+                    value={form.purchased_from}
+                    onChange={e => setForm(f => ({ ...f, purchased_from: e.target.value }))}
+                    placeholder="e.g. Amazon, iHerb, Whole Foods, Costco"
+                    className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
                 </div>
 
                 {status === "error" && (
