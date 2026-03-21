@@ -1,42 +1,26 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
 import AddCustomSupplement from "@/components/AddCustomSupplement";
+import DeleteStackItemButton from "@/components/DeleteStackItemButton";
+import { currentUser } from "@clerk/nextjs/server";
+import { supabaseAdmin } from "@/lib/supabase";
 
-const stackItems = [
-  { name: "Vitamin D3", dose: "5,000 IU", frequency: "Daily", timing: "Morning with food", category: "supplement", icon: "☀️", brand: "Thorne" },
-  { name: "Vitamin K2", dose: "200mcg", frequency: "Daily", timing: "Morning with food", category: "supplement", icon: "🟡", brand: "Life Extension" },
-  { name: "Omega-3", dose: "2g EPA/DHA", frequency: "Daily", timing: "Morning with food", category: "supplement", icon: "🐟", brand: "Nordic Naturals" },
-  { name: "Magnesium Glycinate", dose: "400mg", frequency: "Daily", timing: "Split AM/PM", category: "supplement", icon: "🪨", brand: "Pure Encapsulations" },
-  { name: "NMN", dose: "500mg", frequency: "Daily", timing: "Morning fasted", category: "supplement", icon: "⏳", brand: "Tru Niagen" },
-  { name: "Berberine", dose: "500mg", frequency: "Daily", timing: "Morning fasted", category: "supplement", icon: "🌱", brand: "Thorne" },
-  { name: "CoQ10", dose: "200mg", frequency: "Daily", timing: "Afternoon with food", category: "supplement", icon: "⚡", brand: "Jarrow" },
-  { name: "Lions Mane", dose: "1,000mg", frequency: "Daily", timing: "Afternoon", category: "supplement", icon: "🧠", brand: "Host Defense" },
-  { name: "Zinc", dose: "25mg", frequency: "Daily", timing: "Evening", category: "supplement", icon: "🔵", brand: "Thorne" },
-  { name: "Ashwagandha", dose: "600mg", frequency: "Daily", timing: "Evening", category: "supplement", icon: "🌿", brand: "KSM-66" },
-  { name: "Apigenin", dose: "50mg", frequency: "Daily", timing: "Bedtime", category: "supplement", icon: "🌼", brand: "Swanson" },
-  { name: "Glycine", dose: "3g", frequency: "Daily", timing: "Bedtime", category: "supplement", icon: "💤", brand: "Bulk Supplements" },
-  { name: "Cold Shower", dose: "3 min", frequency: "Daily", timing: "Morning fasted", category: "ritual", icon: "🚿", brand: "" },
-  { name: "Red Light Therapy", dose: "10 min", frequency: "Daily", timing: "Afternoon", category: "ritual", icon: "🔴", brand: "Mito Red" },
-];
+export const dynamic = "force-dynamic";
 
-const timingGroups: Record<string, string[]> = {
-  "Morning fasted": [],
-  "Morning with food": [],
-  "Afternoon": [],
-  "Evening": [],
-  "Bedtime": [],
-  "Split AM/PM": [],
-};
+export default async function MyStackPage() {
+  const user = await currentUser();
+  if (!user) return null;
 
-stackItems.forEach(item => {
-  if (timingGroups[item.timing] !== undefined) {
-    timingGroups[item.timing].push(item.name);
-  }
-});
+  const { data: stackItems } = await supabaseAdmin
+    .from("user_stacks")
+    .select("*, supplement:supplement_id(name, icon, slug)")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
 
-export default function MyStackPage() {
-  const supplements = stackItems.filter(i => i.category === "supplement");
-  const rituals = stackItems.filter(i => i.category === "ritual");
+  const supplements = (stackItems || []).filter(i => i.category === "supplement");
+  const rituals = (stackItems || []).filter(i => i.category === "ritual");
+  const total = (stackItems || []).length;
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
@@ -58,82 +42,100 @@ export default function MyStackPage() {
         <div className="bg-emerald-700 rounded-2xl p-5 text-white">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-2xl font-bold">{stackItems.length} items</div>
+              <div className="text-2xl font-bold">{total} items</div>
               <div className="text-emerald-200 text-sm">{supplements.length} supplements · {rituals.length} rituals</div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold">87%</div>
-              <div className="text-emerald-200 text-sm">Stack score</div>
+              <div className="text-2xl font-bold">🌿</div>
             </div>
           </div>
           <div className="flex gap-2">
-            <Link
-              href="/dashboard/print"
-              className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center"
-            >
+            <Link href="/dashboard/print"
+              className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center">
               🖨️ Print summary
             </Link>
-            <Link
-              href="/dashboard/search"
-              className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center"
-            >
+            <Link href="/dashboard/search"
+              className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center">
               🔬 Research
             </Link>
           </div>
         </div>
 
-        {/* Supplements */}
-        <div>
-          <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
-            💊 Supplements ({supplements.length})
-          </h2>
-          <div className="space-y-2">
-            {supplements.map(item => (
-              <div key={item.name} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
-                  {item.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-stone-900 text-sm">{item.name}</div>
-                  <div className="text-xs text-stone-400 mt-0.5">
-                    {item.dose} · {item.timing}
-                    {item.brand && <span className="ml-1">· {item.brand}</span>}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button className="text-stone-300 hover:text-stone-600 transition-colors text-lg">✏️</button>
-                  <button className="text-stone-300 hover:text-red-500 transition-colors text-lg">🗑️</button>
+        {total === 0 ? (
+          <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
+            <div className="text-4xl mb-3">🌿</div>
+            <p className="font-semibold text-stone-900 mb-1">Your stack is empty</p>
+            <p className="text-stone-500 text-sm mb-4">Search our database or add your own supplements.</p>
+            <Link href="/dashboard/search"
+              className="bg-emerald-700 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-emerald-800 transition-colors inline-block">
+              Browse supplements
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Supplements */}
+            {supplements.length > 0 && (
+              <div>
+                <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
+                  💊 Supplements ({supplements.length})
+                </h2>
+                <div className="space-y-2">
+                  {supplements.map(item => {
+                    const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
+                    const name = supp?.name || item.custom_name || "Unknown";
+                    const icon = supp?.icon || item.custom_icon || "💊";
+                    return (
+                      <div key={item.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
+                          {icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-stone-900 text-sm">{name}</div>
+                          <div className="text-xs text-stone-400 mt-0.5">
+                            {[item.dose, item.timing, item.brand].filter(Boolean).join(" · ")}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <DeleteStackItemButton itemId={item.id} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+            )}
 
-        {/* Rituals */}
-        <div>
-          <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
-            🧘 Rituals ({rituals.length})
-          </h2>
-          <div className="space-y-2">
-            {rituals.map(item => (
-              <div key={item.name} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
-                  {item.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-stone-900 text-sm">{item.name}</div>
-                  <div className="text-xs text-stone-400 mt-0.5">
-                    {item.dose} · {item.timing}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button className="text-stone-300 hover:text-stone-600 transition-colors text-lg">✏️</button>
-                  <button className="text-stone-300 hover:text-red-500 transition-colors text-lg">🗑️</button>
+            {/* Rituals */}
+            {rituals.length > 0 && (
+              <div>
+                <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
+                  🧘 Rituals ({rituals.length})
+                </h2>
+                <div className="space-y-2">
+                  {rituals.map(item => {
+                    const icon = item.custom_icon || "🧘";
+                    return (
+                      <div key={item.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
+                        <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
+                          {icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-stone-900 text-sm">{item.custom_name || "Ritual"}</div>
+                          <div className="text-xs text-stone-400 mt-0.5">
+                            {[item.dose, item.timing].filter(Boolean).join(" · ")}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <DeleteStackItemButton itemId={item.id} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+            )}
+          </>
+        )}
 
         {/* Add from database */}
         <Link

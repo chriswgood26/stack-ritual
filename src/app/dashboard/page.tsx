@@ -31,7 +31,7 @@ export default async function Dashboard() {
   if (!user) return null;
 
   const userId = user.id;
-  const firstName = user.firstName || "there";
+  const firstName = user.firstName || user.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "";
 
   // Fetch user's active stack
   const { data: stackItems } = await supabaseAdmin
@@ -81,9 +81,11 @@ export default async function Dashboard() {
   const supplements = stackItems?.filter(i => i.category === "supplement").length ?? 0;
   const rituals = stackItems?.filter(i => i.category === "ritual").length ?? 0;
 
+  // Use UTC offset for LA time (PDT = UTC-7, PST = UTC-8)
   const now = new Date();
-  const greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening";
-  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const laHour = (now.getUTCHours() - 7 + 24) % 24; // PDT
+  const greeting = laHour < 12 ? "Good morning" : laHour < 17 ? "Good afternoon" : "Good evening";
+  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "America/Los_Angeles" });
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
@@ -103,7 +105,7 @@ export default async function Dashboard() {
 
         {/* Header */}
         <div className="mb-5">
-          <h1 className="text-xl font-bold text-stone-900">{greeting}, {firstName} 👋</h1>
+          <h1 className="text-xl font-bold text-stone-900">{greeting}{firstName ? `, ${firstName}` : ""} 👋</h1>
           <p className="text-stone-500 text-sm mt-0.5">{dateStr}</p>
         </div>
 
@@ -158,17 +160,7 @@ export default async function Dashboard() {
               </div>
             )}
 
-            {/* Quick actions */}
-            <div className="flex gap-2 mb-6">
-              <Link href="/dashboard/print"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-stone-200 text-stone-700 px-3 py-2.5 rounded-full text-sm font-medium hover:bg-stone-50 transition-colors shadow-sm">
-                🖨️ Print
-              </Link>
-              <Link href="/dashboard/search"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white px-3 py-2.5 rounded-full text-sm font-medium hover:bg-emerald-800 transition-colors shadow-sm">
-                🔬 Research
-              </Link>
-            </div>
+
 
             {/* Time slots */}
             <div className="space-y-4">
