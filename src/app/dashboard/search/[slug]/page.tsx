@@ -20,11 +20,12 @@ const interactionIcon: Record<string, string> = {
   neutral: "ℹ️",
 };
 
-export default async function SupplementPage({ params }: { params: { slug: string } }) {
+export default async function SupplementPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const { data: supp, error } = await supabase
     .from("supplements")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .single();
 
   if (error || !supp) {
