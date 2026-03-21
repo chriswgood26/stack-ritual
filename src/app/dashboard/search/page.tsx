@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
+import AddCustomSupplement from "@/components/AddCustomSupplement";
 import { supabase } from "@/lib/supabase";
 
 const categories = [
@@ -33,7 +34,7 @@ export default async function SearchPage() {
       {/* Top Nav */}
       <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center gap-3 sticky top-0 z-10">
         <Link href="/dashboard" className="text-stone-400 hover:text-stone-700 transition-colors">←</Link>
-        <span className="font-bold text-stone-900 tracking-tight">Research</span>
+        <span className="font-bold text-stone-900 tracking-tight flex-1">Research</span>
       </nav>
 
       <div className="max-w-lg mx-auto px-4 py-5">
@@ -63,9 +64,11 @@ export default async function SearchPage() {
 
         {/* Supplements from DB */}
         <div>
-          <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
-            All supplements ({supplements?.length ?? 0})
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">
+              All supplements ({supplements?.length ?? 0})
+            </h2>
+          </div>
           <div className="space-y-2">
             {supplements?.map(supp => (
               <Link
@@ -89,6 +92,14 @@ export default async function SearchPage() {
               </Link>
             ))}
           </div>
+        </div>
+
+        {/* Can't find it? Add it */}
+        <div className="mt-8">
+          <div className="text-center mb-4">
+            <p className="text-stone-500 text-sm">Can&apos;t find what you&apos;re looking for?</p>
+          </div>
+          <AddCustomSupplement />
         </div>
 
         <div className="mt-6">
