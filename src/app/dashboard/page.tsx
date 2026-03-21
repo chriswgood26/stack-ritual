@@ -61,8 +61,8 @@ const timeSlots = [
 const stats = [
   { label: "Supplements", value: "11", icon: "💊" },
   { label: "Rituals", value: "2", icon: "🧘" },
-  { label: "Time slots", value: "5", icon: "⏱️" },
-  { label: "Stack score", value: "87%", icon: "⚡" },
+  { label: "Slots", value: "5", icon: "⏱️" },
+  { label: "Score", value: "87%", icon: "⚡" },
 ];
 
 export default function Dashboard() {
@@ -70,14 +70,14 @@ export default function Dashboard() {
     <div className="min-h-screen bg-stone-50 font-sans">
 
       {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🌿</span>
+          <span className="text-lg">🌿</span>
           <span className="font-bold text-stone-900 tracking-tight">Stack Ritual</span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/search" className="text-stone-500 hover:text-stone-900 transition-colors text-sm font-medium">
-            + Add supplement
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard/search" className="text-emerald-700 text-sm font-semibold">
+            + Add
           </Link>
           <div className="w-8 h-8 bg-emerald-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
             C
@@ -85,76 +85,76 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-4 py-6">
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-stone-900">Good morning, Chris 👋</h1>
-          <p className="text-stone-500 mt-1">Here&apos;s your stack for today — Thursday, March 20</p>
+        <div className="mb-5">
+          <h1 className="text-xl font-bold text-stone-900">Good morning, Chris 👋</h1>
+          <p className="text-stone-500 text-sm mt-0.5">Thursday, March 20 · Your daily stack</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 mb-8">
+        {/* Stats - 2x2 on mobile */}
+        <div className="grid grid-cols-4 gap-2 mb-5">
           {stats.map(s => (
-            <div key={s.label} className="bg-white rounded-xl p-4 border border-stone-100 shadow-sm text-center">
-              <div className="text-2xl mb-1">{s.icon}</div>
-              <div className="text-xl font-bold text-stone-900">{s.value}</div>
-              <div className="text-xs text-stone-500 mt-0.5">{s.label}</div>
+            <div key={s.label} className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center">
+              <div className="text-lg mb-0.5">{s.icon}</div>
+              <div className="text-base font-bold text-stone-900">{s.value}</div>
+              <div className="text-xs text-stone-500 leading-tight">{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-3 mb-8">
-          <Link href="/dashboard/print" className="flex items-center gap-2 bg-white border border-stone-200 text-stone-700 px-4 py-2.5 rounded-full text-sm font-medium hover:bg-stone-50 transition-colors shadow-sm">
+        {/* Quick actions */}
+        <div className="flex gap-2 mb-6">
+          <Link href="/dashboard/print" className="flex-1 flex items-center justify-center gap-1.5 bg-white border border-stone-200 text-stone-700 px-3 py-2.5 rounded-full text-sm font-medium hover:bg-stone-50 transition-colors shadow-sm">
             🖨️ Print summary
           </Link>
-          <Link href="/dashboard/search" className="flex items-center gap-2 bg-emerald-700 text-white px-4 py-2.5 rounded-full text-sm font-medium hover:bg-emerald-800 transition-colors shadow-sm">
-            🔬 Research supplements
+          <Link href="/dashboard/search" className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white px-3 py-2.5 rounded-full text-sm font-medium hover:bg-emerald-800 transition-colors shadow-sm">
+            🔬 Research
           </Link>
         </div>
 
         {/* Time slots */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {timeSlots.map(slot => (
             <div key={slot.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
               {/* Slot header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 bg-stone-50">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{slot.icon}</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{slot.icon}</span>
                   <div>
-                    <div className="font-semibold text-stone-900">{slot.label}</div>
+                    <div className="font-semibold text-stone-900 text-sm">{slot.label}</div>
                     <div className="text-xs text-stone-500">{slot.time}</div>
                   </div>
                 </div>
-                <span className="text-xs font-medium text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">
-                  {slot.items.length} items
+                <span className="text-xs font-medium text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
+                  {slot.items.length}
                 </span>
               </div>
 
               {/* Items */}
               <div className="divide-y divide-stone-50">
                 {slot.items.map(item => (
-                  <div key={item.name} className="flex items-center justify-between px-6 py-4 hover:bg-stone-50 transition-colors group">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                  <div key={item.name} className="flex items-center justify-between px-4 py-3.5">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
                         item.category === "ritual"
                           ? "bg-amber-100 text-amber-700"
                           : "bg-emerald-100 text-emerald-700"
                       }`}>
                         {item.category === "ritual" ? "🧘" : "💊"}
                       </div>
-                      <div>
-                        <div className="font-medium text-stone-900">{item.name}</div>
-                        <div className="text-xs text-stone-400 mt-0.5">{item.note}</div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-stone-900 text-sm">{item.name}</div>
+                        <div className="text-xs text-stone-400 truncate">{item.note}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">
+                    <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                      <span className="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-1 rounded-full whitespace-nowrap">
                         {item.dose}
                       </span>
-                      <button className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center hover:bg-emerald-200">
-                        ✓
+                      <button className="w-7 h-7 rounded-full border-2 border-stone-200 hover:border-emerald-500 hover:bg-emerald-50 transition-colors flex items-center justify-center">
+                        <span className="text-xs text-stone-300 hover:text-emerald-600">✓</span>
                       </button>
                     </div>
                   </div>
@@ -164,9 +164,33 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Bottom padding */}
-        <div className="h-12" />
+        <div className="h-8" />
       </div>
+
+      {/* Bottom Tab Bar — mobile nav */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 flex items-center justify-around px-4 py-2 z-10">
+        <Link href="/dashboard" className="flex flex-col items-center gap-0.5 text-emerald-700">
+          <span className="text-xl">🏠</span>
+          <span className="text-xs font-medium">Today</span>
+        </Link>
+        <Link href="/dashboard/search" className="flex flex-col items-center gap-0.5 text-stone-400">
+          <span className="text-xl">🔍</span>
+          <span className="text-xs">Research</span>
+        </Link>
+        <Link href="/dashboard/stack" className="flex flex-col items-center gap-0.5 text-stone-400">
+          <span className="text-xl">🧱</span>
+          <span className="text-xs">My Stack</span>
+        </Link>
+        <Link href="/dashboard/community" className="flex flex-col items-center gap-0.5 text-stone-400">
+          <span className="text-xl">💬</span>
+          <span className="text-xs">Community</span>
+        </Link>
+        <Link href="/dashboard/profile" className="flex flex-col items-center gap-0.5 text-stone-400">
+          <span className="text-xl">👤</span>
+          <span className="text-xs">Profile</span>
+        </Link>
+      </div>
+
     </div>
   );
 }
