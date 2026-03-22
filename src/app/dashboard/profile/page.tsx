@@ -21,11 +21,21 @@ export default async function ProfilePage() {
   const initials = ((user.firstName?.[0] || "") + (user.lastName?.[0] || "")).toUpperCase() || email[0]?.toUpperCase() || "U";
 
   // Fetch stats
-  const [{ count: stackCount }, { count: logCount }, { count: experienceCount }] = await Promise.all([
+  const today = new Date().toISOString().split("T")[0];
+  const [{ count: stackCount }, { count: logCount }, { count: experienceCount }, { count: todayCount }] = await Promise.all([
     supabaseAdmin.from("user_stacks").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("is_active", true),
     supabaseAdmin.from("daily_logs").select("*", { count: "exact", head: true }).eq("user_id", userId),
     supabaseAdmin.from("experiences").select("*", { count: "exact", head: true }).eq("user_id", userId),
+    supabaseAdmin.from("daily_logs").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("logged_date", today),
   ]);
+
+  // Fetch user's own experiences
+  const { data: myExperiences } = await supabaseAdmin
+    .from("experiences")
+    .select("id, rating, title, body, created_at, supplement:supplement_id(name, icon, slug)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(10);
 
   // Fetch subscription
   const { data: subscription } = await supabaseAdmin
@@ -85,13 +95,25 @@ export default async function ProfilePage() {
             <div className="text-xs text-stone-500 mt-0.5">In stack</div>
           </div>
           <div className="bg-white rounded-2xl p-4 border border-stone-100 shadow-sm text-center">
-            <div className="text-2xl font-bold text-stone-900">{logCount ?? 0}</div>
-            <div className="text-xs text-stone-500 mt-0.5">Check-ins</div>
+            <div className="text-2xl font-bold text-emerald-600">{todayCount ?? 0}<span className="text-stone-400 text-lg font-normal">/{stackCount ?? 0}</span></div>
+            <div className="text-xs text-stone-500 mt-0.5">Taken today</div>
           </div>
           <div className="bg-white rounded-2xl p-4 border border-stone-100 shadow-sm text-center">
             <div className="text-2xl font-bold text-stone-900">{experienceCount ?? 0}</div>
             <div className="text-xs text-stone-500 mt-0.5">Experiences</div>
           </div>
+        </div>
+
+        {/* Lifetime check-ins */}
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">✅</span>
+            <div>
+              <div className="font-semibold text-stone-900 text-sm">Lifetime check-ins</div>
+              <div className="text-xs text-stone-500">Total supplements marked as taken</div>
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-emerald-700">{logCount ?? 0}</div>
         </div>
 
         {/* Plan card */}
@@ -176,13 +198,6 @@ export default async function ProfilePage() {
               </div>
               <span className="text-stone-300">›</span>
             </Link>
-            <Link href="/dashboard/experiences" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">💬</span>
-                <span className="font-medium text-stone-900 text-sm">My experiences</span>
-              </div>
-              <span className="text-stone-300">›</span>
-            </Link>
             <Link href="/dashboard/search" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
               <div className="flex items-center gap-3">
                 <span className="text-xl">🔬</span>
@@ -191,6 +206,41 @@ export default async function ProfilePage() {
               <span className="text-stone-300">›</span>
             </Link>
           </div>
+        </div>
+
+        {/* My Experiences */}
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <span className="font-semibold text-stone-900 text-sm">My Experiences ({experienceCount ?? 0})</span>
+            <Link href="/dashboard/experiences" className="text-xs text-emerald-600 font-medium">+ Add new</Link>
+          </div>
+          {!myExperiences || myExperiences.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-stone-500 text-sm">You haven&apos;t shared any experiences yet.</p>
+              <Link href="/dashboard/experiences" className="text-emerald-600 text-sm font-medium mt-1 inline-block">Share your first experience →</Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-50">
+              {myExperiences.map((exp) => {
+                const supp = Array.isArray(exp.supplement) ? exp.supplement[0] : exp.supplement;
+                return (
+                  <div key={exp.id} className="px-4 py-3.5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base">{supp?.icon || "💊"}</span>
+                      <span className="font-medium text-stone-900 text-sm">{supp?.name || "Custom supplement"}</span>
+                      <div className="flex gap-0.5 ml-auto">
+                        {[1,2,3,4,5].map(i => (
+                          <span key={i} className={`text-xs ${i <= exp.rating ? "text-amber-400" : "text-stone-200"}`}>★</span>
+                        ))}
+                      </div>
+                    </div>
+                    {exp.title && <p className="text-xs font-semibold text-stone-700">{exp.title}</p>}
+                    <p className="text-xs text-stone-500 leading-relaxed mt-0.5 line-clamp-2">{exp.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* App info + feedback */}
