@@ -14,15 +14,23 @@ export default function UpgradeButton({ priceKey, label, className }: Props) {
 
   async function handleUpgrade() {
     setLoading(true);
-    const res = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ priceKey }),
-    });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceKey }),
+      });
+      const data = await res.json();
+      console.log("Checkout response:", data);
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Error: " + (data.error || "Unknown error"));
+        setLoading(false);
+      }
+    } catch (e) {
+      console.error("Checkout error:", e);
+      alert("Something went wrong. Please try again.");
       setLoading(false);
     }
   }
