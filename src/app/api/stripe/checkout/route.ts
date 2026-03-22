@@ -12,8 +12,7 @@ export async function POST(req: NextRequest) {
 
   const { priceKey } = await req.json();
   const priceId = PRICE_IDS[priceKey as keyof typeof PRICE_IDS];
-  console.log("Checkout priceKey:", priceKey, "priceId:", priceId);
-  if (!priceId) return NextResponse.json({ error: `Invalid plan: ${priceKey}`, available: Object.keys(PRICE_IDS) }, { status: 400 });
+  if (!priceId) return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
 
   // Get or create Stripe customer
   const { data: sub } = await supabaseAdmin

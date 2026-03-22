@@ -21,16 +21,12 @@ export default function UpgradeButton({ priceKey, label, className }: Props) {
         body: JSON.stringify({ priceKey }),
       });
       const data = await res.json();
-      console.log("Checkout response:", data);
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert("Error: " + (data.error || "Unknown error"));
         setLoading(false);
       }
-    } catch (e) {
-      console.error("Checkout error:", e);
-      alert("Something went wrong. Please try again.");
+    } catch {
       setLoading(false);
     }
   }
