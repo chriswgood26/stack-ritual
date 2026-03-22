@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
+import MarkAllDoneButton from "@/components/MarkAllDoneButton";
 
 export const dynamic = "force-dynamic";
 
@@ -147,9 +148,16 @@ export default async function Dashboard() {
             {/* Progress bar */}
             {totalItems > 0 && (
               <div className="mb-5">
-                <div className="flex items-center justify-between text-xs text-stone-500 mb-1.5">
-                  <span>Today&apos;s progress</span>
-                  <span>{Math.round((checkedCount / totalItems) * 100)}%</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-stone-500">Today&apos;s progress</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
+                    <MarkAllDoneButton
+                      stackItemIds={(stackItems || []).map(i => i.id)}
+                      date={today}
+                      allDone={checkedCount === totalItems}
+                    />
+                  </div>
                 </div>
                 <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                   <div
