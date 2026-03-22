@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BottomNav from "@/components/BottomNav";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
@@ -156,31 +157,7 @@ export default async function ProfilePage() {
         </p>
 
       </div>
-
-      {/* Bottom Tab Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 flex items-center justify-around px-4 py-2 z-10">
-        <Link href="/dashboard" className="flex flex-col items-center gap-0.5 text-stone-400">
-          <span className="text-xl">🏠</span>
-          <span className="text-xs">Today</span>
-        </Link>
-        <Link href="/dashboard/search" className="flex flex-col items-center gap-0.5 text-stone-400">
-          <span className="text-xl">🔍</span>
-          <span className="text-xs">Research</span>
-        </Link>
-        <Link href="/dashboard/stack" className="flex flex-col items-center gap-0.5 text-stone-400">
-          <span className="text-xl">🧱</span>
-          <span className="text-xs">My Stack</span>
-        </Link>
-        <Link href="/dashboard/experiences" className="flex flex-col items-center gap-0.5 text-stone-400">
-          <span className="text-xl">💬</span>
-          <span className="text-xs">Experiences</span>
-        </Link>
-        <Link href="/dashboard/profile" className="flex flex-col items-center gap-0.5 text-emerald-700">
-          <span className="text-xl">👤</span>
-          <span className="text-xs font-medium">Profile</span>
-        </Link>
-      </div>
-
+      <BottomNav />
     </div>
   );
 }
