@@ -13,7 +13,8 @@ export default async function ProfilePage() {
   if (!user) return null;
 
   const userId = user.id;
-  const firstName = user.firstName || "Friend";
+  const firstName = user.firstName || user.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "Friend";
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || firstName;
   const email = user.emailAddresses?.[0]?.emailAddress || "";
   const initials = ((user.firstName?.[0] || "") + (user.lastName?.[0] || "")).toUpperCase() || email[0]?.toUpperCase() || "U";
 
@@ -59,7 +60,7 @@ export default async function ProfilePage() {
               {initials}
             </div>
             <div>
-              <h1 className="text-xl font-bold">{firstName}</h1>
+              <h1 className="text-xl font-bold">{fullName}</h1>
               <p className="text-emerald-200 text-sm">{email}</p>
               <p className="text-emerald-300 text-xs mt-0.5">Member since {memberSince}</p>
             </div>
