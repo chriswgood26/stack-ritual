@@ -232,30 +232,36 @@ export default function AddCustomSupplement() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose / Duration</label>
-              <input type="text" value={form.dose} onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
-                placeholder={form.isRitual ? "e.g. 10 min" : "e.g. 500mg"}
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand (optional)</label>
-              <input type="text" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
-                placeholder="e.g. Thorne"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-            </div>
-          </div>
-
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased (optional)</label>
-            <input type="text" value={form.purchasedFrom} onChange={e => setForm(f => ({ ...f, purchasedFrom: e.target.value }))}
-              placeholder="e.g. Amazon, iHerb, Whole Foods, Costco"
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">
+              {form.isRitual ? "Duration" : "Dose"}
+            </label>
+            <input type="text" value={form.dose} onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
+              placeholder={form.isRitual ? "e.g. 10 min, 20 min" : "e.g. 500mg"}
               className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
 
+          {!form.isRitual && (
+            <>
+              <div>
+                <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand (optional)</label>
+                <input type="text" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
+                  placeholder="e.g. Thorne, Life Extension"
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased (optional)</label>
+                <input type="text" value={form.purchasedFrom} onChange={e => setForm(f => ({ ...f, purchasedFrom: e.target.value }))}
+                  placeholder="e.g. Amazon, iHerb, Whole Foods"
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+            </>
+          )}
+
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">When to take</label>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">
+              {form.isRitual ? "When performed" : "When to take"}
+            </label>
             <select value={form.timing} onChange={e => setForm(f => ({ ...f, timing: e.target.value }))}
               className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
               <option value="">Select timing...</option>

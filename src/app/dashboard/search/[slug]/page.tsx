@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
 import AddToStackButton from "@/components/AddToStackButton";
-import { supabase } from "@/lib/supabase";
+import { supabase, supabaseAdmin } from "@/lib/supabase";
+import { currentUser } from "@clerk/nextjs/server";
 
 const evidenceColor: Record<string, string> = {
   strong: "bg-emerald-100 text-emerald-700",
@@ -44,6 +45,20 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
     );
   }
 
+  // Check if in user's stack
+  const user = await currentUser();
+  let inStack = false;
+  if (user) {
+    const { data: existing } = await supabaseAdmin
+      .from("user_stacks")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("supplement_id", supp.id)
+      .eq("is_active", true)
+      .single();
+    inStack = !!existing;
+  }
+
   // Fetch interactions
   const { data: interactions } = await supabase
     .from("supplement_interactions")
@@ -84,6 +99,7 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
           supplementName={supp.name}
           defaultTiming={supp.timing_recommendation}
           defaultDose={supp.dose_recommendation}
+          alreadyInStack={inStack}
         />
 
         {/* Timing & Dose */}

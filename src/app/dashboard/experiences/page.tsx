@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 import ShareExperienceButton from "@/components/ShareExperienceButton";
+
+export const dynamic = "force-dynamic";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -19,13 +21,13 @@ function DurationBadge({ weeks }: { weeks: number | null }) {
 }
 
 export default async function ExperiencesPage() {
-  const { data: experiences } = await supabase
+  const { data: experiences } = await supabaseAdmin
     .from("experiences")
     .select("*, supplement:supplement_id(name, slug, icon)")
     .order("created_at", { ascending: false })
     .limit(50);
 
-  const { data: supplements } = await supabase
+  const { data: supplements } = await supabaseAdmin
     .from("supplements")
     .select("id, name, icon, slug")
     .order("name");

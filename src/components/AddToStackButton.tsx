@@ -8,10 +8,11 @@ interface Props {
   supplementName: string;
   defaultTiming?: string;
   defaultDose?: string;
+  alreadyInStack?: boolean;
 }
 
-export default function AddToStackButton({ supplementId, supplementName, defaultTiming, defaultDose }: Props) {
-  const [status, setStatus] = useState<"idle" | "loading" | "added" | "exists" | "error">("idle");
+export default function AddToStackButton({ supplementId, supplementName, defaultTiming, defaultDose, alreadyInStack }: Props) {
+  const [status, setStatus] = useState<"idle" | "loading" | "added" | "exists" | "error">(alreadyInStack ? "exists" : "idle");
   const [showForm, setShowForm] = useState(false);
   const [dose, setDose] = useState(defaultDose || "");
   const [timing, setTiming] = useState(defaultTiming || "");
