@@ -4,6 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
 import FeedbackButton from "@/components/FeedbackButton";
+import ShareAppButton from "@/components/ShareAppButton";
 
 export const dynamic = "force-dynamic";
 
@@ -139,6 +140,7 @@ export default async function ProfilePage() {
         {/* App info + feedback */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="divide-y divide-stone-50">
+            <ShareAppButton />
             <FeedbackButton />
             <div className="flex items-center justify-between px-4 py-4">
               <span className="text-sm text-stone-600">Version</span>
