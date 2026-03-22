@@ -5,6 +5,8 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
 import FeedbackButton from "@/components/FeedbackButton";
 import ShareAppButton from "@/components/ShareAppButton";
+import UpgradeButton from "@/components/UpgradeButton";
+import ManageBillingButton from "@/components/ManageBillingButton";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,15 @@ export default async function ProfilePage() {
     supabaseAdmin.from("daily_logs").select("*", { count: "exact", head: true }).eq("user_id", userId),
     supabaseAdmin.from("experiences").select("*", { count: "exact", head: true }).eq("user_id", userId),
   ]);
+
+  // Fetch subscription
+  const { data: subscription } = await supabaseAdmin
+    .from("subscriptions")
+    .select("plan, status, current_period_end")
+    .eq("user_id", userId)
+    .single();
+
+  const plan = subscription?.plan || "free";
 
   // Fetch recent stack items
   const { data: stackItems } = await supabaseAdmin
@@ -81,6 +92,50 @@ export default async function ProfilePage() {
             <div className="text-2xl font-bold text-stone-900">{experienceCount ?? 0}</div>
             <div className="text-xs text-stone-500 mt-0.5">Experiences</div>
           </div>
+        </div>
+
+        {/* Plan card */}
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-stone-900">
+                  {plan === "free" && "Free Plan"}
+                  {plan === "plus" && "⭐ Plus Plan"}
+                  {plan === "pro" && "🚀 Pro Plan"}
+                </span>
+                {plan !== "free" && (
+                  <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Active</span>
+                )}
+              </div>
+              {plan === "free" && <p className="text-xs text-stone-500 mt-0.5">Up to 5 supplements · Basic features</p>}
+              {plan === "plus" && <p className="text-xs text-stone-500 mt-0.5">Unlimited supplements · Email reminders</p>}
+              {plan === "pro" && <p className="text-xs text-stone-500 mt-0.5">All features · SMS reminders</p>}
+            </div>
+            {plan === "free" && (
+              <UpgradeButton priceKey="plus_monthly" label="Upgrade →" />
+            )}
+          </div>
+
+          {plan === "free" && (
+            <div className="space-y-2 mt-4">
+              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Upgrade to unlock:</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-stone-50 rounded-xl p-3 text-xs text-stone-600">
+                  <div className="font-semibold text-stone-900 mb-0.5">⭐ Plus — $4.99/mo</div>
+                  Unlimited supplements, email reminders
+                </div>
+                <div className="bg-emerald-50 rounded-xl p-3 text-xs text-stone-600">
+                  <div className="font-semibold text-stone-900 mb-0.5">🚀 Pro — $9.99/mo</div>
+                  SMS reminders, click-to-mark-taken
+                </div>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <UpgradeButton priceKey="plus_monthly" label="Get Plus" className="flex-1 bg-stone-800 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-stone-900 transition-colors" />
+                <UpgradeButton priceKey="pro_monthly" label="Get Pro" className="flex-1 bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-800 transition-colors" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Recent stack */}
@@ -143,6 +198,7 @@ export default async function ProfilePage() {
           <div className="divide-y divide-stone-50">
             <ShareAppButton />
             <FeedbackButton />
+            {plan !== "free" && <ManageBillingButton />}
             <div className="flex items-center justify-between px-4 py-4">
               <span className="text-sm text-stone-600">Version</span>
               <span className="text-sm text-stone-400">1.0.0 beta</span>
