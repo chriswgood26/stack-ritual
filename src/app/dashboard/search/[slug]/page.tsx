@@ -66,6 +66,14 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
     .select("*, related:interacts_with_id(name, icon)")
     .eq("supplement_id", supp.id);
 
+  // Fetch experiences for this supplement
+  const { data: experiences } = await supabaseAdmin
+    .from("experiences")
+    .select("id, rating, title, body, duration_weeks, created_at")
+    .eq("supplement_id", supp.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
@@ -184,6 +192,50 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
             </a>
           </div>
           <p className="text-xs text-stone-400 mt-3 text-center">Stack Ritual may earn a commission on purchases</p>
+        </div>
+
+        {/* Community Experiences */}
+        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-stone-900">💬 Community Experiences</h2>
+            <Link href="/dashboard/experiences" className="text-xs text-emerald-600 font-medium">See all →</Link>
+          </div>
+
+          {!experiences || experiences.length === 0 ? (
+            <div className="text-center py-4">
+              <p className="text-stone-500 text-sm">No experiences yet for {supp.name}.</p>
+              <Link href="/dashboard/experiences"
+                className="text-emerald-600 text-sm font-medium mt-1 inline-block">
+                Be the first to share yours →
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {experiences.map((exp: { id: string; rating: number; title: string | null; body: string; duration_weeks: number | null; created_at: string }) => (
+                <div key={exp.id} className="border-b border-stone-50 last:border-0 pb-3 last:pb-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(i => (
+                        <span key={i} className={i <= exp.rating ? "text-amber-400 text-sm" : "text-stone-200 text-sm"}>★</span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {exp.duration_weeks && (
+                        <span className="text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">
+                          {exp.duration_weeks < 4 ? `${exp.duration_weeks}w` : exp.duration_weeks < 52 ? `${Math.round(exp.duration_weeks/4)}mo` : `${Math.round(exp.duration_weeks/52)}yr`}
+                        </span>
+                      )}
+                      <span className="text-xs text-stone-400">
+                        {new Date(exp.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    </div>
+                  </div>
+                  {exp.title && <p className="font-semibold text-stone-900 text-sm">{exp.title}</p>}
+                  <p className="text-stone-600 text-sm leading-relaxed mt-0.5">{exp.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <Disclaimer />

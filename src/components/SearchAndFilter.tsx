@@ -34,6 +34,11 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  // Most commonly deficient / recommended for general health
+  const recommended = supplements.filter(s =>
+    ["vitamin-d3", "magnesium-glycinate", "omega-3", "vitamin-k2", "zinc"].includes(s.slug)
+  );
+
   const filtered = useMemo(() => {
     return supplements.filter(s => {
       const matchesQuery = query.length < 2 || s.name.toLowerCase().includes(query.toLowerCase()) || s.tagline?.toLowerCase().includes(query.toLowerCase());
@@ -96,6 +101,26 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
           ))}
         </div>
       </div>
+
+      {/* Recommended — only show when no search/filter active */}
+      {!query && !activeCategory && recommended.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">⭐ Most commonly needed</h2>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {recommended.map(supp => (
+              <Link key={supp.id} href={`/dashboard/search/${supp.slug}`}
+                className="bg-emerald-50 border border-emerald-100 rounded-2xl p-3 flex-shrink-0 hover:border-emerald-300 transition-colors min-w-[90px] text-center">
+                <div className="text-2xl mb-1">{supp.icon}</div>
+                <div className="text-xs font-semibold text-stone-900 leading-tight">{supp.name.split(" ")[0]}</div>
+                <div className="text-xs text-stone-500 mt-0.5 leading-tight">{supp.tagline.split(" · ")[0]}</div>
+              </Link>
+            ))}
+          </div>
+          <p className="text-xs text-stone-400 mt-2">Studies show most adults are deficient in these</p>
+        </div>
+      )}
 
       {/* Results */}
       <div>
