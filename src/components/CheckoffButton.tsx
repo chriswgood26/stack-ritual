@@ -9,10 +9,12 @@ interface Props {
   isChecked: boolean;
   date: string;
   doseIndex?: number;
+  takenAt?: string | null;
 }
 
-export default function CheckoffButton({ stackItemId, isChecked: initialChecked, date, doseIndex = 0 }: Props) {
+export default function CheckoffButton({ stackItemId, isChecked: initialChecked, date, doseIndex = 0, takenAt: initialTakenAt }: Props) {
   const [checked, setChecked] = useState(initialChecked);
+  const [takenAt, setTakenAt] = useState(initialTakenAt || null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -22,6 +24,7 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
     setChecked(optimistic);
 
     try {
+      const now = new Date();
       const res = await fetch("/api/stack/checkoff", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,8 +32,11 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
       });
 
       if (!res.ok) {
-        setChecked(!optimistic); // revert on failure
+        setChecked(!optimistic);
+        setTakenAt(!optimistic ? null : takenAt);
       } else {
+        if (optimistic) setTakenAt(now.toISOString());
+        else setTakenAt(null);
         router.refresh();
       }
     } catch {
@@ -40,17 +46,28 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
     }
   }
 
+  const timeStr = takenAt
+    ? new Date(takenAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
+    : null;
+
   return (
-    <button
-      onClick={toggle}
-      disabled={loading}
-      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
-        checked
-          ? "bg-emerald-500 border-emerald-500 text-white"
-          : "border-stone-200 hover:border-emerald-400 hover:bg-emerald-50"
-      } ${loading ? "opacity-50" : ""}`}
-    >
-      {checked && <span className="text-xs font-bold">✓</span>}
-    </button>
+    <div className="flex items-center gap-2">
+      {checked && timeStr && (
+        <span className="text-xs font-bold text-red-500 whitespace-nowrap">
+          Complete {timeStr}
+        </span>
+      )}
+      <button
+        onClick={toggle}
+        disabled={loading}
+        className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+          checked
+            ? "bg-emerald-500 border-emerald-500 text-white"
+            : "border-stone-200 hover:border-emerald-400 hover:bg-emerald-50"
+        } ${loading ? "opacity-50" : ""}`}
+      >
+        {checked && <span className="text-xs font-bold">✓</span>}
+      </button>
+    </div>
   );
 }
