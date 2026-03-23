@@ -11,7 +11,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard/experiences": "Experiences",
   "/dashboard/profile": "Profile",
   "/dashboard/print": "Print Summary",
-  "/dashboard/history": "Check-in History",
+  "/dashboard/history": "History",
 };
 
 interface Props {
