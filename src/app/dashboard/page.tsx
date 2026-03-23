@@ -7,6 +7,7 @@ import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
 import MarkAllDoneButton from "@/components/MarkAllDoneButton";
 import EditStackItemButton from "@/components/EditStackItemButton";
+import MoodSlider from "@/components/MoodSlider";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,14 @@ export default async function Dashboard() {
   // Build set of "itemId_doseIndex" keys and taken_at map
   const checkedIds = new Set((todayLogs || []).map((l: { stack_item_id: string; dose_index: number }) => `${l.stack_item_id}_${l.dose_index}`));
   const takenAtMap = Object.fromEntries((todayLogs || []).map((l: { stack_item_id: string; dose_index: number; taken_at: string }) => [`${l.stack_item_id}_${l.dose_index}`, l.taken_at]));
+
+  // Fetch today's mood
+  const { data: moodData } = await supabaseAdmin
+    .from("daily_mood")
+    .select("mood_score")
+    .eq("user_id", userId)
+    .eq("logged_date", today)
+    .single();
 
   // Expand multi-dose items into multiple entries
   type StackItem = NonNullable<typeof stackItems>[0] & { doseLabel?: string; doseIndex?: number; checkoffId?: string };
@@ -265,7 +274,12 @@ export default async function Dashboard() {
           </>
         )}
 
+        {/* Mood slider */}
         <div className="mt-6">
+          <MoodSlider date={today} initialScore={moodData?.mood_score ?? null} />
+        </div>
+
+        <div className="mt-4">
           <Disclaimer compact />
         </div>
 
