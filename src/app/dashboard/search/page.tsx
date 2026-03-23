@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddCustomSupplement from "@/components/AddCustomSupplement";
 import SearchAndFilter from "@/components/SearchAndFilter";
@@ -15,12 +16,7 @@ export default async function SearchPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
-
-      {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center gap-3 sticky top-0 z-10">
-        <Link href="/dashboard" className="text-stone-400 hover:text-stone-700 transition-colors">←</Link>
-        <span className="font-bold text-stone-900 tracking-tight flex-1">Research</span>
-      </nav>
+      <TopNav />
 
       <div className="max-w-lg mx-auto px-4 py-5">
         <SearchAndFilter supplements={supplements || []} />

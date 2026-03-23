@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import Disclaimer from "@/components/Disclaimer";
@@ -117,17 +118,7 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
-
-      {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">🌿</span>
-          <span className="font-bold text-stone-900 tracking-tight">Stack Ritual</span>
-        </div>
-        <Link href="/dashboard/search" className="text-emerald-700 text-sm font-semibold">
-          + Add
-        </Link>
-      </nav>
+      <TopNav />
 
       <div className="max-w-lg mx-auto px-4 py-6 pb-28">
 

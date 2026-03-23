@@ -1,0 +1,44 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const pageTitles: Record<string, string> = {
+  "/dashboard": "Today",
+  "/dashboard/stack": "My Stack",
+  "/dashboard/search": "Research",
+  "/dashboard/experiences": "Experiences",
+  "/dashboard/profile": "Profile",
+  "/dashboard/print": "Print Summary",
+  "/dashboard/history": "Check-in History",
+};
+
+interface Props {
+  title?: string;
+  right?: React.ReactNode;
+}
+
+export default function TopNav({ title, right }: Props) {
+  const pathname = usePathname();
+  const pageTitle = title || pageTitles[pathname] || "";
+
+  return (
+    <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center sticky top-0 z-10">
+      {/* Left — Stack Ritual logo */}
+      <Link href="/dashboard" className="flex items-center gap-1.5 flex-1">
+        <span className="text-lg">🌿</span>
+        <span className="font-bold text-emerald-700 text-sm tracking-tight">Stack Ritual</span>
+      </Link>
+
+      {/* Center — page title */}
+      <div className="absolute left-1/2 -translate-x-1/2 font-bold text-stone-900 text-base">
+        {pageTitle}
+      </div>
+
+      {/* Right slot */}
+      <div className="flex-1 flex justify-end">
+        {right}
+      </div>
+    </nav>
+  );
+}

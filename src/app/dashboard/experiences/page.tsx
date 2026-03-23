@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import { supabaseAdmin } from "@/lib/supabase";
 import ShareExperienceButton from "@/components/ShareExperienceButton";
 
@@ -50,12 +51,7 @@ export default async function ExperiencesPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
-
-      {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-10">
-        <span className="font-bold text-stone-900 tracking-tight">Experiences</span>
-        <ShareExperienceButton supplements={supplements || []} />
-      </nav>
+      <TopNav />
 
       <div className="max-w-lg mx-auto px-4 py-5 space-y-6">
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddCustomSupplement from "@/components/AddCustomSupplement";
 import DeleteStackItemButton from "@/components/DeleteStackItemButton";
@@ -26,17 +27,7 @@ export default async function MyStackPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
-
-      {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-10">
-        <span className="font-bold text-stone-900 tracking-tight">My Stack</span>
-        <Link
-          href="/dashboard/search"
-          className="bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-emerald-800 transition-colors"
-        >
-          + Add
-        </Link>
-      </nav>
+      <TopNav />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 

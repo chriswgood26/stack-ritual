@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
@@ -63,14 +64,13 @@ export default async function ProfilePage() {
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
       {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center justify-between sticky top-0 z-10">
-        <span className="font-bold text-stone-900 tracking-tight">Profile</span>
+      <TopNav right={
         <SignOutButton>
           <button className="text-sm text-stone-500 hover:text-red-500 transition-colors font-medium">
             Sign out
           </button>
         </SignOutButton>
-      </nav>
+      } />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 

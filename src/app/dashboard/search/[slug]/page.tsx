@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddToStackButton from "@/components/AddToStackButton";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
@@ -78,13 +79,7 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
       {/* Top Nav */}
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center gap-3 sticky top-0 z-10">
-        <Link href="/dashboard/search" className="text-stone-400 hover:text-stone-700 transition-colors text-lg">←</Link>
-        <span className="font-bold text-stone-900 tracking-tight flex-1 truncate">{supp.name}</span>
-        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>
-          {supp.evidence_level} evidence
-        </span>
-      </nav>
+      <TopNav title={supp.name} right={<span className={`text-xs px-2.5 py-1 rounded-full font-medium ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>{supp.evidence_level} evidence</span>} />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
