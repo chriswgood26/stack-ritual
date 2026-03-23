@@ -64,13 +64,7 @@ export default async function ProfilePage() {
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
       {/* Top Nav */}
-      <TopNav right={
-        <SignOutButton>
-          <button className="text-sm text-stone-500 hover:text-red-500 transition-colors font-medium">
-            Sign out
-          </button>
-        </SignOutButton>
-      } />
+      <TopNav />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 

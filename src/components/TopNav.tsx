@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SignOutButton } from "@clerk/nextjs";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Today",
@@ -35,9 +36,14 @@ export default function TopNav({ title, right }: Props) {
         {pageTitle}
       </div>
 
-      {/* Right slot */}
-      <div className="flex-1 flex justify-end">
+      {/* Right slot — custom content or default sign out */}
+      <div className="flex-1 flex justify-end items-center gap-3">
         {right}
+        <SignOutButton>
+          <button className="text-xs text-stone-400 hover:text-red-500 transition-colors font-medium">
+            Sign out
+          </button>
+        </SignOutButton>
       </div>
     </nav>
   );
