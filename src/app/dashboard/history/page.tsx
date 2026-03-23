@@ -17,6 +17,12 @@ export default async function HistoryPage() {
     .eq("user_id", user.id)
     .order("logged_date", { ascending: true });
 
+  // Fetch mood scores
+  const { data: moodLogs } = await supabaseAdmin
+    .from("daily_mood")
+    .select("logged_date, mood_score")
+    .eq("user_id", user.id);
+
   const { count: stackSize } = await supabaseAdmin
     .from("user_stacks")
     .select("*", { count: "exact", head: true })
@@ -79,6 +85,7 @@ export default async function HistoryPage() {
           logsByDate={logsByDate}
           totalStack={totalStack}
           today={today}
+          moodByDate={Object.fromEntries((moodLogs || []).map(m => [m.logged_date, m.mood_score]))}
         />
 
       </div>

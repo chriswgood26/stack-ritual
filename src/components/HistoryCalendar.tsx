@@ -6,6 +6,7 @@ interface Props {
   logsByDate: Record<string, number>;
   totalStack: number;
   today: string;
+  moodByDate?: Record<string, number>;
 }
 
 function getCompletionColor(pct: number): string {
@@ -25,9 +26,10 @@ function getFirstDayOfMonth(year: number, month: number) {
   return new Date(year, month, 1).getDay();
 }
 
-function MonthCalendar({ year, month, label, logsByDate, totalStack, today }: {
+function MonthCalendar({ year, month, label, logsByDate, totalStack, today, moodByDate = {} }: {
   year: number; month: number; label: string;
   logsByDate: Record<string, number>; totalStack: number; today: string;
+  moodByDate?: Record<string, number>;
 }) {
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
@@ -60,15 +62,20 @@ function MonthCalendar({ year, month, label, logsByDate, totalStack, today }: {
           const pct = (count / totalStack) * 100;
           const isToday = dateStr === today;
           const isFuture = dateStr > today;
+          const mood = moodByDate[dateStr];
 
           return (
             <div key={day}
-              className={`aspect-square rounded-md flex items-center justify-center text-xs font-medium relative ${
+              title={isFuture ? "" : `${count}/${totalStack} taken${mood ? ` · Mood: ${mood}/10` : ""}`}
+              className={`aspect-square rounded-md flex flex-col items-center justify-center relative ${
                 isFuture ? "bg-stone-50 text-stone-200" : getCompletionColor(pct)
               } ${isToday ? "ring-2 ring-emerald-600 ring-offset-1" : ""}`}
             >
-              {day}
-              {!isFuture && pct >= 100 && (
+              <span className="text-xs font-medium leading-none">{day}</span>
+              {!isFuture && mood && (
+                <span className="text-xs leading-none mt-0.5 opacity-90 font-bold">{mood}</span>
+              )}
+              {!isFuture && pct >= 100 && !mood && (
                 <span className="absolute -top-0.5 -right-0.5 text-xs leading-none">✓</span>
               )}
             </div>
@@ -79,7 +86,7 @@ function MonthCalendar({ year, month, label, logsByDate, totalStack, today }: {
   );
 }
 
-export default function HistoryCalendar({ logsByDate, totalStack, today }: Props) {
+export default function HistoryCalendar({ logsByDate, totalStack, today, moodByDate = {} }: Props) {
   const [showAll, setShowAll] = useState(false);
   const now = new Date();
 
@@ -116,7 +123,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today }: Props
       {legend}
 
       {/* Current month — always shown */}
-      <MonthCalendar {...currentMonth} logsByDate={logsByDate} totalStack={totalStack} today={today} />
+      <MonthCalendar {...currentMonth} logsByDate={logsByDate} totalStack={totalStack} today={today} moodByDate={moodByDate} />
 
       {/* Previous months — behind toggle */}
       {!showAll ? (
@@ -129,7 +136,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today }: Props
       ) : (
         <>
           {previousMonths.map(m => (
-            <MonthCalendar key={`${m.year}-${m.month}`} {...m} logsByDate={logsByDate} totalStack={totalStack} today={today} />
+            <MonthCalendar key={`${m.year}-${m.month}`} {...m} logsByDate={logsByDate} totalStack={totalStack} today={today} moodByDate={moodByDate} />
           ))}
           <button
             onClick={() => setShowAll(false)}
