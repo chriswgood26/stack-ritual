@@ -46,11 +46,12 @@ export default async function Dashboard() {
   const today = new Date().toISOString().split("T")[0];
   const { data: todayLogs } = await supabaseAdmin
     .from("daily_logs")
-    .select("stack_item_id")
+    .select("stack_item_id, dose_index")
     .eq("user_id", userId)
     .eq("logged_date", today);
 
-  const checkedIds = new Set((todayLogs || []).map((l: { stack_item_id: string }) => l.stack_item_id));
+  // Build set of "itemId_doseIndex" keys
+  const checkedIds = new Set((todayLogs || []).map((l: { stack_item_id: string; dose_index: number }) => `${l.stack_item_id}_${l.dose_index}` ));
 
   // Expand multi-dose items into multiple entries
   type StackItem = NonNullable<typeof stackItems>[0] & { doseLabel?: string; doseIndex?: number; checkoffId?: string };
@@ -77,7 +78,7 @@ export default async function Dashboard() {
         });
       });
     } else {
-      expandedItems.push({ ...item, checkoffId: item.id });
+      expandedItems.push({ ...item, doseIndex: 0, checkoffId: `${item.id}_0` });
     }
   });
 
@@ -171,7 +172,7 @@ export default async function Dashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
                     <MarkAllDoneButton
-                      stackItemIds={expandedItems.map(i => i.checkoffId || i.id)}
+                      stackItems={expandedItems.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
                       date={today}
                       allDone={checkedCount === totalItems}
                     />
@@ -242,10 +243,11 @@ export default async function Dashboard() {
                               currentFrequency={item.frequency_type}
                             />
                           <CheckoffButton
-                              stackItemId={checkId}
+                              stackItemId={item.id}
                               userId={userId}
                               isChecked={isChecked}
                               date={today}
+                              doseIndex={item.doseIndex ?? 0}
                             />
                           </div>
                         </div>

@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Props {
-  stackItemIds: string[];
+  stackItems: { id: string; doseIndex: number }[];
   date: string;
   allDone: boolean;
 }
 
-export default function MarkAllDoneButton({ stackItemIds, date, allDone }: Props) {
+export default function MarkAllDoneButton({ stackItems, date, allDone }: Props) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -17,11 +17,11 @@ export default function MarkAllDoneButton({ stackItemIds, date, allDone }: Props
     setLoading(true);
     try {
       await Promise.all(
-        stackItemIds.map(id =>
+        stackItems.map(item =>
           fetch("/api/stack/checkoff", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stack_item_id: id, date, checked: !allDone }),
+            body: JSON.stringify({ stack_item_id: item.id, date, checked: !allDone, dose_index: item.doseIndex }),
           })
         )
       );

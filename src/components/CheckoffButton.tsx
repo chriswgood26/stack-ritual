@@ -8,9 +8,10 @@ interface Props {
   userId: string;
   isChecked: boolean;
   date: string;
+  doseIndex?: number;
 }
 
-export default function CheckoffButton({ stackItemId, isChecked: initialChecked, date }: Props) {
+export default function CheckoffButton({ stackItemId, isChecked: initialChecked, date, doseIndex = 0 }: Props) {
   const [checked, setChecked] = useState(initialChecked);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
       const res = await fetch("/api/stack/checkoff", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stack_item_id: stackItemId, date, checked: optimistic }),
+        body: JSON.stringify({ stack_item_id: stackItemId, date, checked: optimistic, dose_index: doseIndex }),
       });
 
       if (!res.ok) {
