@@ -222,15 +222,17 @@ export default function AddCustomSupplement() {
               className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
           </div>
 
-          {!form.isRitual && (
-            <div>
+          <div>
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Category</label>
-              <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+              <select value={form.category}
+                onChange={e => {
+                  const val = e.target.value;
+                  setForm(f => ({ ...f, category: val, isRitual: val === "ritual" }));
+                }}
                 className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white capitalize">
-                {categories.map(c => <option key={c} value={c}>{c.replace("-", " ")}</option>)}
+                {categories.map(c => <option key={c} value={c}>{c.replace(/-/g, " ")}</option>)}
               </select>
             </div>
-          )}
 
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">
