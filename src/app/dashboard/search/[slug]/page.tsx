@@ -178,15 +178,15 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
           <h2 className="font-semibold text-stone-900 mb-3">🛒 Where to buy</h2>
           <div className="space-y-2">
-            <a href="#" className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 hover:bg-stone-100 transition-colors">
+            <a href={`https://www.iherb.com/search#query=${encodeURIComponent(supp.name)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 hover:bg-stone-100 transition-colors">
               <span className="text-sm font-medium text-stone-700">iHerb</span>
               <span className="text-xs text-emerald-600 font-medium">View →</span>
             </a>
-            <a href="#" className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 hover:bg-stone-100 transition-colors">
+            <a href={`https://www.amazon.com/s?k=${encodeURIComponent(supp.name + ' supplement')}&tag=stackritual-20`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 hover:bg-stone-100 transition-colors">
               <span className="text-sm font-medium text-stone-700">Amazon</span>
               <span className="text-xs text-emerald-600 font-medium">View →</span>
             </a>
-            <a href="#" className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 hover:bg-stone-100 transition-colors">
+            <a href={`https://www.thorne.com/search#q=${encodeURIComponent(supp.name)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 hover:bg-stone-100 transition-colors">
               <span className="text-sm font-medium text-stone-700">Thorne</span>
               <span className="text-xs text-emerald-600 font-medium">View →</span>
             </a>
