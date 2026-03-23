@@ -45,15 +45,41 @@ export default function ExperiencesFeed({ experiences, currentUserId, supplement
   supplements?: Supplement[];
 }) {
   const [filter, setFilter] = useState<"all" | "mine">("all");
+  const [query, setQuery] = useState("");
 
-  const filtered = filter === "mine"
-    ? experiences.filter(e => e.user_id === currentUserId)
-    : experiences;
+  const filtered = experiences.filter(e => {
+    const matchesFilter = filter === "mine" ? e.user_id === currentUserId : true;
+    const supp = Array.isArray(e.supplement) ? e.supplement[0] : e.supplement;
+    const q = query.toLowerCase().trim();
+    const matchesQuery = !q || 
+      e.body.toLowerCase().includes(q) ||
+      (e.title?.toLowerCase().includes(q)) ||
+      (supp?.name.toLowerCase().includes(q));
+    return matchesFilter && matchesQuery;
+  });
 
   const myCount = experiences.filter(e => e.user_id === currentUserId).length;
 
   return (
     <div>
+      {/* Search bar */}
+      <div className="relative mb-3">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400">🔍</span>
+        <input
+          type="search"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search experiences by keyword or supplement..."
+          className="w-full bg-white border border-stone-200 rounded-2xl pl-11 pr-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm text-sm"
+        />
+        {query && (
+          <button onClick={() => setQuery("")}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 text-sm">
+            ✕
+          </button>
+        )}
+      </div>
+
       {/* Filter tabs + Share button */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <button
