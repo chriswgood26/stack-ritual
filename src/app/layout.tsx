@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Stack Ritual — Know your stack. Own your health.",
   description: "Research supplements, build your personal stack, get smart timing recommendations, and share a clean summary with your doctor.",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
