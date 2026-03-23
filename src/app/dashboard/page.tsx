@@ -148,20 +148,20 @@ export default async function Dashboard() {
                 <div className="text-base font-bold text-stone-900">{totalItems}</div>
                 <div className="text-xs text-stone-500 leading-tight">Total</div>
               </div>
-              <div className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center">
+              <Link href="/dashboard/stack" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
                 <div className="text-base font-bold text-stone-900">{supplements}</div>
                 <div className="text-xs text-stone-500 leading-tight">Supps</div>
-              </div>
-              <div className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center">
+              </Link>
+              <Link href="/dashboard/stack" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
                 <div className="text-base font-bold text-stone-900">{rituals}</div>
                 <div className="text-xs text-stone-500 leading-tight">Rituals</div>
-              </div>
-              <div className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center">
+              </Link>
+              <Link href="/dashboard/history" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
                 <div className={`text-base font-bold ${checkedCount === totalItems ? "text-emerald-600" : "text-stone-900"}`}>
                   {checkedCount}/{totalItems}
                 </div>
                 <div className="text-xs text-stone-500 leading-tight">Done</div>
-              </div>
+              </Link>
             </div>
 
             {/* Progress bar */}
