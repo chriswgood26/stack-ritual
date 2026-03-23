@@ -3,6 +3,7 @@ import BottomNav from "@/components/BottomNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddCustomSupplement from "@/components/AddCustomSupplement";
 import DeleteStackItemButton from "@/components/DeleteStackItemButton";
+import EditStackItemButton from "@/components/EditStackItemButton";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -96,7 +97,16 @@ export default async function MyStackPage() {
                             {[item.dose, item.timing, item.brand].filter(Boolean).join(" · ")}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <EditStackItemButton
+                            itemId={item.id}
+                            name={name}
+                            currentDose={item.dose}
+                            currentTiming={item.timing}
+                            currentBrand={item.brand}
+                            currentNotes={item.notes}
+                            currentFrequency={item.frequency_type}
+                          />
                           <DeleteStackItemButton itemId={item.id} />
                         </div>
                       </div>
@@ -126,7 +136,15 @@ export default async function MyStackPage() {
                             {[item.dose, item.timing].filter(Boolean).join(" · ")}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <EditStackItemButton
+                            itemId={item.id}
+                            name={item.custom_name || "Ritual"}
+                            currentDose={item.dose}
+                            currentTiming={item.timing}
+                            currentNotes={item.notes}
+                            currentFrequency={item.frequency_type}
+                          />
                           <DeleteStackItemButton itemId={item.id} />
                         </div>
                       </div>

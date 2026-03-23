@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
 import MarkAllDoneButton from "@/components/MarkAllDoneButton";
+import EditStackItemButton from "@/components/EditStackItemButton";
 
 export const dynamic = "force-dynamic";
 
@@ -218,7 +219,16 @@ export default async function Dashboard() {
                                 {item.dose}
                               </span>
                             )}
-                            <CheckoffButton
+                            <EditStackItemButton
+                              itemId={item.id}
+                              name={name}
+                              currentDose={item.dose}
+                              currentTiming={item.timing}
+                              currentBrand={item.brand}
+                              currentNotes={item.notes}
+                              currentFrequency={item.frequency_type}
+                            />
+                          <CheckoffButton
                               stackItemId={item.id}
                               userId={userId}
                               isChecked={isChecked}
