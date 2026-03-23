@@ -105,16 +105,16 @@ export default async function ProfilePage() {
         </div>
 
         {/* Lifetime check-ins */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-5 py-4 flex items-center justify-between">
+        <Link href="/dashboard/history" className="bg-white rounded-2xl border border-stone-100 shadow-sm px-5 py-4 flex items-center justify-between hover:border-emerald-300 transition-colors">
           <div className="flex items-center gap-3">
             <span className="text-2xl">✅</span>
             <div>
               <div className="font-semibold text-stone-900 text-sm">Lifetime check-ins</div>
-              <div className="text-xs text-stone-500">Total supplements marked as taken</div>
+              <div className="text-xs text-stone-500">View full history calendar →</div>
             </div>
           </div>
           <div className="text-2xl font-bold text-emerald-700">{logCount ?? 0}</div>
-        </div>
+        </Link>
 
         {/* Plan card */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
