@@ -23,6 +23,34 @@ interface Experience {
   supplement: { name: string; slug: string; icon: string } | { name: string; slug: string; icon: string }[] | null;
 }
 
+function HelpfulButton({ experienceId, initialCount }: { experienceId: string; initialCount: number }) {
+  const [count, setCount] = useState(initialCount);
+  const [helpful, setHelpful] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function toggle() {
+    setLoading(true);
+    const res = await fetch("/api/experiences/helpful", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ experience_id: experienceId }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setHelpful(data.helpful);
+      setCount(data.count);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <button onClick={toggle} disabled={loading}
+      className={`text-xs flex items-center gap-1 transition-colors ${helpful ? "text-emerald-600 font-semibold" : "text-stone-400 hover:text-stone-600"}`}>
+      👍 {helpful ? "Helpful" : "Helpful"} ({count})
+    </button>
+  );
+}
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex gap-0.5">
@@ -152,9 +180,7 @@ export default function ExperiencesFeed({ experiences, currentUserId, supplement
                 <p className="text-stone-700 text-sm leading-relaxed">{exp.body}</p>
 
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-stone-50">
-                  <button className="text-xs text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1">
-                    👍 Helpful ({exp.helpful_count})
-                  </button>
+                  <HelpfulButton experienceId={exp.id} initialCount={exp.helpful_count} />
                   {supp?.slug && (
                     <Link href={`/dashboard/search/${supp.slug}`}
                       className="text-xs text-emerald-600 font-medium hover:text-emerald-700 transition-colors">
