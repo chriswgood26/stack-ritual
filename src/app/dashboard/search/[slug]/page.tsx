@@ -79,7 +79,7 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
       {/* Top Nav */}
-      <TopNav title={supp.name} right={<span className={`text-xs px-2.5 py-1 rounded-full font-medium ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>{supp.evidence_level} evidence</span>} />
+      <TopNav title={supp.name} />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
@@ -91,7 +91,12 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
             </div>
             <div>
               <h1 className="text-xl font-bold text-stone-900">{supp.name}</h1>
-              <p className="text-stone-500 text-sm">{supp.category} · {supp.tagline}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-stone-500 text-sm">{supp.category} · {supp.tagline}</p>
+              </div>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>
+                {supp.evidence_level} evidence
+              </span>
             </div>
           </div>
           <p className="text-stone-700 text-sm leading-relaxed">{supp.description}</p>
