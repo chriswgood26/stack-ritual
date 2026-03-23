@@ -93,9 +93,13 @@ export default async function Dashboard() {
     }
   });
 
-  // Group by timing
+  // Separate as-needed from scheduled
+  const scheduledItems = expandedItems.filter(i => i.timing !== "as-needed");
+  const asNeededItems = expandedItems.filter(i => i.timing === "as-needed");
+
+  // Group scheduled items by timing only
   const grouped: Record<string, StackItem[]> = {};
-  expandedItems.forEach(item => {
+  scheduledItems.forEach(item => {
     const timing = item.timing || "unscheduled";
     if (!grouped[timing]) grouped[timing] = [];
     grouped[timing]!.push(item);
@@ -117,10 +121,10 @@ export default async function Dashboard() {
     });
   }
 
-  const totalItems = expandedItems.length;
-  const checkedCount = expandedItems.filter(i => checkedIds.has(i.checkoffId || i.id)).length;
-  const supplements = expandedItems.filter(i => i.category === "supplement").length;
-  const rituals = expandedItems.filter(i => i.category === "ritual").length;
+  const totalItems = scheduledItems.length;
+  const checkedCount = scheduledItems.filter(i => checkedIds.has(i.checkoffId || i.id)).length;
+  const supplements = scheduledItems.filter(i => i.category === "supplement").length;
+  const rituals = scheduledItems.filter(i => i.category === "ritual").length;
 
   // Use UTC offset for LA time (PDT = UTC-7, PST = UTC-8)
   const now = new Date();
@@ -185,7 +189,7 @@ export default async function Dashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
                     <MarkAllDoneButton
-                      stackItems={expandedItems.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
+                      stackItems={scheduledItems.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
                       date={today}
                       allDone={checkedCount === totalItems}
                     />
@@ -272,6 +276,48 @@ export default async function Dashboard() {
               ))}
             </div>
           </>
+        )}
+
+        {/* As needed section */}
+        {asNeededItems.length > 0 && (
+          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden mt-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">⚡</span>
+                <div>
+                  <div className="font-semibold text-stone-900 text-sm">As Needed</div>
+                  <div className="text-xs text-stone-500">Only take if required today</div>
+                </div>
+              </div>
+              <span className="text-xs font-medium text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">{asNeededItems.length}</span>
+            </div>
+            <div className="divide-y divide-stone-50">
+              {asNeededItems.map(item => {
+                const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
+                const name = supp?.name || item.custom_name || "Unknown";
+                const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
+                const checkId = item.checkoffId || item.id;
+                const isChecked = checkedIds.has(checkId);
+                return (
+                  <div key={checkId} className="flex items-center justify-between px-4 py-3.5">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${item.category === "ritual" ? "bg-amber-100" : "bg-stone-100"}`}>
+                        {icon}
+                      </div>
+                      <div className="min-w-0">
+                        <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>{name}</div>
+                        {item.dose && <div className="text-xs text-stone-400 truncate max-w-[160px]">{item.dose.split(".")[0].split(",")[0]}</div>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                      <EditStackItemButton itemId={item.id} name={name} currentDose={item.dose} currentTiming={item.timing} currentBrand={item.brand} currentNotes={item.notes} currentFrequency={item.frequency_type} />
+                      <CheckoffButton stackItemId={item.id} userId={userId} isChecked={isChecked} date={today} doseIndex={item.doseIndex ?? 0} takenAt={takenAtMap[checkId] || null} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         {/* Mood slider */}
