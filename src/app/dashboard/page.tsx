@@ -209,16 +209,14 @@ export default async function Dashboard() {
                                 {name}
                               </div>
                               {item.dose && (
-                                <div className="text-xs text-stone-400">{item.dose}</div>
+                                <div className="text-xs text-stone-400 truncate max-w-[160px]">
+                                  {item.dose.split(".")[0].split(",")[0]}
+                                </div>
                               )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                            {item.dose && (
-                              <span className="text-xs font-medium text-stone-600 bg-stone-100 px-2 py-1 rounded-full whitespace-nowrap hidden sm:block">
-                                {item.dose}
-                              </span>
-                            )}
+  
                             <EditStackItemButton
                               itemId={item.id}
                               name={name}
