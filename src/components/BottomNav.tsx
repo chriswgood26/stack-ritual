@@ -7,7 +7,7 @@ const tabs = [
   { href: "/dashboard", label: "Today", icon: "🏠", exact: true },
   { href: "/dashboard/stack", label: "My Stack", icon: "🧱" },
   { href: "/dashboard/search", label: "Research", icon: "🔍" },
-  { href: "/dashboard/experiences", label: "Experiences", icon: "🗣️" },
+  { href: "/dashboard/experiences", label: "Experiences", icon: "⭐" },
   { href: "/dashboard/profile", label: "Profile", icon: "👤" },
 ];
 
