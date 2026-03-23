@@ -9,7 +9,7 @@ interface Supplement {
   icon: string;
 }
 
-export default function ShareExperienceButton({ supplements }: { supplements: Supplement[] }) {
+export default function ShareExperienceButton({ supplements, compact = false }: { supplements: Supplement[]; compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [form, setForm] = useState({
@@ -51,7 +51,7 @@ export default function ShareExperienceButton({ supplements }: { supplements: Su
         onClick={() => setOpen(true)}
         className="bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-emerald-800 transition-colors"
       >
-        + Share yours
+        {compact ? "+ Share" : "+ Share yours"}
       </button>
 
       {open && (

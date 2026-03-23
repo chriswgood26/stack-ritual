@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ShareExperienceButton from "@/components/ShareExperienceButton";
+
+interface Supplement {
+  id: string;
+  name: string;
+  icon: string;
+  slug: string;
+}
 
 interface Experience {
   id: string;
@@ -31,9 +39,10 @@ function DurationBadge({ weeks }: { weeks: number | null }) {
   return <span className="text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">{label}</span>;
 }
 
-export default function ExperiencesFeed({ experiences, currentUserId }: {
+export default function ExperiencesFeed({ experiences, currentUserId, supplements = [] }: {
   experiences: Experience[];
   currentUserId?: string;
+  supplements?: Supplement[];
 }) {
   const [filter, setFilter] = useState<"all" | "mine">("all");
 
@@ -45,8 +54,8 @@ export default function ExperiencesFeed({ experiences, currentUserId }: {
 
   return (
     <div>
-      {/* Filter tabs */}
-      <div className="flex items-center gap-2 mb-4">
+      {/* Filter tabs + Share button */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
         <button
           onClick={() => setFilter("all")}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -55,7 +64,7 @@ export default function ExperiencesFeed({ experiences, currentUserId }: {
               : "bg-white border border-stone-200 text-stone-600 hover:border-emerald-300"
           }`}
         >
-          All experiences ({experiences.length})
+          All ({experiences.length})
         </button>
         {currentUserId && (
           <button
@@ -69,6 +78,9 @@ export default function ExperiencesFeed({ experiences, currentUserId }: {
             Mine ({myCount})
           </button>
         )}
+        <div className="ml-auto">
+          <ShareExperienceButton supplements={supplements} compact />
+        </div>
       </div>
 
       {/* Feed */}

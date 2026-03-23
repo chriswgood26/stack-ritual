@@ -49,7 +49,7 @@ export default async function MyStackPage() {
             </Link>
             <Link href="/dashboard/search"
               className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center">
-              🔬 Research
+              + Add to My Stack
             </Link>
           </div>
         </div>
@@ -152,7 +152,7 @@ export default async function MyStackPage() {
           href="/dashboard/search"
           className="flex items-center justify-center gap-2 bg-emerald-700 text-white rounded-2xl py-4 font-medium text-sm hover:bg-emerald-800 transition-colors"
         >
-          🔬 Search supplement database
+          + Add to My Stack
         </Link>
 
         {/* Add custom */}

@@ -40,7 +40,7 @@ export default async function ExperiencesPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
-      <TopNav right={<ShareExperienceButton supplements={supplements || []} />} />
+      <TopNav />
 
       <div className="max-w-lg mx-auto px-4 py-5 space-y-6">
 
@@ -66,6 +66,7 @@ export default async function ExperiencesPage() {
         <ExperiencesFeed
           experiences={experiences || []}
           currentUserId={user?.id}
+          supplements={supplements || []}
         />
 
       </div>
