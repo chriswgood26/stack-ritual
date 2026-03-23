@@ -56,18 +56,15 @@ export default function MoodSlider({ date, initialScore, initialNotes }: Props) 
 
   return (
     <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-stone-900 text-sm">How have you felt today?</h3>
-        {saved && (
-          <span className="text-xs text-emerald-600 font-medium">✓ Saved</span>
-        )}
-      </div>
-
-      {/* Score display */}
-      <div className="text-center mb-4">
-        <div className="text-4xl mb-1">{moodEmoji(score)}</div>
-        <div className={`text-sm font-semibold ${moodColor(score)}`}>{moodLabel(score)}</div>
-        <div className="text-2xl font-bold text-stone-900 mt-0.5">{score}<span className="text-sm text-stone-400 font-normal">/10</span></div>
+      {/* Header row — question + emoji + score + saved */}
+      <div className="flex items-center gap-3 mb-4">
+        <h3 className="font-semibold text-stone-900 text-sm flex-1">How have you felt today?</h3>
+        <span className="text-2xl">{moodEmoji(score)}</span>
+        <div className="text-right">
+          <div className="text-lg font-bold text-stone-900 leading-none">{score}<span className="text-xs text-stone-400 font-normal">/10</span></div>
+          <div className={`text-xs font-medium ${moodColor(score)} leading-none mt-0.5`}>{moodLabel(score)}</div>
+        </div>
+        {saved && <span className="text-xs text-emerald-600 font-medium whitespace-nowrap">✓ Saved</span>}
       </div>
 
       {/* Slider */}
