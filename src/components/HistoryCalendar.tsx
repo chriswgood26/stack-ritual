@@ -79,7 +79,9 @@ function MonthCalendar({ year, month, label, logsByDate, totalStack, today, mood
             >
               <span className="text-xs font-medium leading-none">{day}</span>
               {!isFuture && mood && (
-                <span className="text-xs leading-none mt-0.5 opacity-90 font-bold">{mood}</span>
+                <span className="text-xs leading-none" style={{fontSize: '10px'}}>
+                  {mood <= 2 ? "😞" : mood <= 4 ? "😕" : mood <= 6 ? "😐" : mood <= 8 ? "🙂" : "😁"}
+                </span>
               )}
               {!isFuture && pct >= 100 && !mood && (
                 <span className="absolute -top-0.5 -right-0.5 text-xs leading-none">✓</span>
