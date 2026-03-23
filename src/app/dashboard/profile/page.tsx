@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
 import FeedbackButton from "@/components/FeedbackButton";
 import ShareAppButton from "@/components/ShareAppButton";
+import EditProfileButton from "@/components/EditProfileButton";
 import UpgradeButton from "@/components/UpgradeButton";
 import ManageBillingButton from "@/components/ManageBillingButton";
 
@@ -240,6 +241,7 @@ export default async function ProfilePage() {
         {/* App info + feedback */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="divide-y divide-stone-50">
+            <EditProfileButton />
             <ShareAppButton />
             <FeedbackButton />
             {plan !== "free" && <ManageBillingButton />}
