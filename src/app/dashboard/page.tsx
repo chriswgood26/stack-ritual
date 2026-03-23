@@ -169,7 +169,9 @@ export default async function Dashboard() {
             {totalItems > 0 && (
               <div className="mb-5">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-stone-500">Today&apos;s progress</span>
+                  <Link href="/dashboard/history" className="text-xs text-stone-500 hover:text-emerald-600 transition-colors flex items-center gap-1">
+                    📅 Today&apos;s progress
+                  </Link>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
                     <MarkAllDoneButton
