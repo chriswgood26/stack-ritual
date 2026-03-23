@@ -12,10 +12,6 @@ export const dynamic = "force-dynamic";
 const timingOrder = [
   { key: "morning-fasted", label: "Morning — Fasted", time: "6:00 – 8:00 AM", icon: "🌅" },
   { key: "morning-food", label: "Morning — With Food", time: "8:00 – 9:00 AM", icon: "☀️" },
-  { key: "2x-daily", label: "2x Daily", time: "AM + PM", icon: "☀️" },
-  { key: "2x-with-meals", label: "2x Daily with Meals", time: "AM + PM meals", icon: "☀️" },
-  { key: "3x-daily", label: "3x Daily", time: "AM, Midday, PM", icon: "🔄" },
-  { key: "3x-with-meals", label: "3x Daily with Meals", time: "With each meal", icon: "🔄" },
   { key: "split", label: "Split Dose", time: "AM + PM", icon: "🔄" },
   { key: "afternoon", label: "Afternoon", time: "12:00 – 2:00 PM", icon: "🌤️" },
   { key: "evening", label: "Evening", time: "6:00 – 8:00 PM", icon: "🌆" },
