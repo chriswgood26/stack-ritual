@@ -9,6 +9,7 @@ import ShareAppButton from "@/components/ShareAppButton";
 import EditProfileButton from "@/components/EditProfileButton";
 import UpgradeButton from "@/components/UpgradeButton";
 import ManageBillingButton from "@/components/ManageBillingButton";
+import SMSSettings from "@/components/SMSSettings";
 
 export const dynamic = "force-dynamic";
 
@@ -244,6 +245,7 @@ export default async function ProfilePage() {
         {/* App info + feedback */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="divide-y divide-stone-50">
+            <SMSSettings isPro={plan === "pro"} />
             <ShareAppButton />
             <FeedbackButton />
             {plan !== "free" && <ManageBillingButton />}
