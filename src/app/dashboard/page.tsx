@@ -55,9 +55,38 @@ export default async function Dashboard() {
 
   const checkedIds = new Set((todayLogs || []).map((l: { stack_item_id: string }) => l.stack_item_id));
 
-  // Group by timing
-  const grouped: Record<string, typeof stackItems> = {};
+  // Expand multi-dose items into multiple entries
+  type StackItem = NonNullable<typeof stackItems>[0] & { doseLabel?: string; doseIndex?: number; checkoffId?: string };
+  const expandedItems: StackItem[] = [];
+
   (stackItems || []).forEach(item => {
+    const freq = item.timing || "unscheduled";
+    const multiMap: Record<string, { count: number; slots: string[] }> = {
+      "2x-daily":       { count: 2, slots: ["morning-food", "evening"] },
+      "2x-with-meals":  { count: 2, slots: ["morning-food", "evening"] },
+      "3x-daily":       { count: 3, slots: ["morning-food", "afternoon", "evening"] },
+      "3x-with-meals":  { count: 3, slots: ["morning-food", "afternoon", "evening"] },
+      "4x-daily":       { count: 4, slots: ["morning-food", "afternoon", "evening", "bedtime"] },
+    };
+    const multi = multiMap[freq];
+    if (multi) {
+      multi.slots.forEach((slot, idx) => {
+        expandedItems.push({
+          ...item,
+          timing: slot,
+          doseLabel: ["1st dose", "2nd dose", "3rd dose", "4th dose"][idx],
+          doseIndex: idx,
+          checkoffId: `${item.id}_${idx}`,
+        });
+      });
+    } else {
+      expandedItems.push({ ...item, checkoffId: item.id });
+    }
+  });
+
+  // Group by timing
+  const grouped: Record<string, StackItem[]> = {};
+  expandedItems.forEach(item => {
     const timing = item.timing || "unscheduled";
     if (!grouped[timing]) grouped[timing] = [];
     grouped[timing]!.push(item);
@@ -79,10 +108,10 @@ export default async function Dashboard() {
     });
   }
 
-  const totalItems = stackItems?.length ?? 0;
-  const checkedCount = checkedIds.size;
-  const supplements = stackItems?.filter(i => i.category === "supplement").length ?? 0;
-  const rituals = stackItems?.filter(i => i.category === "ritual").length ?? 0;
+  const totalItems = expandedItems.length;
+  const checkedCount = expandedItems.filter(i => checkedIds.has(i.checkoffId || i.id)).length;
+  const supplements = expandedItems.filter(i => i.category === "supplement").length;
+  const rituals = expandedItems.filter(i => i.category === "ritual").length;
 
   // Use UTC offset for LA time (PDT = UTC-7, PST = UTC-8)
   const now = new Date();
@@ -155,7 +184,7 @@ export default async function Dashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
                     <MarkAllDoneButton
-                      stackItemIds={(stackItems || []).map(i => i.id)}
+                      stackItemIds={expandedItems.map(i => i.checkoffId || i.id)}
                       date={today}
                       allDone={checkedCount === totalItems}
                     />
@@ -194,10 +223,11 @@ export default async function Dashboard() {
                       const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
                       const name = supp?.name || item.custom_name || "Unknown";
                       const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
-                      const isChecked = checkedIds.has(item.id);
+                      const checkId = item.checkoffId || item.id;
+                      const isChecked = checkedIds.has(checkId);
 
                       return (
-                        <div key={item.id} className="flex items-center justify-between px-4 py-3.5">
+                        <div key={checkId} className="flex items-center justify-between px-4 py-3.5">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
                               item.category === "ritual" ? "bg-amber-100" : "bg-emerald-100"
@@ -208,11 +238,9 @@ export default async function Dashboard() {
                               <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>
                                 {name}
                               </div>
-                              {item.dose && (
-                                <div className="text-xs text-stone-400 truncate max-w-[160px]">
-                                  {item.dose.split(".")[0].split(",")[0]}
-                                </div>
-                              )}
+                              <div className="text-xs text-stone-400">
+                                {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0].split(",")[0] : ""}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 ml-2 flex-shrink-0">
@@ -227,7 +255,7 @@ export default async function Dashboard() {
                               currentFrequency={item.frequency_type}
                             />
                           <CheckoffButton
-                              stackItemId={item.id}
+                              stackItemId={checkId}
                               userId={userId}
                               isChecked={isChecked}
                               date={today}
