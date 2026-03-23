@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function EditProfileButton() {
+export default function EditProfileButton({ inCard = false }: { inCard?: boolean }) {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [firstName, setFirstName] = useState(user?.firstName || "");
@@ -35,13 +35,22 @@ export default function EditProfileButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-between px-4 py-4 w-full hover:bg-stone-50 transition-colors"
+        className={inCard
+          ? "flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm w-full"
+          : "flex items-center justify-between px-4 py-4 w-full hover:bg-stone-50 transition-colors"
+        }
       >
-        <div className="flex items-center gap-3">
-          <span className="text-xl">✏️</span>
-          <span className="font-medium text-stone-900 text-sm">Edit profile name</span>
-        </div>
-        <span className="text-stone-300">›</span>
+        {inCard ? (
+          <><span>✏️</span><span className="font-medium">Edit profile name</span></>
+        ) : (
+          <>
+            <div className="flex items-center gap-3">
+              <span className="text-xl">✏️</span>
+              <span className="font-medium text-stone-900 text-sm">Edit profile name</span>
+            </div>
+            <span className="text-stone-300">›</span>
+          </>
+        )}
       </button>
 
       {open && (

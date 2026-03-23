@@ -71,7 +71,7 @@ export default async function ProfilePage() {
 
         {/* Profile card */}
         <div className="bg-emerald-700 rounded-2xl p-6 text-white">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl font-bold">
               {initials}
             </div>
@@ -80,6 +80,9 @@ export default async function ProfilePage() {
               <p className="text-emerald-200 text-sm">{email}</p>
               <p className="text-emerald-300 text-xs mt-0.5">Member since {memberSince}</p>
             </div>
+          </div>
+          <div className="border-t border-white/20 pt-3">
+            <EditProfileButton inCard />
           </div>
         </div>
 
@@ -241,7 +244,6 @@ export default async function ProfilePage() {
         {/* App info + feedback */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="divide-y divide-stone-50">
-            <EditProfileButton />
             <ShareAppButton />
             <FeedbackButton />
             {plan !== "free" && <ManageBillingButton />}
