@@ -62,6 +62,7 @@ export default async function Dashboard() {
     const multiMap: Record<string, { count: number; slots: string[] }> = {
       "2x-daily":       { count: 2, slots: ["morning-food", "evening"] },
       "2x-with-meals":  { count: 2, slots: ["morning-food", "evening"] },
+      "split":          { count: 2, slots: ["morning-food", "evening"] },
       "3x-daily":       { count: 3, slots: ["morning-food", "afternoon", "evening"] },
       "3x-with-meals":  { count: 3, slots: ["morning-food", "afternoon", "evening"] },
       "4x-daily":       { count: 4, slots: ["morning-food", "afternoon", "evening", "bedtime"] },
