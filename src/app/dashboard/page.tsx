@@ -210,7 +210,7 @@ export default async function Dashboard() {
             <div className="space-y-4">
               {orderedGroups.map(group => (
                 <div key={group.key} className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-emerald-50">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{group.icon}</span>
                       <div>
@@ -281,7 +281,7 @@ export default async function Dashboard() {
         {/* As needed section */}
         {asNeededItems.length > 0 && (
           <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden mt-4">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-emerald-100 bg-emerald-50">
               <div className="flex items-center gap-2">
                 <span className="text-lg">⚡</span>
                 <div>
