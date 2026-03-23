@@ -9,8 +9,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // For now allow any authenticated user — will lock down once we get your user ID
-  // if (!ADMIN_IDS.includes(userId)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!ADMIN_IDS.includes(userId)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { itemId, table, action } = await req.json();
 

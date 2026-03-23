@@ -6,12 +6,12 @@ import AdminActions from "./AdminActions";
 
 export const dynamic = "force-dynamic";
 
-// Only Chris can access this — add your Clerk user ID here
-const ADMIN_USER_IDS = ["user_2vXXXXXXXXXXXXXXXXXXXX"]; // will update after first load
+const ADMIN_USER_IDS = ["user_3BGCbiChIFduGWHj5gzAmUxoK51"];
 
 export default async function AdminPage() {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
+  if (!ADMIN_USER_IDS.includes(user.id)) redirect("/dashboard");
 
   // Fetch pending supplement submissions
   const { data: pendingSupps } = await supabaseAdmin
