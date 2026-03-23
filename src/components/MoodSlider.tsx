@@ -5,6 +5,7 @@ import { useState, useCallback } from "react";
 interface Props {
   date: string;
   initialScore?: number | null;
+  initialNotes?: string | null;
 }
 
 const moodEmoji = (score: number) => {
@@ -31,8 +32,9 @@ const moodColor = (score: number) => {
   return "text-emerald-600";
 };
 
-export default function MoodSlider({ date, initialScore }: Props) {
+export default function MoodSlider({ date, initialScore, initialNotes }: Props) {
   const [score, setScore] = useState(initialScore || 5);
+  const [notes, setNotes] = useState(initialNotes || "");
   const [saved, setSaved] = useState(!!initialScore);
   const [saving, setSaving] = useState(false);
 
@@ -46,7 +48,7 @@ export default function MoodSlider({ date, initialScore }: Props) {
     const res = await fetch("/api/mood", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mood_score: score, date }),
+      body: JSON.stringify({ mood_score: score, date, notes: notes.trim() || null }),
     });
     if (res.ok) setSaved(true);
     setSaving(false);
@@ -90,6 +92,17 @@ export default function MoodSlider({ date, initialScore }: Props) {
         {[1,2,3,4,5,6,7,8,9,10].map(n => (
           <span key={n} className={`text-xs ${n === score ? "text-emerald-600 font-bold" : "text-stone-300"}`}>{n}</span>
         ))}
+      </div>
+
+      {/* Notes */}
+      <div className="mb-4">
+        <textarea
+          value={notes}
+          onChange={e => { setNotes(e.target.value); setSaved(false); }}
+          placeholder="Any notes about how you're feeling today? (optional)"
+          rows={2}
+          className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-700 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+        />
       </div>
 
       {/* Save button */}

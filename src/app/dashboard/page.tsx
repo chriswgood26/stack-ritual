@@ -58,7 +58,7 @@ export default async function Dashboard() {
   // Fetch today's mood
   const { data: moodData } = await supabaseAdmin
     .from("daily_mood")
-    .select("mood_score")
+    .select("mood_score, notes")
     .eq("user_id", userId)
     .eq("logged_date", today)
     .single();
@@ -276,7 +276,7 @@ export default async function Dashboard() {
 
         {/* Mood slider */}
         <div className="mt-6">
-          <MoodSlider date={today} initialScore={moodData?.mood_score ?? null} />
+          <MoodSlider date={today} initialScore={moodData?.mood_score ?? null} initialNotes={moodData?.notes ?? null} />
         </div>
 
         <div className="mt-4">
