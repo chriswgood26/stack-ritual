@@ -15,6 +15,36 @@ export async function POST(req: NextRequest) {
   const { itemId, table, action } = await req.json();
 
   if (action === "approve" && table === "user_submitted_supplements") {
+    // Fetch the submission
+    const { data: sub } = await supabaseAdmin
+      .from("user_submitted_supplements")
+      .select("*")
+      .eq("id", itemId)
+      .single();
+
+    if (sub) {
+      // Generate slug from name
+      const slug = sub.name.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .trim();
+
+      // Insert into main supplements table
+      await supabaseAdmin.from("supplements").upsert({
+        name: sub.name,
+        slug,
+        category: sub.category || "other",
+        icon: sub.icon || "💊",
+        tagline: sub.tagline || null,
+        description: sub.tagline || null,
+        dose_recommendation: sub.dose || null,
+        timing_recommendation: sub.timing || null,
+        evidence_level: "limited",
+      }, { onConflict: "slug", ignoreDuplicates: true });
+    }
+
+    // Mark as approved
     await supabaseAdmin
       .from("user_submitted_supplements")
       .update({ status: "approved", approved_at: new Date().toISOString() })
