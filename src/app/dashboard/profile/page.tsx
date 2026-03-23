@@ -94,10 +94,10 @@ export default async function ProfilePage() {
             <div className="text-2xl font-bold text-stone-900">{stackCount ?? 0}</div>
             <div className="text-xs text-stone-500 mt-0.5">In stack</div>
           </Link>
-          <div className="bg-white rounded-2xl p-4 border border-stone-100 shadow-sm text-center">
+          <Link href="/dashboard" className="bg-white rounded-2xl p-4 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
             <div className="text-2xl font-bold text-emerald-600">{todayCount ?? 0}<span className="text-stone-400 text-lg font-normal">/{stackCount ?? 0}</span></div>
             <div className="text-xs text-stone-500 mt-0.5">Taken today</div>
-          </div>
+          </Link>
           <Link href="/dashboard/experiences" className="bg-white rounded-2xl p-4 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
             <div className="text-2xl font-bold text-stone-900">{experienceCount ?? 0}</div>
             <div className="text-xs text-stone-500 mt-0.5">Experiences</div>
