@@ -146,7 +146,7 @@ export default async function ProfilePage() {
           {plan === "plus" && (
             <div className="bg-emerald-50 rounded-xl p-3 mt-2">
               <div className="font-semibold text-stone-900 text-xs mb-0.5">🚀 Upgrade to Pro — $9.99/mo</div>
-              <p className="text-xs text-stone-600">SMS reminders + click-to-mark-taken links</p>
+              <p className="text-xs text-stone-600">All features + SMS reminders coming soon</p>
             </div>
           )}
 
@@ -160,7 +160,7 @@ export default async function ProfilePage() {
                 </div>
                 <div className="bg-emerald-50 rounded-xl p-3 text-xs text-stone-600">
                   <div className="font-semibold text-stone-900 mb-0.5">🚀 Pro — $9.99/mo</div>
-                  SMS reminders, click-to-mark-taken
+                  SMS reminders (coming soon)
                 </div>
               </div>
               <div className="flex gap-2 mt-3">
