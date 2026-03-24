@@ -77,6 +77,20 @@ export default function SMSSettings({ isPro }: { isPro: boolean }) {
                 <p className="font-semibold text-stone-900 text-sm mb-1">Pro Feature</p>
                 <p className="text-stone-500 text-sm">Upgrade to Pro to get SMS reminders with click-to-mark-done links.</p>
               </div>
+            ) : true ? (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center space-y-3">
+                <div className="text-4xl">📱</div>
+                <div>
+                  <p className="font-semibold text-stone-900 text-sm">SMS Reminders — Coming Soon!</p>
+                  <p className="text-stone-500 text-sm mt-1">We&apos;re finalizing carrier approval to send SMS reminders. You&apos;ll be notified by email as soon as it&apos;s ready.</p>
+                </div>
+                <div className="bg-white rounded-xl p-3 text-xs text-stone-600 text-left space-y-1">
+                  <div className="flex items-center gap-2"><span className="text-emerald-600">✓</span> Daily reminder texts at your chosen times</div>
+                  <div className="flex items-center gap-2"><span className="text-emerald-600">✓</span> Tap to mark your full stack done — no app needed</div>
+                  <div className="flex items-center gap-2"><span className="text-emerald-600">✓</span> Custom times for each supplement slot</div>
+                </div>
+                <p className="text-xs text-stone-400">Expected availability: 2–3 weeks</p>
+              </div>
             ) : (
               <>
                 {/* Enable toggle */}
