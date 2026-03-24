@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
     apple: "/favicon.svg",
   },
+  other: {
+    "impact-site-verification": "359487ab-3ea9-426b-b73b-e654d683f27c",
+  },
 };
 
 export default function RootLayout({
