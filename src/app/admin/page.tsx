@@ -264,7 +264,6 @@ export default async function AdminPage() {
               })}
             </div>
           )}
-        </div>
 
         {/* Supplement Library */}
         <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
