@@ -225,8 +225,8 @@ const plusTier = [
 
 const proTier = [
   "Everything in Plus",
-  "SMS text reminders",
-  "Tap-to-mark-done via text",
+  "📱 SMS reminders (coming soon)",
+  "📱 Tap-to-mark-done via text (coming soon)",
   "Custom reminder times",
   "Priority support",
 ];
