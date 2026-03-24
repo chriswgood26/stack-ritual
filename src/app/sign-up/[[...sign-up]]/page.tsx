@@ -10,7 +10,7 @@ export default function SignUpPage() {
         </div>
         <p className="text-stone-500 text-sm">Join thousands optimizing their health ritual.</p>
       </div>
-      <SignUp />
+      <SignUp fallbackRedirectUrl="/dashboard" forceRedirectUrl="/dashboard" />
     </div>
   );
 }

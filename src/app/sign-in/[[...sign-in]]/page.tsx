@@ -10,7 +10,7 @@ export default function SignInPage() {
         </div>
         <p className="text-stone-500 text-sm">Know your stack. Own your health.</p>
       </div>
-      <SignIn />
+      <SignIn fallbackRedirectUrl="/dashboard" forceRedirectUrl="/dashboard" />
     </div>
   );
 }
