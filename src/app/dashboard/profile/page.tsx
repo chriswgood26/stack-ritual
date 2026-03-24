@@ -2,6 +2,7 @@ import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import TopNav from "@/components/TopNav";
 import { currentUser } from "@clerk/nextjs/server";
+import { getToday } from "@/lib/timezone";
 import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -25,7 +26,7 @@ export default async function ProfilePage() {
   const initials = ((user.firstName?.[0] || "") + (user.lastName?.[0] || "")).toUpperCase() || email[0]?.toUpperCase() || "U";
 
   // Fetch stats
-  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+  const today = getToday();
   const [{ count: stackCount }, { count: logCount }, { count: experienceCount }, { count: todayCount }] = await Promise.all([
     supabaseAdmin.from("user_stacks").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("is_active", true),
     supabaseAdmin.from("daily_logs").select("*", { count: "exact", head: true }).eq("user_id", userId),

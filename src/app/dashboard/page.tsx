@@ -2,6 +2,7 @@ import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import TopNav from "@/components/TopNav";
 import { currentUser } from "@clerk/nextjs/server";
+import { getToday } from "@/lib/timezone";
 import { supabaseAdmin } from "@/lib/supabase";
 import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
@@ -45,7 +46,7 @@ export default async function Dashboard() {
 
   // Fetch today's checkoffs — use Pacific time
   const now = new Date();
-  const today = now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); // YYYY-MM-DD in Pacific time
+  const today = getToday(); // YYYY-MM-DD in Pacific time
   const { data: todayLogs } = await supabaseAdmin
     .from("daily_logs")
     .select("stack_item_id, dose_index, taken_at")

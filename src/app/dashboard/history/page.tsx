@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
+import { getToday, getUserTimezone } from "@/lib/timezone";
 import { supabaseAdmin } from "@/lib/supabase";
 import BottomNav from "@/components/BottomNav";
 import TopNav from "@/components/TopNav";
@@ -43,16 +44,16 @@ export default async function HistoryPage() {
   // Current streak
   let streak = 0;
   const now = new Date();
-  const today = now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+  const today = getToday();
   const checkDate = new Date(now);
   while (true) {
-    const dateStr = checkDate.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    const dateStr = checkDate.toLocaleDateString("en-CA", { timeZone: getUserTimezone() });
     if (logsByDate[dateStr] && logsByDate[dateStr] >= totalStack) {
       streak++;
       checkDate.setDate(checkDate.getDate() - 1);
     } else if (dateStr === today) {
       checkDate.setDate(checkDate.getDate() - 1);
-      const yesterday = checkDate.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+      const yesterday = checkDate.toLocaleDateString("en-CA", { timeZone: getUserTimezone() });
       if (!logsByDate[yesterday] || logsByDate[yesterday] < totalStack) break;
     } else {
       break;
