@@ -128,7 +128,6 @@ export default async function Dashboard() {
   const rituals = scheduledItems.filter(i => i.category === "ritual").length;
 
   // Use UTC offset for LA time (PDT = UTC-7, PST = UTC-8)
-  const now = new Date();
   const laHour = (now.getUTCHours() - 7 + 24) % 24; // PDT
   const greeting = laHour < 12 ? "Good morning" : laHour < 17 ? "Good afternoon" : "Good evening";
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "America/Los_Angeles" });
