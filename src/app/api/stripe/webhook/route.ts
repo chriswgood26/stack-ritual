@@ -13,8 +13,11 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     console.error("Webhook signature failed:", err);
+    console.error("Webhook secret present:", !!webhookSecret, "| Secret prefix:", webhookSecret?.slice(0, 8));
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
+
+  console.log("Webhook received:", event.type, "| ID:", event.id);
 
   async function upsertSubscription(sub: Stripe.Subscription) {
     const userId = sub.metadata?.clerk_user_id;
