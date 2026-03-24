@@ -16,8 +16,8 @@ export default function Home() {
           <Link href="#features" className="hover:text-stone-900 transition-colors">Features</Link>
           <Link href="#how-it-works" className="hover:text-stone-900 transition-colors">How it works</Link>
           <Link href="#pricing" className="hover:text-stone-900 transition-colors">Pricing</Link>
-          <Link href="#waitlist" className="bg-emerald-700 text-white px-4 py-2 rounded-full hover:bg-emerald-800 transition-colors">
-            Join waitlist
+          <Link href="/sign-up" className="bg-emerald-700 text-white px-4 py-2 rounded-full hover:bg-emerald-800 transition-colors">
+            Start Now
           </Link>
         </div>
       </nav>
