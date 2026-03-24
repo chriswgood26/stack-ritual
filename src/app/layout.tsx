@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stack Ritual — Know your stack. Own your health.",
-  description: "Research supplements, build your personal stack, get smart timing recommendations, and share a clean summary with your doctor.",
+  title: "Stack Ritual — Stack your habits. Own your health.",
+  description: "Build consistent supplement and wellness habits with smart scheduling, daily check-offs, streak tracking, and doctor-ready summaries.",
   icons: {
     icon: "/favicon.svg",
     apple: "/favicon.svg",

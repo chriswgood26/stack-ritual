@@ -28,7 +28,7 @@ export default function Home() {
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-8 pt-20 pb-24 text-center">
         <div className="inline-block bg-emerald-100 text-emerald-800 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-          Your complete optimization ritual
+          Build habits that actually stick
         </div>
         <h1 className="text-5xl font-bold tracking-tight leading-tight mb-6 text-stone-900">
           Know your stack.<br />
@@ -51,7 +51,7 @@ export default function Home() {
 
       {/* Social proof strip */}
       <div className="bg-emerald-700 text-white py-4 text-center text-sm font-medium">
-        Trusted by biohackers, longevity enthusiasts, and health-conscious adults 40+
+        Trusted by people who are serious about turning good intentions into lasting health habits
       </div>
 
       {/* Features */}
@@ -198,16 +198,16 @@ const features = [
 
 const steps = [
   {
-    title: "Search & research",
-    description: "Look up any supplement and get clear, trustworthy info on what it does, side effects, and how it fits with other things you're taking.",
+    title: "Build your ritual stack",
+    description: "Add the supplements and wellness practices you want to make a habit. Stack Ritual organizes them into a daily schedule that fits your life.",
   },
   {
-    title: "Build your stack",
-    description: "Add your supplements, doses, and wellness rituals. Stack Ritual builds your personalized daily schedule automatically.",
+    title: "Connect to your existing habits",
+    description: "Attach your supplements to moments you already do — morning coffee, meals, bedtime. Habit stacking makes new routines stick.",
   },
   {
-    title: "Track & share",
-    description: "See your stack at a glance, log how it's working, and print a clean summary to share with your healthcare provider.",
+    title: "Track streaks. See progress.",
+    description: "Check off your stack daily, watch your streak grow, and see how your mood and energy change over time. Share a clean summary with your doctor.",
   },
 ];
 
