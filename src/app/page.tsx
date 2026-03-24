@@ -105,7 +105,7 @@ export default function Home() {
               {plusTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-400">✓</span>{f}</li>)}
             </ul>
             <a href="/sign-up" className="block text-center bg-emerald-600 text-white py-3 rounded-full font-semibold hover:bg-emerald-500 transition-colors text-sm">
-              Get Plus
+              Subscribe
             </a>
           </div>
           {/* Pro */}
@@ -118,7 +118,7 @@ export default function Home() {
               {proTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-300">✓</span>{f}</li>)}
             </ul>
             <a href="/sign-up" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors text-sm">
-              Get Pro
+              Subscribe
             </a>
           </div>
         </div>
