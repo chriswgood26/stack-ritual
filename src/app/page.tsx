@@ -1,5 +1,4 @@
 import Link from "next/link";
-import WaitlistForm from "@/components/WaitlistForm";
 import Disclaimer from "@/components/Disclaimer";
 
 export default function Home() {
@@ -35,7 +34,15 @@ export default function Home() {
           Research supplements, build your personal stack, get smart timing recommendations,
           and share a clean summary with your doctor — all in one place.
         </p>
-        <WaitlistForm />
+        <div className="flex items-center justify-center gap-4">
+          <Link href="/sign-up" className="bg-emerald-700 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-emerald-800 transition-colors shadow-sm">
+            Start for free →
+          </Link>
+          <Link href="#how-it-works" className="text-stone-600 px-6 py-4 rounded-full text-lg font-medium hover:text-stone-900 transition-colors">
+            See how it works
+          </Link>
+        </div>
+        <p className="text-sm text-stone-500 mt-3">Free to start · No credit card required</p>
       </section>
 
       {/* Social proof strip */}
@@ -128,8 +135,11 @@ export default function Home() {
       <section className="bg-stone-900 text-white py-20 text-center px-8">
         <h2 className="text-3xl font-bold mb-4">Ready to optimize your ritual?</h2>
         <p className="text-stone-400 mb-10 text-lg">Be first to know when Stack Ritual launches.</p>
-        <div className="max-w-md mx-auto">
-          <WaitlistForm />
+        <div className="flex flex-col items-center gap-3">
+          <Link href="/sign-up" className="bg-emerald-500 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-emerald-400 transition-colors">
+            Start for free →
+          </Link>
+          <p className="text-stone-400 text-sm">No credit card required</p>
         </div>
       </section>
 
