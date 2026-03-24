@@ -80,7 +80,11 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
 
       {/* Top Nav */}
-      <TopNav title={supp.name} />
+      <TopNav title={supp.name} right={
+        <Link href="/dashboard/search" className="text-stone-500 hover:text-stone-900 text-sm font-medium transition-colors">
+          ← Research
+        </Link>
+      } />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
 
