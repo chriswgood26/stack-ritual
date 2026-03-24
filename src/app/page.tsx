@@ -100,12 +100,12 @@ export default function Home() {
           <div className="bg-stone-900 text-white rounded-2xl p-8 shadow-md">
             <h3 className="text-xl font-bold mb-1">Plus</h3>
             <div className="text-4xl font-bold mb-1">$4.99<span className="text-lg font-normal opacity-75">/mo</span></div>
-            <p className="text-stone-400 text-sm mb-6">or $39/year — save 35%</p>
+            <p className="text-stone-400 text-sm mb-6">Billed monthly</p>
             <ul className="space-y-3 text-stone-300 mb-8">
               {plusTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-400">✓</span>{f}</li>)}
             </ul>
             <a href="/sign-up" className="block text-center bg-emerald-600 text-white py-3 rounded-full font-semibold hover:bg-emerald-500 transition-colors text-sm">
-              Start free trial
+              Get Plus
             </a>
           </div>
           {/* Pro */}
@@ -113,12 +113,12 @@ export default function Home() {
             <div className="absolute top-4 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-2.5 py-1 rounded-full">BEST VALUE</div>
             <h3 className="text-xl font-bold mb-1">Pro</h3>
             <div className="text-4xl font-bold mb-1">$9.99<span className="text-lg font-normal opacity-75">/mo</span></div>
-            <p className="text-emerald-200 text-sm mb-6">or $79/year — save 34%</p>
+            <p className="text-emerald-200 text-sm mb-6">Billed monthly</p>
             <ul className="space-y-3 text-emerald-50 mb-8">
               {proTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-300">✓</span>{f}</li>)}
             </ul>
             <a href="/sign-up" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors text-sm">
-              Start free trial
+              Get Pro
             </a>
           </div>
         </div>
