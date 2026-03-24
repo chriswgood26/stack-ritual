@@ -43,8 +43,9 @@ export default async function Dashboard() {
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
-  // Fetch today's checkoffs
-  const today = new Date().toISOString().split("T")[0];
+  // Fetch today's checkoffs — use Pacific time
+  const now = new Date();
+  const today = now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" }); // YYYY-MM-DD in Pacific time
   const { data: todayLogs } = await supabaseAdmin
     .from("daily_logs")
     .select("stack_item_id, dose_index, taken_at")
