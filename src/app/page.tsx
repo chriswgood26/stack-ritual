@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
+import PricingButton from "@/components/PricingButton";
 
 export default function Home() {
   return (
@@ -99,9 +100,7 @@ export default function Home() {
             <ul className="space-y-3 text-stone-700 mb-8">
               {freeTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-600">✓</span>{f}</li>)}
             </ul>
-            <a href="/sign-up" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors text-sm">
-              Get started free
-            </a>
+<PricingButton label="Get started free" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors text-sm" />
           </div>
           {/* Plus */}
           <div className="bg-stone-900 text-white rounded-2xl p-8 shadow-md">
@@ -111,9 +110,7 @@ export default function Home() {
             <ul className="space-y-3 text-stone-300 mb-8">
               {plusTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-400">✓</span>{f}</li>)}
             </ul>
-            <a href="/sign-up" className="block text-center bg-emerald-600 text-white py-3 rounded-full font-semibold hover:bg-emerald-500 transition-colors text-sm">
-              Subscribe
-            </a>
+<PricingButton label="Subscribe" className="block text-center bg-emerald-600 text-white py-3 rounded-full font-semibold hover:bg-emerald-500 transition-colors text-sm" />
           </div>
           {/* Pro */}
           <div className="bg-emerald-700 text-white rounded-2xl p-8 shadow-md relative overflow-hidden">
@@ -124,9 +121,7 @@ export default function Home() {
             <ul className="space-y-3 text-emerald-50 mb-8">
               {proTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-300">✓</span>{f}</li>)}
             </ul>
-            <a href="/sign-up" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors text-sm">
-              Subscribe
-            </a>
+<PricingButton label="Subscribe" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors text-sm" />
           </div>
         </div>
       </section>
