@@ -5,6 +5,7 @@ import Link from "next/link";
 import AdminActions from "./AdminActions";
 import UserManager from "./UserManager";
 import EditSubmissionButton from "./EditSubmissionButton";
+import EditSupplementButton from "./EditSupplementButton";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,12 @@ export default async function AdminPage() {
     .select("*")
     .order("created_at", { ascending: false })
     .limit(20);
+
+  // Fetch all supplements
+  const { data: allSupplements } = await supabaseAdmin
+    .from("supplements")
+    .select("id, name, slug, category, icon, tagline, evidence_level, description, benefits, side_effects, timing_recommendation, dose_recommendation")
+    .order("name");
 
   // Stats
   const { count: totalUsers } = await supabaseAdmin
@@ -149,6 +156,26 @@ export default async function AdminPage() {
               })}
             </div>
           )}
+        </div>
+
+        {/* Supplement Library */}
+        <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
+          <div className="px-5 py-4 border-b border-stone-700 flex items-center justify-between">
+            <h2 className="font-bold text-white">Supplement Library</h2>
+            <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-medium">{allSupplements?.length ?? 0} supplements</span>
+          </div>
+          <div className="divide-y divide-stone-700 max-h-96 overflow-y-auto">
+            {allSupplements?.map(supp => (
+              <div key={supp.id} className="px-5 py-3 flex items-center gap-3">
+                <span className="text-xl">{supp.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-white text-sm">{supp.name}</div>
+                  <div className="text-xs text-stone-400">{supp.category} · {supp.evidence_level}</div>
+                </div>
+                <EditSupplementButton supplement={supp} />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* App feedback */}
