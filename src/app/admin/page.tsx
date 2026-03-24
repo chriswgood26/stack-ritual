@@ -126,8 +126,7 @@ export default async function AdminPage() {
         </div>
 
         {/* Recent experiences */}
-        <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <details className="group">
+        <details className="group bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
           <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
             <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
             <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▼</span>
@@ -163,8 +162,7 @@ export default async function AdminPage() {
 
         {/* Recent experiences */}
         <div id="experiences" />
-        <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <details className="group">
+        <details className="group bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
           <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
             <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
             <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▼</span>
@@ -271,8 +269,7 @@ export default async function AdminPage() {
         </div>
 
         {/* Recent experiences */}
-        <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <details className="group">
+        <details className="group bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
           <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
             <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
             <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▼</span>
