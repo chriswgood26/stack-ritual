@@ -25,22 +25,22 @@ export default function TopNav({ title, right }: Props) {
 
   return (
     <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center sticky top-0 z-10">
-      {/* Left — Stack Ritual logo */}
-      <Link href="/dashboard" className="flex items-center gap-1.5 flex-1">
+      {/* Left — Stack Ritual logo (icon only on mobile) */}
+      <Link href="/dashboard" className="flex items-center gap-1.5 flex-shrink-0">
         <span className="text-lg">🌿</span>
-        <span className="font-bold text-emerald-700 text-sm tracking-tight">Stack Ritual</span>
+        <span className="font-bold text-emerald-700 text-sm tracking-tight hidden sm:block">Stack Ritual</span>
       </Link>
 
       {/* Center — page title */}
-      <div className="absolute left-1/2 -translate-x-1/2 font-bold text-stone-900 text-base max-w-[40%] truncate text-center">
+      <div className="flex-1 text-center font-bold text-stone-900 text-base truncate px-2">
         {pageTitle}
       </div>
 
       {/* Right slot — custom content or default sign out */}
-      <div className="flex-1 flex justify-end items-center gap-3">
+      <div className="flex-shrink-0 flex items-center gap-2">
         {right}
         <SignOutButton>
-          <button className="text-xs text-stone-400 hover:text-red-500 transition-colors font-medium">
+          <button className="text-xs text-stone-400 hover:text-red-500 transition-colors font-medium whitespace-nowrap">
             Sign out
           </button>
         </SignOutButton>
