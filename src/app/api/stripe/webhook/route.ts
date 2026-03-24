@@ -20,8 +20,20 @@ export async function POST(req: NextRequest) {
   console.log("Webhook received:", event.type, "| ID:", event.id);
 
   async function upsertSubscription(sub: Stripe.Subscription) {
-    const userId = sub.metadata?.clerk_user_id;
-    if (!userId) return;
+    // Try metadata first, then look up by customer ID
+    let userId = sub.metadata?.clerk_user_id;
+    if (!userId) {
+      const { data: existing } = await supabaseAdmin
+        .from("subscriptions")
+        .select("user_id")
+        .eq("stripe_customer_id", sub.customer as string)
+        .single();
+      userId = existing?.user_id;
+    }
+    if (!userId) {
+      console.error("No user found for customer:", sub.customer);
+      return;
+    }
 
     const item = sub.items.data[0];
     const priceId = item?.price?.id;
