@@ -32,7 +32,7 @@ export default function TopNav({ title, right }: Props) {
       </Link>
 
       {/* Center — page title */}
-      <div className="absolute left-1/2 -translate-x-1/2 font-bold text-stone-900 text-base">
+      <div className="absolute left-1/2 -translate-x-1/2 font-bold text-stone-900 text-base max-w-[40%] truncate text-center">
         {pageTitle}
       </div>
 
