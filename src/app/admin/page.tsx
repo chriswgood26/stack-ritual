@@ -307,6 +307,9 @@ export default async function AdminPage() {
           )}
         </div>
 
+        {/* User Management */}
+        <div id="users" />
+        <UserManager />
 
       </div>
     </div>
