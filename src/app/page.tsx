@@ -80,32 +80,45 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="max-w-5xl mx-auto px-8 py-24">
+      <section id="pricing" className="max-w-6xl mx-auto px-8 py-24">
         <h2 className="text-3xl font-bold text-center mb-4">Simple pricing</h2>
-        <p className="text-stone-600 text-center mb-16">Start free. Upgrade when you're ready.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        <p className="text-stone-600 text-center mb-16">Start free. Upgrade when you&apos;re ready.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Free */}
           <div className="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
             <h3 className="text-xl font-bold mb-1">Free</h3>
             <div className="text-4xl font-bold mb-1">$0</div>
             <p className="text-stone-500 text-sm mb-6">Forever free</p>
             <ul className="space-y-3 text-stone-700 mb-8">
-              {freeTier.map(f => <li key={f} className="flex items-center gap-2"><span className="text-emerald-600">✓</span>{f}</li>)}
+              {freeTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-600">✓</span>{f}</li>)}
             </ul>
-            <a href="#waitlist" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors">
-              Join Waitlist
+            <a href="/sign-up" className="block text-center border border-stone-300 text-stone-700 py-3 rounded-full font-medium hover:bg-stone-50 transition-colors text-sm">
+              Get started free
             </a>
           </div>
-          {/* Premium */}
-          <div className="bg-emerald-700 text-white rounded-2xl p-8 shadow-md">
-            <h3 className="text-xl font-bold mb-1">Premium</h3>
+          {/* Plus */}
+          <div className="bg-stone-900 text-white rounded-2xl p-8 shadow-md">
+            <h3 className="text-xl font-bold mb-1">Plus</h3>
+            <div className="text-4xl font-bold mb-1">$4.99<span className="text-lg font-normal opacity-75">/mo</span></div>
+            <p className="text-stone-400 text-sm mb-6">or $39/year — save 35%</p>
+            <ul className="space-y-3 text-stone-300 mb-8">
+              {plusTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-400">✓</span>{f}</li>)}
+            </ul>
+            <a href="/sign-up" className="block text-center bg-emerald-600 text-white py-3 rounded-full font-semibold hover:bg-emerald-500 transition-colors text-sm">
+              Start free trial
+            </a>
+          </div>
+          {/* Pro */}
+          <div className="bg-emerald-700 text-white rounded-2xl p-8 shadow-md relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-2.5 py-1 rounded-full">BEST VALUE</div>
+            <h3 className="text-xl font-bold mb-1">Pro</h3>
             <div className="text-4xl font-bold mb-1">$9.99<span className="text-lg font-normal opacity-75">/mo</span></div>
             <p className="text-emerald-200 text-sm mb-6">or $79/year — save 34%</p>
             <ul className="space-y-3 text-emerald-50 mb-8">
-              {premiumTier.map(f => <li key={f} className="flex items-center gap-2"><span className="text-emerald-300">✓</span>{f}</li>)}
+              {proTier.map(f => <li key={f} className="flex items-center gap-2 text-sm"><span className="text-emerald-300">✓</span>{f}</li>)}
             </ul>
-            <a href="#waitlist" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors">
-              Join Waitlist
+            <a href="/sign-up" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors text-sm">
+              Start free trial
             </a>
           </div>
         </div>
@@ -195,16 +208,25 @@ const freeTier = [
   "Basic research library",
   "Stack builder",
   "Print & share summary",
+  "Community experiences",
   "Affiliate buy links",
 ];
 
-const premiumTier = [
+const plusTier = [
   "Everything in Free",
   "Unlimited supplements",
   "Smart timing engine",
   "Interactions checker",
-  "Daily reminders",
-  "Community experiences",
+  "Daily email reminders",
+  "Weekly progress summary",
   "Rituals & activities tracker",
   "Advanced research data",
+];
+
+const proTier = [
+  "Everything in Plus",
+  "SMS text reminders",
+  "Tap-to-mark-done via text",
+  "Custom reminder times",
+  "Priority support",
 ];
