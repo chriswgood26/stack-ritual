@@ -1,4 +1,5 @@
 "use client";
+import EvidenceBadge from "@/components/EvidenceBadge";
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
@@ -153,9 +154,7 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
                   <p className="text-xs text-stone-500 mt-0.5 truncate">{supp.tagline}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>
-                    {supp.evidence_level}
-                  </span>
+                  <EvidenceBadge level={supp.evidence_level ?? "limited"} />
                   <span className="text-stone-300 text-sm">›</span>
                 </div>
               </Link>

@@ -3,6 +3,7 @@ import BottomNav from "@/components/BottomNav";
 import TopNav from "@/components/TopNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddToStackButton from "@/components/AddToStackButton";
+import EvidenceBadge from "@/components/EvidenceBadge";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -94,9 +95,7 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
               <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-stone-500 text-sm">{supp.category} · {supp.tagline}</p>
               </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${evidenceColor[supp.evidence_level] ?? evidenceColor.limited}`}>
-                {supp.evidence_level} evidence
-              </span>
+              <EvidenceBadge level={supp.evidence_level ?? "limited"} />
             </div>
           </div>
           <p className="text-stone-700 text-sm leading-relaxed">{supp.description}</p>
