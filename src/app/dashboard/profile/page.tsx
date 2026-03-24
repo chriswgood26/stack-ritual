@@ -137,7 +137,17 @@ export default async function ProfilePage() {
             {plan === "free" && (
               <UpgradeButton priceKey="plus_monthly" label="Upgrade →" />
             )}
+            {plan === "plus" && (
+              <UpgradeButton priceKey="pro_monthly" label="Go Pro →" />
+            )}
           </div>
+
+          {plan === "plus" && (
+            <div className="bg-emerald-50 rounded-xl p-3 mt-2">
+              <div className="font-semibold text-stone-900 text-xs mb-0.5">🚀 Upgrade to Pro — $9.99/mo</div>
+              <p className="text-xs text-stone-600">SMS reminders + click-to-mark-taken links</p>
+            </div>
+          )}
 
           {plan === "free" && (
             <div className="space-y-2 mt-4">
