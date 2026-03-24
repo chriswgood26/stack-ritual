@@ -127,9 +127,11 @@ export default async function AdminPage() {
 
         {/* Recent experiences */}
         <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-700">
-            <h2 className="font-bold text-white">Recent Experiences</h2>
-          </div>
+          <details className="group">
+          <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
+            <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
+            <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▼</span>
+          </summary>
           {!experiences || experiences.length === 0 ? (
             <div className="px-5 py-8 text-center text-stone-500 text-sm">No experiences yet</div>
           ) : (
@@ -162,9 +164,11 @@ export default async function AdminPage() {
         {/* Recent experiences */}
         <div id="experiences" />
         <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-700">
-            <h2 className="font-bold text-white">Recent Experiences</h2>
-          </div>
+          <details className="group">
+          <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
+            <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
+            <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▼</span>
+          </summary>
           {!experiences || experiences.length === 0 ? (
             <div className="px-5 py-8 text-center text-stone-500 text-sm">No experiences yet</div>
           ) : (
@@ -268,9 +272,11 @@ export default async function AdminPage() {
 
         {/* Recent experiences */}
         <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-700">
-            <h2 className="font-bold text-white">Recent Experiences</h2>
-          </div>
+          <details className="group">
+          <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
+            <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
+            <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▼</span>
+          </summary>
           {!experiences || experiences.length === 0 ? (
             <div className="px-5 py-8 text-center text-stone-500 text-sm">No experiences yet</div>
           ) : (
