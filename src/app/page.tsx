@@ -133,7 +133,7 @@ export default function Home() {
         </div>
         <p>© 2026 Stack Ritual. All rights reserved.</p>
         <div className="flex gap-6">
-          <Link href="/privacy" className="hover:text-stone-700 transition-colors">Privacy</Link>
+          <Link href="/privacy" className="hover:text-stone-700 transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-stone-700 transition-colors">Terms</Link>
         </div>
       </footer>
