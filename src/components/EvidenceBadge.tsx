@@ -41,8 +41,8 @@ export default function EvidenceBadge({ level }: { level: string }) {
         <>
           {/* Backdrop */}
           <div className="fixed inset-0 z-40" onClick={() => setShowTooltip(false)} />
-          {/* Tooltip */}
-          <div className="absolute right-0 top-8 z-50 w-72 bg-white rounded-2xl border border-stone-200 shadow-lg p-4">
+          {/* Tooltip — fixed position centered on screen for mobile */}
+          <div className="fixed left-4 right-4 top-1/3 z-50 bg-white rounded-2xl border border-stone-200 shadow-lg p-4 mx-auto max-w-sm">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">{info.icon}</span>
               <span className="font-semibold text-stone-900 text-sm">{info.label}</span>
