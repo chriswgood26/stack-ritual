@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
+import UserManager from "./UserManager";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,9 @@ export default async function AdminPage() {
       </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+
+        {/* User Management */}
+        <UserManager />
 
         {/* Stats overview */}
         <div className="grid grid-cols-4 gap-4">
