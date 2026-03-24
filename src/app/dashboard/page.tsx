@@ -46,7 +46,7 @@ export default async function Dashboard() {
 
   // Fetch today's checkoffs — use Pacific time
   const now = new Date();
-  const today = getToday(); // YYYY-MM-DD in Pacific time
+  const today = await getToday(); // YYYY-MM-DD in Pacific time
   const { data: todayLogs } = await supabaseAdmin
     .from("daily_logs")
     .select("stack_item_id, dose_index, taken_at")

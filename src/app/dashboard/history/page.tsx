@@ -44,16 +44,16 @@ export default async function HistoryPage() {
   // Current streak
   let streak = 0;
   const now = new Date();
-  const today = getToday();
+  const today = await getToday();
   const checkDate = new Date(now);
   while (true) {
-    const dateStr = checkDate.toLocaleDateString("en-CA", { timeZone: getUserTimezone() });
+    const dateStr = checkDate.toLocaleDateString("en-CA", { timeZone: await getUserTimezone() });
     if (logsByDate[dateStr] && logsByDate[dateStr] >= totalStack) {
       streak++;
       checkDate.setDate(checkDate.getDate() - 1);
     } else if (dateStr === today) {
       checkDate.setDate(checkDate.getDate() - 1);
-      const yesterday = checkDate.toLocaleDateString("en-CA", { timeZone: getUserTimezone() });
+      const yesterday = checkDate.toLocaleDateString("en-CA", { timeZone: await getUserTimezone() });
       if (!logsByDate[yesterday] || logsByDate[yesterday] < totalStack) break;
     } else {
       break;
