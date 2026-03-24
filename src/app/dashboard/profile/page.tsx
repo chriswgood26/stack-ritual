@@ -264,7 +264,7 @@ export default async function ProfilePage() {
             {plan !== "free" && <ManageBillingButton />}
             <div className="flex items-center justify-between px-4 py-4">
               <span className="text-sm text-stone-600">Version</span>
-              <span className="text-sm text-stone-400">1.0.0 beta</span>
+              <span className="text-sm text-stone-400">v1.0</span>
             </div>
             <Link href="https://stackritual.com" target="_blank" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
               <span className="text-sm text-stone-600">stackritual.com</span>
