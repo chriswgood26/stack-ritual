@@ -8,6 +8,7 @@ import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
 import MarkAllDoneButton from "@/components/MarkAllDoneButton";
 import EditStackItemButton from "@/components/EditStackItemButton";
+import MarkSlotDoneButton from "@/components/MarkSlotDoneButton";
 import MoodSlider from "@/components/MoodSlider";
 
 export const dynamic = "force-dynamic";
@@ -219,9 +220,16 @@ export default async function Dashboard() {
                         <div className="text-xs text-stone-500">{group.time}</div>
                       </div>
                     </div>
-                    <span className="text-xs font-medium text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
-                      {group.items.length}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <MarkSlotDoneButton
+                        items={group.items.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
+                        date={today}
+                        allDone={group.items.every(i => checkedIds.has(i.checkoffId || i.id))}
+                      />
+                      <span className="text-xs font-medium text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full">
+                        {group.items.length}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="divide-y divide-stone-50">
