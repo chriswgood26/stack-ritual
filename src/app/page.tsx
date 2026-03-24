@@ -132,7 +132,7 @@ export default function Home() {
       {/* CTA */}
       <section className="bg-stone-900 text-white py-20 text-center px-8">
         <h2 className="text-3xl font-bold mb-4">Ready to optimize your ritual?</h2>
-        <p className="text-stone-400 mb-10 text-lg">Be first to know when Stack Ritual launches.</p>
+        <p className="text-stone-400 mb-10 text-lg">Stack Ritual has launched! Start tracking your supplements today.</p>
         <div className="flex flex-col items-center gap-3">
           <Link href="/sign-up" className="bg-emerald-500 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-emerald-400 transition-colors">
             Start for free →
