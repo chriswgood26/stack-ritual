@@ -11,7 +11,19 @@ export async function POST(req: NextRequest) {
 
   if (!ADMIN_IDS.includes(userId)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { itemId, table, action } = await req.json();
+  const body = await req.json();
+  const { itemId, table, action } = body;
+
+  if (action === "edit" && table === "user_submitted_supplements") {
+    const updates = body.updates;
+    if (updates) {
+      await supabaseAdmin
+        .from("user_submitted_supplements")
+        .update({ ...updates, name_normalized: updates.name?.toLowerCase().trim() })
+        .eq("id", itemId);
+    }
+    return NextResponse.json({ message: "updated" });
+  }
 
   if (action === "approve" && table === "user_submitted_supplements") {
     // Fetch the submission

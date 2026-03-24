@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
 import UserManager from "./UserManager";
+import EditSubmissionButton from "./EditSubmissionButton";
 
 export const dynamic = "force-dynamic";
 
@@ -109,7 +110,10 @@ export default async function AdminPage() {
                     {supp.brand && <div className="text-xs text-stone-400">Brand: {supp.brand}</div>}
                     <div className="text-xs text-stone-500 mt-1">Submitted: {new Date(supp.created_at).toLocaleDateString()}</div>
                   </div>
-                  <AdminActions itemId={supp.id} table="user_submitted_supplements" type="supplement" />
+                  <div className="flex gap-2">
+                    <EditSubmissionButton submission={supp} />
+                    <AdminActions itemId={supp.id} table="user_submitted_supplements" type="supplement" />
+                  </div>
                 </div>
               ))}
             </div>
