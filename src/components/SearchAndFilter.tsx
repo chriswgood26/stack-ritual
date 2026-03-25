@@ -72,8 +72,8 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
         )}
       </div>
 
-      {/* Categories */}
-      <div className="mb-6">
+      {/* Categories — hide when searching */}
+      {!query && <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Browse by category</h2>
           {activeCategory && (
@@ -101,7 +101,7 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
             </button>
           ))}
         </div>
-      </div>
+      </div>}
 
       {/* Recommended — only show when no search/filter active */}
       {!query && !activeCategory && recommended.length > 0 && (
