@@ -259,7 +259,7 @@ export default async function Dashboard() {
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
-                            <div className="flex items-center gap-2">
+                            {/* Top row: name + edit */}
                             <EditStackItemButton
                               itemId={item.id}
                               name={name}
@@ -272,25 +272,27 @@ export default async function Dashboard() {
                               currentQuantityRemaining={item.quantity_remaining}
                               currentQuantityUnit={item.quantity_unit}
                             />
-                          <CheckoffButton
-                              stackItemId={item.id}
-                              userId={userId}
-                              isChecked={isChecked}
-                              date={today}
-                              doseIndex={item.doseIndex ?? 0}
-                              takenAt={takenAtMap[checkId] || null}
-                            />
-                            </div>
-                            {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
-                              <QuantityAdjuster
-                                itemId={item.id}
-                                currentRemaining={item.quantity_remaining}
-                                currentTotal={item.quantity_total}
-                                unit={item.quantity_unit}
-                                name={name}
-                                compact
+                            {/* Second row: Complete time (from CheckoffButton) + badge + checkoff */}
+                            <div className="flex items-center gap-1.5">
+                              {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
+                                <QuantityAdjuster
+                                  itemId={item.id}
+                                  currentRemaining={item.quantity_remaining}
+                                  currentTotal={item.quantity_total}
+                                  unit={item.quantity_unit}
+                                  name={name}
+                                  compact
+                                />
+                              )}
+                              <CheckoffButton
+                                stackItemId={item.id}
+                                userId={userId}
+                                isChecked={isChecked}
+                                date={today}
+                                doseIndex={item.doseIndex ?? 0}
+                                takenAt={takenAtMap[checkId] || null}
                               />
-                            )}
+                            </div>
                           </div>
                         </div>
                       );
