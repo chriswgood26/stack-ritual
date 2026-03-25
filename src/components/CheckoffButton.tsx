@@ -62,7 +62,7 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
         disabled={loading}
         className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
           checked
-            ? "bg-emerald-500 border-emerald-500 text-white"
+            ? "bg-emerald-700 border-emerald-700 text-white"
             : "border-stone-200 hover:border-emerald-400 hover:bg-emerald-50"
         } ${loading ? "opacity-50" : ""}`}
       >
