@@ -249,27 +249,20 @@ export default async function Dashboard() {
                             }`}>
                               {icon}
                             </div>
-                            <div className="min-w-0">
-                              <EditStackItemButton
-                                itemId={item.id}
-                                name={name}
-                                currentDose={item.dose}
-                                currentTiming={item.timing}
-                                currentBrand={item.brand}
-                                currentNotes={item.notes}
-                                currentFrequency={item.frequency_type}
-                                currentQuantityTotal={item.quantity_total}
-                                currentQuantityRemaining={item.quantity_remaining}
-                                currentQuantityUnit={item.quantity_unit}
-                                asLabel
-                                labelClassName={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
-                              />
+                            <div className="min-w-0 flex-1">
+                              <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>
+                                {supp?.slug ? (
+                                  <Link href={`/dashboard/search/${supp.slug}`} className="hover:text-emerald-700 transition-colors">
+                                    {name}
+                                  </Link>
+                                ) : name}
+                              </div>
                               <div className="text-xs text-stone-400">
                                 {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
+                          <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0 min-w-fit">
                             <div className="flex items-center gap-1.5">
                               {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
                                 <QuantityAdjuster
