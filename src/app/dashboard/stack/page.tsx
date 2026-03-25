@@ -20,17 +20,9 @@ export default async function MyStackPage() {
     .select("*, supplement:supplement_id(name, icon, slug)")
     .eq("user_id", user.id)
     .eq("is_active", true)
-    .order("created_at", { ascending: true });
+    .order("custom_name", { ascending: true, nullsFirst: false });
 
-  const getItemName = (item: typeof stackItems[0]) => {
-    const s = item.supplement;
-    const supp = Array.isArray(s) ? s[0] : s;
-    return (supp as {name?: string})?.name || item.custom_name || "";
-  };
-
-  const supplements = (stackItems || [])
-    .filter(i => i.category === "supplement")
-    .sort((a, b) => getItemName(a).localeCompare(getItemName(b)));
+  const supplements = (stackItems || []).filter(i => i.category === "supplement");
   const rituals = (stackItems || [])
     .filter(i => i.category === "ritual")
     .sort((a, b) => (a.custom_name || "").localeCompare(b.custom_name || ""));
