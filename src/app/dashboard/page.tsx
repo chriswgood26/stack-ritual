@@ -9,6 +9,7 @@ import CheckoffButton from "@/components/CheckoffButton";
 import MarkAllDoneButton from "@/components/MarkAllDoneButton";
 import EditStackItemButton from "@/components/EditStackItemButton";
 import MarkSlotDoneButton from "@/components/MarkSlotDoneButton";
+import QuantityAdjuster from "@/components/QuantityAdjuster";
 import MoodSlider from "@/components/MoodSlider";
 
 export const dynamic = "force-dynamic";
