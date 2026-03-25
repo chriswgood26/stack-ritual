@@ -257,7 +257,16 @@ export default async function Dashboard() {
                                 <span className="text-xs text-stone-400">
                                   {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                                 </span>
-                                <span className="text-xs text-amber-500">qty:{String(item.quantity_remaining)}</span>
+                                {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
+                                  <QuantityAdjuster
+                                    itemId={item.id}
+                                    currentRemaining={item.quantity_remaining}
+                                    currentTotal={item.quantity_total}
+                                    unit={item.quantity_unit}
+                                    name={name}
+                                    compact
+                                  />
+                                )}
                               </div>
                             </div>
                           </div>
