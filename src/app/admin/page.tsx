@@ -95,14 +95,16 @@ export default async function AdminPage() {
         </div>
 
         {/* App feedback */}
-        <div id="feedback" className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-700">
+        <div id="feedback" />
+        <details className="bg-stone-800 rounded-2xl border border-stone-700">
+          <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
             <h2 className="font-bold text-white">App Feedback ({totalFeedback ?? 0})</h2>
-          </div>
+            <span className="text-stone-400 text-sm select-none">▼</span>
+          </summary>
           {!feedback || feedback.length === 0 ? (
             <div className="px-5 py-8 text-center text-stone-500 text-sm">No feedback yet</div>
           ) : (
-            <div className="divide-y divide-stone-700">
+            <div className="divide-y divide-stone-700 max-h-96 overflow-y-auto">
               {feedback.map(fb => (
                 <div key={fb.id} className="px-5 py-4">
                   <div className="flex items-center gap-2 mb-1">
@@ -114,7 +116,7 @@ export default async function AdminPage() {
               ))}
             </div>
           )}
-        </div>
+        </details>
 
         {/* Pending supplement submissions */}
         <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
