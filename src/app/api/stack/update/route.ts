@@ -17,9 +17,14 @@ export async function POST(req: NextRequest) {
       brand: brand || null,
       notes: notes || null,
       frequency_type: frequency_type || "daily",
-      quantity_total: quantity_total !== "" && quantity_total !== null && quantity_total !== undefined ? Number(quantity_total) : null,
-      quantity_remaining: quantity_remaining !== "" && quantity_remaining !== null && quantity_remaining !== undefined ? Number(quantity_remaining) : null,
-      quantity_unit: quantity_unit || "capsules",
+      // Only update inventory if values were explicitly provided (not empty string)
+      ...(quantity_total !== "" && quantity_total !== null && quantity_total !== undefined
+        ? { quantity_total: Number(quantity_total) }
+        : {}),
+      ...(quantity_remaining !== "" && quantity_remaining !== null && quantity_remaining !== undefined
+        ? { quantity_remaining: Number(quantity_remaining) }
+        : {}),
+      ...(quantity_unit ? { quantity_unit } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", item_id)
