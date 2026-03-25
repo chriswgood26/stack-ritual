@@ -161,10 +161,10 @@ export default async function Dashboard() {
           <>
             {/* Stats */}
             <div className="grid grid-cols-4 gap-2 mb-5">
-              <div className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center">
+              <Link href="/dashboard/stack" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
                 <div className="text-base font-bold text-stone-900">{totalItems}</div>
                 <div className="text-xs text-stone-500 leading-tight">Total</div>
-              </div>
+              </Link>
               <Link href="/dashboard/stack" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
                 <div className="text-base font-bold text-stone-900">{supplements}</div>
                 <div className="text-xs text-stone-500 leading-tight">Supps</div>
