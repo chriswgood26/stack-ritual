@@ -20,12 +20,20 @@ export default async function MyStackPage() {
     .select("*, supplement:supplement_id(name, icon, slug)")
     .eq("user_id", user.id)
     .eq("is_active", true)
-    .order("custom_name", { ascending: true, nullsFirst: false });
+    .order("created_at", { ascending: true });
 
-  const supplements = (stackItems || []).filter(i => i.category === "supplement");
-  const rituals = (stackItems || [])
-    .filter(i => i.category === "ritual")
-    .sort((a, b) => (a.custom_name || "").localeCompare(b.custom_name || ""));
+  const getDisplayName = (item: { custom_name?: string | null; supplement?: unknown }) => {
+    try {
+      const s = item.supplement as { name?: string } | { name?: string }[] | null;
+      if (Array.isArray(s)) return s[0]?.name || item.custom_name || "";
+      return (s as { name?: string })?.name || item.custom_name || "";
+    } catch { return item.custom_name || ""; }
+  };
+
+  const supplements = (stackItems || [])
+    .filter(i => i.category === "supplement")
+    .sort((a, b) => getDisplayName(a).localeCompare(getDisplayName(b)));
+  const rituals = (stackItems || []).filter(i => i.category === "ritual").sort((a, b) => (a.custom_name || "").localeCompare(b.custom_name || ""));
   const total = (stackItems || []).length;
 
   return (
