@@ -10,9 +10,10 @@ interface Props {
   unit: string | null;
   name: string;
   compact?: boolean;
+  supplementSlug?: string | null;
 }
 
-export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false }: Props) {
+export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false, supplementSlug }: Props) {
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState(currentRemaining?.toString() || "");
   const [saving, setSaving] = useState(false);
@@ -113,6 +114,22 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
             <div className="bg-stone-50 rounded-xl px-4 py-3 text-xs text-stone-500">
               Current: <strong>{currentRemaining}</strong> {unitLabel} remaining
               {currentTotal && <span> of {currentTotal}</span>}
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Reorder</p>
+              <div className="flex gap-2">
+                <a href={`https://www.iherb.com/search?q=${encodeURIComponent(name)}&rcode=7113351`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-700 py-2 rounded-xl text-xs font-semibold text-center hover:bg-emerald-100 transition-colors">
+                  iHerb →
+                </a>
+                <a href={`https://www.amazon.com/s?k=${encodeURIComponent(name + ' supplement')}&tag=stackritual-20`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex-1 bg-stone-50 border border-stone-200 text-stone-700 py-2 rounded-xl text-xs font-semibold text-center hover:bg-stone-100 transition-colors">
+                  Amazon →
+                </a>
+              </div>
             </div>
           </div>
         </div>
