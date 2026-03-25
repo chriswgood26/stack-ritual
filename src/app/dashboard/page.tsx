@@ -250,13 +250,20 @@ export default async function Dashboard() {
                               {icon}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className={`font-medium text-sm truncate ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>
-                                {supp?.slug ? (
-                                  <Link href={`/dashboard/search/${supp.slug}`} className="hover:text-emerald-700 transition-colors">
-                                    {name}
-                                  </Link>
-                                ) : name}
-                              </div>
+                              <EditStackItemButton
+                                itemId={item.id}
+                                name={name}
+                                currentDose={item.dose}
+                                currentTiming={item.timing}
+                                currentBrand={item.brand}
+                                currentNotes={item.notes}
+                                currentFrequency={item.frequency_type}
+                                currentQuantityTotal={item.quantity_total}
+                                currentQuantityRemaining={item.quantity_remaining}
+                                currentQuantityUnit={item.quantity_unit}
+                                asLabel
+                                labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
+                              />
                               <div className="text-xs text-stone-400 truncate">
                                 {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                               </div>
