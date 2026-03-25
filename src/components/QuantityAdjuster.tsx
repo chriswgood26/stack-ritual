@@ -68,7 +68,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
     <>
       <button onClick={() => setOpen(true)}
         className={`rounded-full border font-medium transition-colors ${color} ${sizeClass}`}>
-        {currentRemaining} remaining
+        {currentRemaining} {unitLabel} remaining
       </button>
 
       {open && (
