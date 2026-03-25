@@ -139,7 +139,13 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 <div>
                   <label className="text-xs text-stone-400 block mb-1">Remaining</label>
                   <input type="number" value={form.quantity_remaining}
-                    onChange={e => setForm(f => ({ ...f, quantity_remaining: e.target.value }))}
+                    onChange={e => {
+                      const val = e.target.value;
+                      const max = form.quantity_total ? parseInt(form.quantity_total) : Infinity;
+                      const num = parseInt(val);
+                      setForm(f => ({ ...f, quantity_remaining: (!isNaN(num) && num > max) ? form.quantity_total : val }));
+                    }}
+                    max={form.quantity_total || undefined}
                     placeholder="90"
                     className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                 </div>
