@@ -19,7 +19,13 @@ export const metadata: Metadata = {
   description: "Build consistent supplement and wellness habits with smart scheduling, daily check-offs, streak tracking, and doctor-ready summaries.",
   icons: {
     icon: "/favicon.svg",
-    apple: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: [
+      { url: "/apple-touch-icon.svg", sizes: "180x180", type: "image/svg+xml" },
+    ],
+    other: [
+      { rel: "apple-touch-icon", url: "/apple-touch-icon.svg" },
+    ],
   },
   other: {
     "impact-site-verification": "359487ab-3ea9-426b-b73b-e654d683f27c",
