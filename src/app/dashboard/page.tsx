@@ -143,7 +143,7 @@ export default async function Dashboard() {
         {/* Header */}
         <div className="mb-5">
           <h1 className="text-xl font-bold text-stone-900">{greeting}{firstName ? `, ${firstName}` : ""} 👋</h1>
-          <p className="text-stone-500 text-sm mt-0.5">{dateStr}</p>
+          <Link href="/dashboard/history" className="text-stone-500 text-sm mt-0.5 hover:text-emerald-600 transition-colors">{dateStr} →</Link>
         </div>
 
         {totalItems === 0 ? (
@@ -173,7 +173,7 @@ export default async function Dashboard() {
                 <div className="text-base font-bold text-stone-900">{rituals}</div>
                 <div className="text-xs text-stone-500 leading-tight">Rituals</div>
               </Link>
-              <Link href="/dashboard/history" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
+              <Link href="/dashboard/mood-report?range=30" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
                 <div className={`text-base font-bold ${checkedCount === totalItems ? "text-emerald-600" : "text-stone-900"}`}>
                   {checkedCount}/{totalItems}
                 </div>

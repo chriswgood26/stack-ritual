@@ -209,6 +209,13 @@ export default async function ProfilePage() {
               </div>
               <span className="text-stone-300">›</span>
             </Link>
+            <Link href="/dashboard/mood-report?range=30" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📊</span>
+                <span className="font-medium text-stone-900 text-sm">Mood & wellness report</span>
+              </div>
+              <span className="text-stone-300">›</span>
+            </Link>
             <Link href="/dashboard/search" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
               <div className="flex items-center gap-3">
                 <span className="text-xl">🔬</span>
