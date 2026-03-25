@@ -113,7 +113,7 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
           <div className="flex gap-2 overflow-x-auto pb-1">
             {recommended.map(supp => (
               <Link key={supp.id} href={`/dashboard/search/${supp.slug}`}
-                className="bg-emerald-50 border border-emerald-100 rounded-2xl p-3 flex-shrink-0 hover:border-emerald-300 transition-colors min-w-[90px] text-center">
+                className="bg-amber-50 border border-amber-100 rounded-2xl p-3 flex-shrink-0 hover:border-amber-300 transition-colors min-w-[90px] text-center">
                 <div className="text-2xl mb-1">{supp.icon}</div>
                 <div className="text-xs font-semibold text-stone-900 leading-tight">{supp.name.length > 10 ? supp.name.replace("Vitamin ", "Vit. ") : supp.name}</div>
                 <div className="text-xs text-stone-500 mt-0.5 leading-tight">{supp.tagline.split(" · ")[0]}</div>
