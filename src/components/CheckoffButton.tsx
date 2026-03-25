@@ -53,7 +53,7 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
   return (
     <div className="flex items-center gap-2">
       {checked && timeStr && (
-        <span className="text-xs font-bold text-red-500 whitespace-nowrap">
+        <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
           Complete {timeStr}
         </span>
       )}
