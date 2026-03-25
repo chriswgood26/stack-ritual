@@ -25,6 +25,9 @@ export async function POST(req: NextRequest) {
     .eq("id", item_id)
     .eq("user_id", userId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ message: "updated" });
+  if (error) {
+    console.error("Update error:", error.message, error.details);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json({ message: "updated", saved: { quantity_total, quantity_remaining, quantity_unit } });
 }
