@@ -244,6 +244,18 @@ export default async function Dashboard() {
                       return (
                         <div key={checkId} className="flex items-center justify-between px-4 py-3.5">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <EditStackItemButton
+                              itemId={item.id}
+                              name={name}
+                              currentDose={item.dose}
+                              currentTiming={item.timing}
+                              currentBrand={item.brand}
+                              currentNotes={item.notes}
+                              currentFrequency={item.frequency_type}
+                              currentQuantityTotal={item.quantity_total}
+                              currentQuantityRemaining={item.quantity_remaining}
+                              currentQuantityUnit={item.quantity_unit}
+                            />
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
                               item.category === "ritual" ? "bg-amber-100" : "bg-emerald-100"
                             }`}>
@@ -259,20 +271,6 @@ export default async function Dashboard() {
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
-                            {/* Top row: name + edit */}
-                            <EditStackItemButton
-                              itemId={item.id}
-                              name={name}
-                              currentDose={item.dose}
-                              currentTiming={item.timing}
-                              currentBrand={item.brand}
-                              currentNotes={item.notes}
-                              currentFrequency={item.frequency_type}
-                              currentQuantityTotal={item.quantity_total}
-                              currentQuantityRemaining={item.quantity_remaining}
-                              currentQuantityUnit={item.quantity_unit}
-                            />
-                            {/* Second row: Complete time (from CheckoffButton) + badge + checkoff */}
                             <div className="flex items-center gap-1.5">
                               {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
                                 <QuantityAdjuster
