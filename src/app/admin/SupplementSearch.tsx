@@ -26,7 +26,7 @@ export default function SupplementSearch({ supplements }: { supplements: Supplem
     : supplements.filter(s =>
         s.name.toLowerCase().includes(query.toLowerCase()) ||
         s.category.toLowerCase().includes(query.toLowerCase())
-      );
+      ).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <>

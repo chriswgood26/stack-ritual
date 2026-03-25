@@ -46,7 +46,7 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
       const matchesQuery = query.length < 2 || s.name.toLowerCase().includes(query.toLowerCase()) || s.tagline?.toLowerCase().includes(query.toLowerCase());
       const matchesCategory = !activeCategory || s.category === activeCategory;
       return matchesQuery && matchesCategory;
-    });
+    }).sort((a, b) => a.name.localeCompare(b.name));
   }, [supplements, query, activeCategory]);
 
   function toggleCategory(val: string) {
