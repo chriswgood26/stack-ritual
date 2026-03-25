@@ -154,7 +154,9 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
                   <p className="text-xs text-stone-500 mt-0.5 truncate">{supp.tagline}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <EvidenceBadge level={supp.evidence_level ?? "limited"} />
+                  <div onClick={e => e.preventDefault()}>
+                    <EvidenceBadge level={supp.evidence_level ?? "limited"} />
+                  </div>
                   <span className="text-stone-300 text-sm">›</span>
                 </div>
               </Link>
