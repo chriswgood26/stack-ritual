@@ -22,8 +22,17 @@ export default async function MyStackPage() {
     .eq("is_active", true)
     .order("created_at", { ascending: true });
 
-  const supplements = (stackItems || []).filter(i => i.category === "supplement");
-  const rituals = (stackItems || []).filter(i => i.category === "ritual");
+  const getItemName = (item: typeof stackItems[0]) => {
+    const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
+    return supp?.name || item.custom_name || "";
+  };
+
+  const supplements = (stackItems || [])
+    .filter(i => i.category === "supplement")
+    .sort((a, b) => getItemName(a).localeCompare(getItemName(b)));
+  const rituals = (stackItems || [])
+    .filter(i => i.category === "ritual")
+    .sort((a, b) => (a.custom_name || "").localeCompare(b.custom_name || ""));
   const total = (stackItems || []).length;
 
   return (
