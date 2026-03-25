@@ -9,9 +9,10 @@ interface Props {
   currentTotal: number | null;
   unit: string | null;
   name: string;
+  compact?: boolean;
 }
 
-export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name }: Props) {
+export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false }: Props) {
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState(currentRemaining?.toString() || "");
   const [saving, setSaving] = useState(false);
@@ -60,11 +61,12 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
   const color = pct <= 15 ? "text-red-600 bg-red-50 border-red-200" :
     pct <= 25 ? "text-amber-600 bg-amber-50 border-amber-200" :
     "text-emerald-700 bg-emerald-50 border-emerald-200";
+  const sizeClass = compact ? "text-xs px-1.5 py-0 leading-5" : "text-xs px-2 py-1";
 
   return (
     <>
       <button onClick={() => setOpen(true)}
-        className={`text-xs px-2 py-1 rounded-full border font-medium transition-colors ${color}`}>
+        className={`rounded-full border font-medium transition-colors ${color} ${sizeClass}`}>
         {currentRemaining} {unitLabel}
       </button>
 
