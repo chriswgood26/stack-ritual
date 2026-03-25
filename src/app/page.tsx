@@ -7,12 +7,13 @@ export default function Home() {
     <div className="min-h-screen bg-stone-50 text-stone-900 font-sans">
 
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 max-w-6xl mx-auto">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-5 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌿</span>
-          <span className="text-xl font-bold tracking-tight">Stack Ritual</span>
+          <span className="text-lg sm:text-xl font-bold tracking-tight">Stack Ritual</span>
         </div>
-        <div className="flex items-center gap-6 text-sm font-medium text-stone-600">
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-stone-600">
           <Link href="#features" className="hover:text-stone-900 transition-colors">Features</Link>
           <Link href="#how-it-works" className="hover:text-stone-900 transition-colors">How it works</Link>
           <Link href="#pricing" className="hover:text-stone-900 transition-colors">Pricing</Link>
@@ -20,6 +21,15 @@ export default function Home() {
             Log in
           </Link>
           <Link href="/sign-up" className="bg-emerald-700 text-white px-4 py-2 rounded-full hover:bg-emerald-800 transition-colors">
+            Start Now
+          </Link>
+        </div>
+        {/* Mobile nav */}
+        <div className="flex md:hidden items-center gap-3">
+          <Link href="/sign-in" className="text-stone-600 text-sm font-medium hover:text-stone-900 transition-colors">
+            Log in
+          </Link>
+          <Link href="/sign-up" className="bg-emerald-700 text-white px-3 py-1.5 rounded-full text-sm font-semibold hover:bg-emerald-800 transition-colors">
             Start Now
           </Link>
         </div>
