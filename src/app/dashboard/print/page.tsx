@@ -19,7 +19,7 @@ export default function PrintPage() {
         </div>
         <div className="flex gap-2">
           <a
-            href={`mailto:?subject=My%20Supplement%20Stack%20Summary&body=Hi%2C%0A%0APlease%20find%20my%20supplement%20stack%20summary%20from%20Stack%20Ritual%20attached%20as%20a%20PDF.%0A%0AYou%20can%20also%20view%20it%20online%20at%3A%20https%3A%2F%2Fstackritual.com%2Fdashboard%2Fprint%0A%0AThanks`}
+            href={`mailto:?subject=My%20Supplement%20Stack%20Summary&body=Hi%2C%0A%0AI%27ve%20attached%20my%20supplement%20stack%20summary%20as%20a%20PDF%20for%20your%20review.%0A%0AThis%20report%20was%20generated%20by%20Stack%20Ritual%20(stackritual.com)%20and%20includes%20my%20current%20supplements%2C%20dosages%2C%20and%20timing.%0A%0ANote%3A%20Please%20save%20this%20email%20draft%2C%20then%20use%20the%20Print%20%2F%20Save%20PDF%20button%20on%20the%20previous%20screen%20to%20generate%20the%20PDF%20and%20attach%20it%20before%20sending.%0A%0AThanks`}
             className="bg-stone-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-stone-800 transition-colors"
           >
             ✉️ Email
@@ -32,9 +32,12 @@ export default function PrintPage() {
           </button>
         </div>
       </nav>
-      <div className="max-w-2xl mx-auto px-4 py-4 print:hidden">
+      <div className="max-w-2xl mx-auto px-4 py-4 print:hidden space-y-2">
         <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800">
-          💡 Click <strong>Print / Save PDF</strong> to print or save as PDF to share with your doctor.
+          💡 Click <strong>Print / Save PDF</strong> to save as a PDF, then attach it to an email.
+        </div>
+        <div className="bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-xs text-stone-600">
+          📧 <strong>To email your doctor:</strong> First save the PDF using the button above, then tap <strong>✉️ Email</strong> to open your email app and attach the saved PDF.
         </div>
       </div>
       <PrintContent today={today} />

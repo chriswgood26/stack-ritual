@@ -56,7 +56,7 @@ function MoodReportContent() {
         </div>
         <div className="flex gap-2">
           <a
-            href={`mailto:?subject=My%20Mood%20%26%20Wellness%20Report&body=Hi%2C%0A%0APlease%20find%20my%20mood%20and%20wellness%20report%20from%20Stack%20Ritual%20attached%20as%20a%20PDF.%0A%0AYou%20can%20view%20it%20online%20at%3A%20https%3A%2F%2Fstackritual.com%2Fdashboard%2Fmood-report%0A%0AThanks`}
+            href={`mailto:?subject=My%20Mood%20%26%20Wellness%20Report&body=Hi%2C%0A%0AI%27ve%20attached%20my%20mood%20and%20wellness%20report%20as%20a%20PDF%20for%20your%20review.%0A%0AThis%20report%20was%20generated%20by%20Stack%20Ritual%20(stackritual.com)%20and%20shows%20my%20daily%20mood%20scores%2C%20supplement%20adherence%2C%20and%20the%20correlation%20between%20the%20two.%0A%0ANote%3A%20Please%20save%20this%20draft%2C%20use%20Print%20%2F%20Save%20PDF%20to%20generate%20the%20PDF%2C%20then%20attach%20it%20before%20sending.%0A%0AThanks`}
             className="bg-stone-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-stone-800 transition-colors"
           >
             ✉️ Email
