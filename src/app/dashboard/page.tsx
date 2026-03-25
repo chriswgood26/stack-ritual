@@ -259,16 +259,6 @@ export default async function Dashboard() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                            {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
-                              <QuantityAdjuster
-                                itemId={item.id}
-                                currentRemaining={item.quantity_remaining}
-                                currentTotal={item.quantity_total}
-                                unit={item.quantity_unit}
-                                name={name}
-                                compact
-                              />
-                            )}
                             <EditStackItemButton
                               itemId={item.id}
                               name={name}
@@ -281,6 +271,16 @@ export default async function Dashboard() {
                               currentQuantityRemaining={item.quantity_remaining}
                               currentQuantityUnit={item.quantity_unit}
                             />
+                            {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
+                              <QuantityAdjuster
+                                itemId={item.id}
+                                currentRemaining={item.quantity_remaining}
+                                currentTotal={item.quantity_total}
+                                unit={item.quantity_unit}
+                                name={name}
+                                compact
+                              />
+                            )}
                           <CheckoffButton
                               stackItemId={item.id}
                               userId={userId}
