@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { getToday, getUserTimezone } from "@/lib/timezone";
 import { supabaseAdmin } from "@/lib/supabase";
 import BottomNav from "@/components/BottomNav";
+import MoodAnalytics from "@/components/MoodAnalytics";
 import TopNav from "@/components/TopNav";
 import HistoryCalendar from "@/components/HistoryCalendar";
 
@@ -21,7 +22,7 @@ export default async function HistoryPage() {
   // Fetch mood scores
   const { data: moodLogs } = await supabaseAdmin
     .from("daily_mood")
-    .select("logged_date, mood_score")
+    .select("logged_date, mood_score, notes")
     .eq("user_id", user.id);
 
   const { count: stackSize } = await supabaseAdmin
