@@ -253,7 +253,7 @@ export default async function Dashboard() {
                                 {name}
                               </div>
                               <div className="text-xs text-stone-400">
-                                {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0].split(",")[0] : ""}
+                                {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                               </div>
                             </div>
                           </div>
@@ -315,7 +315,7 @@ export default async function Dashboard() {
                       </div>
                       <div className="min-w-0">
                         <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>{name}</div>
-                        {item.dose && <div className="text-xs text-stone-400 truncate max-w-[160px]">{item.dose.split(".")[0].split(",")[0]}</div>}
+                        {item.dose && <div className="text-xs text-stone-400 truncate max-w-[160px]">{item.dose.split(".")[0]}</div>}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 ml-2 flex-shrink-0">
