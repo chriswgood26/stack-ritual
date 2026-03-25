@@ -250,39 +250,37 @@ export default async function Dashboard() {
                               {icon}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>
+                              <div className={`font-medium text-sm truncate ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>
                                 {supp?.slug ? (
                                   <Link href={`/dashboard/search/${supp.slug}`} className="hover:text-emerald-700 transition-colors">
                                     {name}
                                   </Link>
                                 ) : name}
                               </div>
-                              <div className="text-xs text-stone-400">
+                              <div className="text-xs text-stone-400 truncate">
                                 {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0 min-w-fit">
-                            <div className="flex items-center gap-1.5">
-                              {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
-                                <QuantityAdjuster
-                                  itemId={item.id}
-                                  currentRemaining={item.quantity_remaining}
-                                  currentTotal={item.quantity_total}
-                                  unit={item.quantity_unit}
-                                  name={name}
-                                  compact
-                                />
-                              )}
-                              <CheckoffButton
-                                stackItemId={item.id}
-                                userId={userId}
-                                isChecked={isChecked}
-                                date={today}
-                                doseIndex={item.doseIndex ?? 0}
-                                takenAt={takenAtMap[checkId] || null}
+                          <div className="flex flex-col items-end gap-0.5 ml-2 flex-shrink-0 min-w-fit">
+                            <CheckoffButton
+                              stackItemId={item.id}
+                              userId={userId}
+                              isChecked={isChecked}
+                              date={today}
+                              doseIndex={item.doseIndex ?? 0}
+                              takenAt={takenAtMap[checkId] || null}
+                            />
+                            {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
+                              <QuantityAdjuster
+                                itemId={item.id}
+                                currentRemaining={item.quantity_remaining}
+                                currentTotal={item.quantity_total}
+                                unit={item.quantity_unit}
+                                name={name}
+                                compact
                               />
-                            </div>
+                            )}
                           </div>
                         </div>
                       );
