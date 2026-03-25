@@ -14,6 +14,8 @@ interface Props {
   currentQuantityTotal?: number | null;
   currentQuantityRemaining?: number | null;
   currentQuantityUnit?: string | null;
+  asLabel?: boolean;
+  labelClassName?: string;
 }
 
 const timingOptions = [
@@ -43,7 +45,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, asLabel = false, labelClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({

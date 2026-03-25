@@ -244,27 +244,26 @@ export default async function Dashboard() {
                       return (
                         <div key={checkId} className="flex items-center justify-between px-4 py-3.5">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <EditStackItemButton
-                              itemId={item.id}
-                              name={name}
-                              currentDose={item.dose}
-                              currentTiming={item.timing}
-                              currentBrand={item.brand}
-                              currentNotes={item.notes}
-                              currentFrequency={item.frequency_type}
-                              currentQuantityTotal={item.quantity_total}
-                              currentQuantityRemaining={item.quantity_remaining}
-                              currentQuantityUnit={item.quantity_unit}
-                            />
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
                               item.category === "ritual" ? "bg-amber-100" : "bg-emerald-100"
                             }`}>
                               {icon}
                             </div>
                             <div className="min-w-0">
-                              <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>
-                                {name}
-                              </div>
+                              <EditStackItemButton
+                                itemId={item.id}
+                                name={name}
+                                currentDose={item.dose}
+                                currentTiming={item.timing}
+                                currentBrand={item.brand}
+                                currentNotes={item.notes}
+                                currentFrequency={item.frequency_type}
+                                currentQuantityTotal={item.quantity_total}
+                                currentQuantityRemaining={item.quantity_remaining}
+                                currentQuantityUnit={item.quantity_unit}
+                                asLabel
+                                labelClassName={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
+                              />
                               <div className="text-xs text-stone-400">
                                 {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                               </div>
