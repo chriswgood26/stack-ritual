@@ -117,7 +117,7 @@ function PrintContent({ today }: { today: string }) {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pb-16 print:px-0 print:max-w-full print:pb-0 print:pt-0">
+    <div className="max-w-2xl mx-auto px-2 sm:px-4 pb-16 print:px-0 print:max-w-full print:pb-0 print:pt-0 overflow-x-hidden">
       <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 print:shadow-none print:border-none print:rounded-none print:p-0">
 
         {/* Header */}
@@ -152,7 +152,7 @@ function PrintContent({ today }: { today: string }) {
                 <h2 className="text-sm font-bold text-stone-500 uppercase tracking-wider mb-2 pb-1 border-b border-stone-100">
                   {group.label}
                 </h2>
-                <table className="w-full text-sm">
+                <div className="overflow-x-auto -mx-2 sm:mx-0"><table className="w-full text-xs sm:text-sm min-w-[400px] sm:min-w-0">
                   <thead>
                     <tr className="text-xs text-stone-400 font-medium">
                       <th className="text-left py-1.5 w-1/4">Name</th>
@@ -183,7 +183,7 @@ function PrintContent({ today }: { today: string }) {
                       );
                     })}
                   </tbody>
-                </table>
+</table></div>
               </div>
             ))}
           </div>
