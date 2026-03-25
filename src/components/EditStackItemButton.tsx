@@ -77,8 +77,8 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
   return (
     <>
       <button onClick={() => setOpen(true)}
-        className="text-stone-300 hover:text-emerald-500 transition-colors text-lg p-1">
-        ✏️
+        className={asLabel ? (labelClassName || "font-medium text-sm text-stone-900") : "text-stone-300 hover:text-emerald-500 transition-colors text-lg p-1"}>
+        {asLabel ? name : "✏️"}
       </button>
 
       {open && (
