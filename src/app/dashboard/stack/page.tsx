@@ -98,15 +98,13 @@ export default async function MyStackPage() {
                           <div className="text-xs text-stone-400 mt-0.5 flex items-center gap-2 flex-wrap">
                             <span>{[item.dose, item.timing, item.brand].filter(Boolean).join(" · ")}</span>
                           </div>
-                          {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
-                            <QuantityAdjuster
-                              itemId={item.id}
-                              currentRemaining={item.quantity_remaining}
-                              currentTotal={item.quantity_total}
-                              unit={item.quantity_unit}
-                              name={name}
-                            />
-                          )}
+                          <QuantityAdjuster
+                            itemId={item.id}
+                            currentRemaining={item.quantity_remaining ?? null}
+                            currentTotal={item.quantity_total ?? null}
+                            unit={item.quantity_unit ?? null}
+                            name={name}
+                          />
                           <div className="hidden">
                           </div>
                         </div>
