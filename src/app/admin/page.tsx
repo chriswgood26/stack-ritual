@@ -7,6 +7,7 @@ import UserManager from "./UserManager";
 import EditSubmissionButton from "./EditSubmissionButton";
 import EditSupplementButton from "./EditSupplementButton";
 import AddSupplementButton from "./AddSupplementButton";
+import SupplementSearch from "./SupplementSearch";
 
 export const dynamic = "force-dynamic";
 
@@ -188,18 +189,7 @@ export default async function AdminPage() {
               <AddSupplementButton />
             </div>
           </div>
-          <div className="divide-y divide-stone-700 max-h-96 overflow-y-auto">
-            {allSupplements?.map(supp => (
-              <div key={supp.id} className="px-5 py-3 flex items-center gap-3">
-                <span className="text-xl">{supp.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-white text-sm">{supp.name}</div>
-                  <div className="text-xs text-stone-400">{supp.category} · {supp.evidence_level}</div>
-                </div>
-                <EditSupplementButton supplement={supp} />
-              </div>
-            ))}
-          </div>
+          <SupplementSearch supplements={allSupplements || []} />
         </div>
 
         {/* User Management */}
