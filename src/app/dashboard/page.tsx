@@ -258,7 +258,8 @@ export default async function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                          <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
+                            <div className="flex items-center gap-2">
                             <EditStackItemButton
                               itemId={item.id}
                               name={name}
@@ -271,6 +272,15 @@ export default async function Dashboard() {
                               currentQuantityRemaining={item.quantity_remaining}
                               currentQuantityUnit={item.quantity_unit}
                             />
+                          <CheckoffButton
+                              stackItemId={item.id}
+                              userId={userId}
+                              isChecked={isChecked}
+                              date={today}
+                              doseIndex={item.doseIndex ?? 0}
+                              takenAt={takenAtMap[checkId] || null}
+                            />
+                            </div>
                             {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
                               <QuantityAdjuster
                                 itemId={item.id}
@@ -281,14 +291,6 @@ export default async function Dashboard() {
                                 compact
                               />
                             )}
-                          <CheckoffButton
-                              stackItemId={item.id}
-                              userId={userId}
-                              isChecked={isChecked}
-                              date={today}
-                              doseIndex={item.doseIndex ?? 0}
-                              takenAt={takenAtMap[checkId] || null}
-                            />
                           </div>
                         </div>
                       );
