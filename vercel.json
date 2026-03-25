@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/weekly-summary",
       "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/low-supply",
+      "schedule": "0 8 * * *"
     }
   ]
 }

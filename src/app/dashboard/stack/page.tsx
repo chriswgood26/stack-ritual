@@ -4,6 +4,7 @@ import TopNav from "@/components/TopNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddCustomSupplement from "@/components/AddCustomSupplement";
 import DeleteStackItemButton from "@/components/DeleteStackItemButton";
+import QuantityAdjuster from "@/components/QuantityAdjuster";
 import EditStackItemButton from "@/components/EditStackItemButton";
 import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -86,17 +87,17 @@ export default async function MyStackPage() {
                           <div className="font-semibold text-stone-900 text-sm">{name}</div>
                           <div className="text-xs text-stone-400 mt-0.5 flex items-center gap-2 flex-wrap">
                             <span>{[item.dose, item.timing, item.brand].filter(Boolean).join(" · ")}</span>
-                            {item.quantity_remaining !== null && item.quantity_remaining !== undefined && item.quantity_total && (
-                              <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
-                                item.quantity_remaining <= Math.max(7, item.quantity_total * 0.15)
-                                  ? "bg-red-100 text-red-600"
-                                  : item.quantity_remaining <= Math.max(14, item.quantity_total * 0.25)
-                                  ? "bg-amber-100 text-amber-600"
-                                  : "bg-emerald-100 text-emerald-700"
-                              }`}>
-                                {item.quantity_remaining} {item.quantity_unit || "left"}
-                              </span>
-                            )}
+                          </div>
+                          {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
+                            <QuantityAdjuster
+                              itemId={item.id}
+                              currentRemaining={item.quantity_remaining}
+                              currentTotal={item.quantity_total}
+                              unit={item.quantity_unit}
+                              name={name}
+                            />
+                          )}
+                          <div className="hidden">
                           </div>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
