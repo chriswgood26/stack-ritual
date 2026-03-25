@@ -267,6 +267,9 @@ export default async function Dashboard() {
                               currentBrand={item.brand}
                               currentNotes={item.notes}
                               currentFrequency={item.frequency_type}
+                              currentQuantityTotal={item.quantity_total}
+                              currentQuantityRemaining={item.quantity_remaining}
+                              currentQuantityUnit={item.quantity_unit}
                             />
                           <CheckoffButton
                               stackItemId={item.id}
@@ -319,7 +322,7 @@ export default async function Dashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                      <EditStackItemButton itemId={item.id} name={name} currentDose={item.dose} currentTiming={item.timing} currentBrand={item.brand} currentNotes={item.notes} currentFrequency={item.frequency_type} />
+                      <EditStackItemButton itemId={item.id} name={name} currentDose={item.dose} currentTiming={item.timing} currentBrand={item.brand} currentNotes={item.notes} currentFrequency={item.frequency_type} currentQuantityTotal={item.quantity_total} currentQuantityRemaining={item.quantity_remaining} currentQuantityUnit={item.quantity_unit} />
                       <CheckoffButton stackItemId={item.id} userId={userId} isChecked={isChecked} date={today} doseIndex={item.doseIndex ?? 0} takenAt={takenAtMap[checkId] || null} />
                     </div>
                   </div>
