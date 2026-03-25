@@ -63,7 +63,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     const res = await fetch("/api/stack/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item_id: itemId, ...form, quantity_total: form.quantity_total ? parseInt(form.quantity_total) : null, quantity_remaining: form.quantity_remaining ? parseInt(form.quantity_remaining) : null }),
+      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit }),
     });
     if (res.ok) {
       setOpen(false);

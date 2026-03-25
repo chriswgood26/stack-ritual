@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
       brand: brand || null,
       notes: notes || null,
       frequency_type: frequency_type || "daily",
-      quantity_total: quantity_total ? parseInt(quantity_total) : null,
-      quantity_remaining: quantity_remaining !== undefined ? parseInt(quantity_remaining) : undefined,
+      quantity_total: quantity_total !== "" && quantity_total !== null && quantity_total !== undefined ? Number(quantity_total) : null,
+      quantity_remaining: quantity_remaining !== "" && quantity_remaining !== null && quantity_remaining !== undefined ? Number(quantity_remaining) : null,
       quantity_unit: quantity_unit || "capsules",
       updated_at: new Date().toISOString(),
     })
