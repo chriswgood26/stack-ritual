@@ -23,8 +23,9 @@ export default async function MyStackPage() {
     .order("created_at", { ascending: true });
 
   const getItemName = (item: typeof stackItems[0]) => {
-    const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
-    return supp?.name || item.custom_name || "";
+    const s = item.supplement;
+    const supp = Array.isArray(s) ? s[0] : s;
+    return (supp as {name?: string})?.name || item.custom_name || "";
   };
 
   const supplements = (stackItems || [])
