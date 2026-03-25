@@ -59,7 +59,7 @@ export default function AddSupplementButton() {
     setSaving(false);
   }
 
-  const categories = ["vitamins", "minerals", "nootropics", "adaptogens", "longevity", "sleep", "gut-health", "hormones", "amino-acids", "herbs", "ritual", "other"];
+  const categories = ["vitamins", "minerals", "nootropics", "adaptogens", "longevity", "sleep", "gut-health", "hormones", "amino-acids", "herbs", "phytonutrients", "ritual", "other"];
 
   return (
     <>

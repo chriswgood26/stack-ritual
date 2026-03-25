@@ -44,7 +44,7 @@ const timingOptions = [
 
 const categories = [
   "vitamins", "minerals", "nootropics", "adaptogens",
-  "longevity", "sleep", "gut-health", "hormones", "amino-acids", "herbs", "ritual", "other"
+  "longevity", "sleep", "gut-health", "hormones", "amino-acids", "herbs", "phytonutrients", "ritual", "other"
 ];
 
 export default function AddCustomSupplement() {

@@ -22,6 +22,7 @@ const categories = [
   { label: "Longevity", icon: "⏳", value: "longevity" },
   { label: "Sleep", icon: "🌙", value: "sleep" },
   { label: "Gut Health", icon: "🦠", value: "gut-health" },
+  { label: "Phytonutrients", icon: "🌱", value: "phytonutrients" },
   { label: "Rituals", icon: "🧘", value: "ritual" },
 ];
 
