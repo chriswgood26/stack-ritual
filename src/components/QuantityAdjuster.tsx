@@ -98,7 +98,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
 
             {/* Manual set */}
             <div>
-              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Set exact amount</p>
+              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Set exact amount remaining</p>
               <div className="flex gap-2">
                 <input type="number" value={qty} onChange={e => setQty(e.target.value)} min="0"
                   placeholder="0"
