@@ -11,6 +11,9 @@ interface Props {
   currentNotes?: string | null;
   currentFrequency?: string | null;
   name: string;
+  currentQuantityTotal?: number | null;
+  currentQuantityRemaining?: number | null;
+  currentQuantityUnit?: string | null;
 }
 
 const timingOptions = [
@@ -40,7 +43,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -49,6 +52,9 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     brand: currentBrand || "",
     notes: currentNotes || "",
     frequency_type: currentFrequency || "daily",
+    quantity_total: currentQuantityTotal?.toString() || "",
+    quantity_remaining: currentQuantityRemaining?.toString() || "",
+    quantity_unit: currentQuantityUnit || "capsules",
   });
   const router = useRouter();
 
@@ -57,7 +63,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     const res = await fetch("/api/stack/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item_id: itemId, ...form }),
+      body: JSON.stringify({ item_id: itemId, ...form, quantity_total: form.quantity_total ? parseInt(form.quantity_total) : null, quantity_remaining: form.quantity_remaining ? parseInt(form.quantity_remaining) : null }),
     });
     if (res.ok) {
       setOpen(false);
@@ -118,6 +124,40 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 placeholder="Any personal notes about this supplement..."
                 rows={2}
                 className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none" />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Supply tracking (optional)</label>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="text-xs text-stone-400 block mb-1">Total qty</label>
+                  <input type="number" value={form.quantity_total}
+                    onChange={e => setForm(f => ({ ...f, quantity_total: e.target.value }))}
+                    placeholder="90"
+                    className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-stone-400 block mb-1">Remaining</label>
+                  <input type="number" value={form.quantity_remaining}
+                    onChange={e => setForm(f => ({ ...f, quantity_remaining: e.target.value }))}
+                    placeholder="90"
+                    className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-stone-400 block mb-1">Unit</label>
+                  <select value={form.quantity_unit} onChange={e => setForm(f => ({ ...f, quantity_unit: e.target.value }))}
+                    className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                    <option>capsules</option>
+                    <option>tablets</option>
+                    <option>softgels</option>
+                    <option>gummies</option>
+                    <option>ml</option>
+                    <option>scoops</option>
+                    <option>drops</option>
+                  </select>
+                </div>
+              </div>
+              <p className="text-xs text-stone-400 mt-1.5">We'll alert you when you're running low (~2 weeks left)</p>
             </div>
 
             <div className="flex gap-3 pt-2">

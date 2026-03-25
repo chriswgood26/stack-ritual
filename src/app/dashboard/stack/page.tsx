@@ -84,8 +84,19 @@ export default async function MyStackPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold text-stone-900 text-sm">{name}</div>
-                          <div className="text-xs text-stone-400 mt-0.5">
-                            {[item.dose, item.timing, item.brand].filter(Boolean).join(" · ")}
+                          <div className="text-xs text-stone-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                            <span>{[item.dose, item.timing, item.brand].filter(Boolean).join(" · ")}</span>
+                            {item.quantity_remaining !== null && item.quantity_remaining !== undefined && item.quantity_total && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                                item.quantity_remaining <= Math.max(7, item.quantity_total * 0.15)
+                                  ? "bg-red-100 text-red-600"
+                                  : item.quantity_remaining <= Math.max(14, item.quantity_total * 0.25)
+                                  ? "bg-amber-100 text-amber-600"
+                                  : "bg-emerald-100 text-emerald-700"
+                              }`}>
+                                {item.quantity_remaining} {item.quantity_unit || "left"}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
@@ -97,6 +108,9 @@ export default async function MyStackPage() {
                             currentBrand={item.brand}
                             currentNotes={item.notes}
                             currentFrequency={item.frequency_type}
+                            currentQuantityTotal={item.quantity_total}
+                            currentQuantityRemaining={item.quantity_remaining}
+                            currentQuantityUnit={item.quantity_unit}
                           />
                           <DeleteStackItemButton itemId={item.id} />
                         </div>
