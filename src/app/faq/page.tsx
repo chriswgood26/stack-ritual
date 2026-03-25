@@ -40,7 +40,7 @@ const faqs = [
       },
       {
         q: "Is there a yearly plan?",
-        a: "Monthly billing is available now. Annual billing with a discount is coming soon — sign up for our email updates to be notified when it launches."
+        a: "Monthly billing is available now. Annual billing with a discount is on our roadmap — follow us on social media or check back for updates when it launches."
       },
     ]
   },
