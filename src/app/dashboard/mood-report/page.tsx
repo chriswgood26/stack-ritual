@@ -54,10 +54,18 @@ function MoodReportContent() {
           <Link href="/dashboard/history" className="text-stone-400 text-lg">←</Link>
           <span className="font-bold text-stone-900">Mood Report</span>
         </div>
-        <button onClick={() => window.print()}
-          className="bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-emerald-800 transition-colors">
-          🖨️ Print / Save PDF
-        </button>
+        <div className="flex gap-2">
+          <a
+            href={`mailto:?subject=My%20Mood%20%26%20Wellness%20Report&body=Hi%2C%0A%0APlease%20find%20my%20mood%20and%20wellness%20report%20from%20Stack%20Ritual%20attached%20as%20a%20PDF.%0A%0AYou%20can%20view%20it%20online%20at%3A%20https%3A%2F%2Fstackritual.com%2Fdashboard%2Fmood-report%0A%0AThanks`}
+            className="bg-stone-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-stone-800 transition-colors"
+          >
+            ✉️ Email
+          </a>
+          <button onClick={() => window.print()}
+            className="bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-emerald-800 transition-colors">
+            🖨️ Print / Save PDF
+          </button>
+        </div>
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-6 pb-20 print:px-0 print:py-0">
