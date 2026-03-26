@@ -162,7 +162,10 @@ export default async function ProfilePage() {
         {stackItems && stackItems.length > 0 && (
           <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 bg-stone-50">
-              <span className="font-semibold text-stone-900 text-sm">My Stack</span>
+              <div>
+                <span className="font-semibold text-stone-900 text-sm">My Stack</span>
+                <p className="text-xs text-stone-400 mt-0.5">5 most recently added</p>
+              </div>
               <Link href="/dashboard/stack" className="text-xs text-emerald-600 font-medium">View all →</Link>
             </div>
             <div className="divide-y divide-stone-50">
