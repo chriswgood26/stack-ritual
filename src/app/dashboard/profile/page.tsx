@@ -34,31 +34,18 @@ export default async function ProfilePage() {
     supabaseAdmin.from("daily_logs").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("logged_date", today),
   ]);
 
-  // Fetch user's own experiences
-  const { data: myExperiences } = await supabaseAdmin
-    .from("experiences")
-    .select("id, rating, title, body, created_at, supplement:supplement_id(name, icon, slug)")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(10);
-
-  // Fetch subscription
-  const { data: subscription } = await supabaseAdmin
-    .from("subscriptions")
-    .select("plan, status, current_period_end")
-    .eq("user_id", userId)
-    .single();
+  // Fetch all remaining data in parallel
+  const [
+    { data: myExperiences },
+    { data: subscription },
+    { data: stackItems }
+  ] = await Promise.all([
+    supabaseAdmin.from("experiences").select("id, rating, title, body, created_at, supplement:supplement_id(name, icon, slug)").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
+    supabaseAdmin.from("subscriptions").select("plan, status, current_period_end").eq("user_id", userId).single(),
+    supabaseAdmin.from("user_stacks").select("id, custom_name, supplement:supplement_id(name, icon), timing, dose").eq("user_id", userId).eq("is_active", true).order("created_at", { ascending: false }).limit(5),
+  ]);
 
   const plan = subscription?.plan || "free";
-
-  // Fetch recent stack items
-  const { data: stackItems } = await supabaseAdmin
-    .from("user_stacks")
-    .select("id, custom_name, supplement:supplement_id(name, icon), timing, dose")
-    .eq("user_id", userId)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false })
-    .limit(5);
 
   const memberSince = new Date(user.createdAt || Date.now()).toLocaleDateString("en-US", {
     month: "long", year: "numeric"
