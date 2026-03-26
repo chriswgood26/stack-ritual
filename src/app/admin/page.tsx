@@ -73,7 +73,10 @@ export default async function AdminPage() {
           <span className="font-bold text-white">Stack Ritual Admin</span>
           <span className="text-xs bg-emerald-700 text-emerald-100 px-2 py-0.5 rounded-full">Private</span>
         </div>
-        <Link href="/dashboard" className="text-stone-400 hover:text-white text-sm transition-colors">← Back to app</Link>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/releases" className="text-stone-400 hover:text-white text-sm transition-colors">📋 Release Notes</Link>
+          <Link href="/dashboard" className="text-stone-400 hover:text-white text-sm transition-colors">← Back to app</Link>
+        </div>
       </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
