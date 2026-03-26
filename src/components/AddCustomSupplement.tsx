@@ -123,7 +123,7 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
         <div className="text-3xl mb-2">🎉</div>
         <p className="font-semibold text-emerald-800">Submitted for review!</p>
-        <p className="text-emerald-700 text-sm mt-1">We&apos;ll add it to the database soon. It&apos;s been added to your stack in the meantime.</p>
+        <p className="text-emerald-700 text-sm mt-1">We&apos;ll add it to the database soon. It&apos;s been added to <Link href="/dashboard/stack" className="font-semibold underline hover:text-emerald-900">your stack</Link> in the meantime.</p>
         <button onClick={() => { setStep("search"); setQuery(""); setStatus("idle"); setForm({ name: "", category: "other", icon: "💊", tagline: "", dose: "", timing: "", brand: "", purchasedFrom: "", isRitual: false }); }}
           className="mt-4 text-emerald-700 text-sm font-medium underline">
           Add another

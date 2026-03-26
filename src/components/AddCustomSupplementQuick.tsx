@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AddCustomSupplementQuick({ name }: { name: string }) {
   const [open, setOpen] = useState(false);
@@ -38,7 +39,7 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center">
         <div className="text-3xl mb-2">🎉</div>
         <p className="font-semibold text-emerald-800">"{name}" added to your stack!</p>
-        <p className="text-emerald-700 text-sm mt-1">It's been submitted for review and added to your stack.</p>
+        <p className="text-emerald-700 text-sm mt-1">It's been submitted for review and added to <Link href="/dashboard/stack" className="font-semibold underline hover:text-emerald-900">your stack</Link>.</p>
       </div>
     );
   }
