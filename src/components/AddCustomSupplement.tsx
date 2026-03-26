@@ -110,7 +110,7 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
   if (!showForm) {
     return (
       <button
-        onClick={() => setShowForm(true)}
+        onClick={() => { setShowForm(true); if (initialName) { setStep('details'); setForm(f => ({ ...f, name: initialName })); } }}
         className="flex items-center justify-center gap-2 bg-white border-2 border-dashed border-stone-200 rounded-2xl py-4 w-full text-stone-500 hover:border-emerald-400 hover:text-emerald-700 transition-colors font-medium text-sm"
       >
         + Add supplement or ritual not in our database
