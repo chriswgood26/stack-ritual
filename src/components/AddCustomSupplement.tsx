@@ -52,14 +52,14 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [step, setStep] = useState<"search" | "details" | "success">("search");
+  const [step, setStep] = useState<"search" | "details" | "success">(initialName ? "details" : "search");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [message, setMessage] = useState("");
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
   const [form, setForm] = useState({
-    name: "",  // will be set from search
+    name: initialName,
     category: "other",
     icon: "💊",
     tagline: "",
