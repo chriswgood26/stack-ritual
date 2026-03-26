@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { item_id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit } = await req.json();
+  const { item_id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit, auto_decrement } = await req.json();
   if (!item_id) return NextResponse.json({ error: "item_id required" }, { status: 400 });
 
   const { error } = await supabaseAdmin
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
         ? { quantity_remaining: Number(quantity_remaining) }
         : {}),
       ...(quantity_unit ? { quantity_unit } : {}),
+      ...(auto_decrement !== undefined ? { auto_decrement: !!auto_decrement } : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", item_id)

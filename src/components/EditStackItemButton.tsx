@@ -14,6 +14,7 @@ interface Props {
   currentQuantityTotal?: number | null;
   currentQuantityRemaining?: number | null;
   currentQuantityUnit?: string | null;
+  currentAutoDecrement?: boolean | null;
   asLabel?: boolean;
   labelClassName?: string;
 }
@@ -45,7 +46,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, asLabel = false, labelClassName }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, asLabel = false, labelClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -57,6 +58,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     quantity_total: currentQuantityTotal?.toString() || "",
     quantity_remaining: currentQuantityRemaining?.toString() || "",
     quantity_unit: currentQuantityUnit || "capsules",
+    auto_decrement: currentAutoDecrement !== false,
   });
   const router = useRouter();
 
@@ -65,7 +67,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     const res = await fetch("/api/stack/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit }),
+      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit, auto_decrement: form.auto_decrement }),
     });
     if (res.ok) {
       setOpen(false);
