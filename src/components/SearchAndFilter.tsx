@@ -32,8 +32,9 @@ const evidenceColor: Record<string, string> = {
   limited: "bg-stone-100 text-stone-500",
 };
 
-export default function SearchAndFilter({ supplements }: { supplements: Supplement[] }) {
+export default function SearchAndFilter({ supplements, onQueryChange }: { supplements: Supplement[]; onQueryChange?: (q: string) => void }) {
   const [query, setQuery] = useState("");
+  const updateQuery = (q: string) => { setQuery(q); onQueryChange?.(q); };
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   // Most commonly deficient / recommended for general health
@@ -61,12 +62,12 @@ export default function SearchAndFilter({ supplements }: { supplements: Suppleme
         <input
           type="search"
           value={query}
-          onChange={e => setQuery(e.target.value)}
+          onChange={e => updateQuery(e.target.value)}
           placeholder="Search supplements, vitamins, rituals..."
           className="w-full bg-white border border-stone-200 rounded-2xl pl-11 pr-4 py-3.5 text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm text-sm"
         />
         {query && (
-          <button onClick={() => setQuery("")}
+          <button onClick={() => updateQuery("")}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 text-sm">
             ✕
           </button>

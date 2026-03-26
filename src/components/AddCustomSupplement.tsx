@@ -47,7 +47,7 @@ const categories = [
   "longevity", "sleep", "gut-health", "hormones", "amino-acids", "herbs", "phytonutrients", "ritual", "other"
 ];
 
-export default function AddCustomSupplement() {
+export default function AddCustomSupplement({ initialName = "" }: { initialName?: string }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -59,7 +59,7 @@ export default function AddCustomSupplement() {
   const router = useRouter();
 
   const [form, setForm] = useState({
-    name: "",
+    name: initialName,
     category: "other",
     icon: "💊",
     tagline: "",
