@@ -4,6 +4,7 @@ import TopNav from "@/components/TopNav";
 import Disclaimer from "@/components/Disclaimer";
 import AddToStackButton from "@/components/AddToStackButton";
 import EvidenceBadge from "@/components/EvidenceBadge";
+import BrandRatings from "@/components/BrandRatings";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -196,6 +197,9 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
           </div>
           <p className="text-xs text-stone-400 mt-3 text-center">Stack Ritual may earn a commission on purchases</p>
         </div>
+
+        {/* Brand Ratings */}
+        <BrandRatings supplementId={supp.id} supplementName={supp.name} />
 
         {/* Community Experiences */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
