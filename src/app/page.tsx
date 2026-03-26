@@ -191,6 +191,16 @@ const features = [
     description: "Know when to take what. We analyze your full stack and build a daily schedule that maximizes absorption and avoids conflicts.",
   },
   {
+    icon: "📦",
+    title: "Inventory Tracking",
+    description: "Track how many doses you have left. Get low-supply alerts before you run out and reorder in one tap from iHerb or Amazon.",
+  },
+  {
+    icon: "⭐",
+    title: "Brand Ratings",
+    description: "Community-rated supplement brands ranked by quality, effectiveness, and value. Find out which brands are actually worth buying.",
+  },
+  {
     icon: "🖨️",
     title: "Print & Share",
     description: "Generate a clean, one-page summary of your stack to share with your doctor, coach, or anyone who needs to know what you're taking.",
