@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useState, useCallback } from "react";
 
@@ -112,6 +113,9 @@ export default function MoodSlider({ date, initialScore, initialNotes }: Props) 
           {saving ? "Saving..." : "Save mood"}
         </button>
       )}
+      <Link href="/dashboard/history" className="block text-center text-xs text-stone-400 hover:text-emerald-600 transition-colors mt-1">
+        Show History →
+      </Link>
     </div>
   );
 }
