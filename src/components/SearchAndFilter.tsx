@@ -32,10 +32,12 @@ const evidenceColor: Record<string, string> = {
   limited: "bg-stone-100 text-stone-500",
 };
 
-export default function SearchAndFilter({ supplements, onQueryChange }: { supplements: Supplement[]; onQueryChange?: (q: string) => void }) {
+export default function SearchAndFilter({ supplements, onQueryChange, onResultsChange }: { supplements: Supplement[]; onQueryChange?: (q: string) => void; onResultsChange?: (hasResults: boolean) => void }) {
   const [query, setQuery] = useState("");
   const updateQuery = (q: string) => { setQuery(q); onQueryChange?.(q); };
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  // Notify parent of results
+  const prevHasResults = typeof window !== "undefined" ? true : true;
 
   // Most commonly deficient / recommended for general health
   const recommended = supplements.filter(s =>
@@ -49,6 +51,9 @@ export default function SearchAndFilter({ supplements, onQueryChange }: { supple
       return matchesQuery && matchesCategory;
     }).sort((a, b) => a.name.localeCompare(b.name));
   }, [supplements, query, activeCategory]);
+
+  // Notify parent whether results exist
+  if (onResultsChange) { setTimeout(() => onResultsChange(filtered.length > 0), 0); }
 
   function toggleCategory(val: string) {
     setActiveCategory(prev => prev === val ? null : val);

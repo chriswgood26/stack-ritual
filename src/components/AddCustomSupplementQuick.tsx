@@ -1,0 +1,143 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function AddCustomSupplementQuick({ name }: { name: string }) {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    category: "other",
+    icon: "💊",
+    dose: "",
+    timing: "",
+    brand: "",
+    purchasedFrom: "",
+    isRitual: false,
+  });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const router = useRouter();
+
+  async function handleSubmit() {
+    setStatus("loading");
+    const res = await fetch("/api/supplements/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, ...form, purchased_from: form.purchasedFrom }),
+    });
+    const data = await res.json();
+    if (data.message === "submitted" || data.message === "already_submitted") {
+      setStatus("success");
+      router.refresh();
+    } else {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center">
+        <div className="text-3xl mb-2">🎉</div>
+        <p className="font-semibold text-emerald-800">"{name}" added to your stack!</p>
+        <p className="text-emerald-700 text-sm mt-1">It's been submitted for review and added to your stack.</p>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full bg-emerald-700 text-white py-4 rounded-2xl font-semibold text-base hover:bg-emerald-800 transition-colors flex items-center justify-center gap-2 shadow-sm"
+      >
+        + Add "{name}" to my stack
+      </button>
+    );
+  }
+
+  const timingOptions = [
+    { group: "Daily", options: [
+      { value: "morning-fasted", label: "Morning — Fasted" },
+      { value: "morning-food", label: "Morning — With Food" },
+      { value: "afternoon", label: "Afternoon" },
+      { value: "evening", label: "Evening" },
+      { value: "bedtime", label: "Bedtime" },
+      { value: "split", label: "Split Dose (AM + PM)" },
+    ]},
+    { group: "Multiple times daily", options: [
+      { value: "2x-daily", label: "2x Daily (AM + PM)" },
+      { value: "3x-daily", label: "3x Daily" },
+      { value: "3x-with-meals", label: "3x Daily with Meals" },
+    ]},
+    { group: "Less than daily", options: [
+      { value: "weekly", label: "Weekly" },
+      { value: "monthly", label: "Monthly" },
+      { value: "as-needed", label: "As needed" },
+    ]},
+  ];
+
+  return (
+    <div className="bg-white rounded-2xl border border-emerald-200 shadow-sm p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-stone-900">Add "{name}"</h3>
+        <button onClick={() => setOpen(false)} className="text-stone-400 text-xl">✕</button>
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={() => setForm(f => ({ ...f, isRitual: false, category: "other" }))}
+          className={`flex-1 py-2 rounded-xl text-sm font-medium border transition-colors ${!form.isRitual ? "bg-emerald-700 text-white border-emerald-700" : "bg-white text-stone-600 border-stone-200"}`}>
+          💊 Supplement
+        </button>
+        <button onClick={() => setForm(f => ({ ...f, isRitual: true, category: "ritual" }))}
+          className={`flex-1 py-2 rounded-xl text-sm font-medium border transition-colors ${form.isRitual ? "bg-amber-600 text-white border-amber-600" : "bg-white text-stone-600 border-stone-200"}`}>
+          🧘 Ritual
+        </button>
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose / Duration</label>
+        <input type="text" value={form.dose} onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
+          placeholder={form.isRitual ? "e.g. 10 min" : "e.g. 500mg"}
+          className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">
+          {form.isRitual ? "When performed" : "When to take"}
+        </label>
+        <select value={form.timing} onChange={e => setForm(f => ({ ...f, timing: e.target.value }))}
+          className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+          <option value="">Select timing...</option>
+          {timingOptions.map(g => (
+            <optgroup key={g.group} label={g.group}>
+              {g.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+
+      {!form.isRitual && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand</label>
+            <input type="text" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
+              placeholder="e.g. Thorne"
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased</label>
+            <input type="text" value={form.purchasedFrom} onChange={e => setForm(f => ({ ...f, purchasedFrom: e.target.value }))}
+              placeholder="e.g. iHerb"
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+      )}
+
+      {status === "error" && <p className="text-red-500 text-xs text-center">Something went wrong. Try again.</p>}
+
+      <button onClick={handleSubmit} disabled={status === "loading"}
+        className="w-full bg-emerald-700 text-white py-3.5 rounded-2xl font-semibold hover:bg-emerald-800 transition-colors disabled:opacity-60">
+        {status === "loading" ? "Adding..." : `Add "${name}" to my stack`}
+      </button>
+    </div>
+  );
+}
