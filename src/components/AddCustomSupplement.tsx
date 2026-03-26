@@ -48,7 +48,7 @@ const categories = [
 ];
 
 export default function AddCustomSupplement({ initialName = "" }: { initialName?: string }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialName);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -59,7 +59,7 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
   const router = useRouter();
 
   const [form, setForm] = useState({
-    name: initialName,
+    name: "",  // will be set from search
     category: "other",
     icon: "💊",
     tagline: "",
