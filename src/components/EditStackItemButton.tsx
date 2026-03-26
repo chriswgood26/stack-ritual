@@ -159,6 +159,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                     <option>tablets</option>
                     <option>softgels</option>
                     <option>gummies</option>
+                    <option>supplies</option>
                     <option>ml</option>
                     <option>scoops</option>
                     <option>drops</option>
