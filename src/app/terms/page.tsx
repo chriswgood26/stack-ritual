@@ -22,7 +22,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-bold text-stone-900 mb-3">1. Acceptance of Terms</h2>
-            <p>By creating an account and using Stack Ritual (&quot;the Service&quot;), you agree to be bound by these Terms and Conditions. If you do not agree to these terms, you may not use the Service. These terms constitute a legally binding agreement between you and Stack Ritual.</p>
+            <p>By creating an account and using Stack Ritual (&quot;the Service&quot;), you agree to be bound by these Terms and Conditions. If you do not agree to these terms, you may not use the Service. These terms constitute a legally binding agreement between you and Stack Ritual LLC, a Washington limited liability company (&quot;Stack Ritual,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;).</p>
           </section>
 
           <section>
@@ -51,7 +51,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-bold text-stone-900 mb-3">4. Limitation of Liability and Indemnification</h2>
             <p className="mb-3">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:</p>
-            <p className="mb-3"><strong>Limitation of Liability:</strong> Stack Ritual's total liability to you for any claims arising from or related to the Service shall not exceed the amount you paid to Stack Ritual in the twelve (12) months preceding the claim. If you have not made any payment, Stack Ritual's liability is limited to fifty dollars ($50.00).</p>
+            <p className="mb-3"><strong>Limitation of Liability:</strong> Stack Ritual LLC's total liability to you for any claims arising from or related to the Service shall not exceed the amount you paid to Stack Ritual LLC in the twelve (12) months preceding the claim. If you have not made any payment, Stack Ritual LLC's liability is limited to fifty dollars ($50.00).</p>
             <p className="mb-3">IN NO EVENT SHALL STACK RITUAL BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM:</p>
             <ul className="list-disc pl-5 space-y-1.5 mb-3">
               <li>Your use of or inability to use the Service</li>
@@ -60,7 +60,7 @@ export default function TermsPage() {
               <li>Any inaccurate, incomplete, or misleading information on the Service</li>
               <li>Unauthorized access to or alteration of your data</li>
             </ul>
-            <p className="mb-3"><strong>Indemnification:</strong> You agree to indemnify, defend, and hold harmless Stack Ritual and its officers, directors, employees, agents, and successors from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or in any way connected with:</p>
+            <p className="mb-3"><strong>Indemnification:</strong> You agree to indemnify, defend, and hold harmless Stack Ritual LLC and its officers, directors, employees, agents, and successors from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or in any way connected with:</p>
             <ul className="list-disc pl-5 space-y-1.5">
               <li>Your use of the Service</li>
               <li>Your violation of these Terms</li>
@@ -78,12 +78,12 @@ export default function TermsPage() {
               <li>Acknowledge that your experiences are personal and may not apply to others</li>
               <li>Agree not to submit false, misleading, harmful, or inappropriate content</li>
             </ul>
-            <p className="mt-3">Stack Ritual reserves the right to remove any user-generated content that violates these terms or is otherwise inappropriate, without notice.</p>
+            <p className="mt-3">Stack Ritual LLC reserves the right to remove any user-generated content that violates these terms or is otherwise inappropriate, without notice.</p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-stone-900 mb-3">6. Affiliate Disclosures</h2>
-            <p>Stack Ritual participates in affiliate programs. When you click on links to purchase supplements, we may earn a commission at no additional cost to you. This does not influence the information or recommendations provided on the platform. We are not responsible for third-party websites, their products, or any transactions you make with them.</p>
+            <p>Stack Ritual LLC participates in affiliate programs. When you click on links to purchase supplements, we may earn a commission at no additional cost to you. This does not influence the information or recommendations provided on the platform. We are not responsible for third-party websites, their products, or any transactions you make with them.</p>
           </section>
 
           <section>
@@ -108,12 +108,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-bold text-stone-900 mb-3">9. Governing Law</h2>
-            <p>These Terms shall be governed by the laws of the State of California, without regard to conflict of law principles. Any disputes not subject to arbitration shall be resolved in the state or federal courts located in Los Angeles County, California.</p>
+            <p>These Terms shall be governed by the laws of the State of Washington, without regard to conflict of law principles. Any disputes not subject to arbitration shall be resolved in the state or federal courts located in Washington State. Stack Ritual LLC is a Washington limited liability company (EIN: 41-5158692).</p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-stone-900 mb-3">10. Changes to Terms</h2>
-            <p>Stack Ritual reserves the right to modify these Terms at any time. Material changes will be communicated via email or in-app notification. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
+            <p>Stack Ritual LLC reserves the right to modify these Terms at any time. Material changes will be communicated via email or in-app notification. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
           </section>
 
           <section>
