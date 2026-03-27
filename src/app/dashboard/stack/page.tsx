@@ -143,8 +143,9 @@ export default async function MyStackPage() {
                 <div className="space-y-2">
                   {rituals.map(item => {
                     const icon = item.custom_icon || "🧘";
+                    const ritualName = item.custom_name || "Ritual";
                     return (
-                      <div key={item.id} data-stack-name={(name || "").toLowerCase()} data-stack-brand={(item.brand || "").toLowerCase()} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
+                      <div key={item.id} data-stack-name={ritualName.toLowerCase()} data-stack-brand={(item.brand || "").toLowerCase()} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
                         <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
                           {icon}
                         </div>
