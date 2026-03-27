@@ -66,11 +66,7 @@ export default async function MyStackPage() {
           </div>
         </div>
 
-        <StackSearch items={stackItems || []}>
-          {(filteredItems) => (<>
-        {filteredItems.length === 0 && total > 0 ? (
-          <div className="text-center py-4 text-stone-400 text-sm">No items match your search</div>
-        ) : total === 0 ? (
+        {total === 0 ? (
           <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
             <div className="text-4xl mb-3">🌿</div>
             <p className="font-semibold text-stone-900 mb-1">Your stack is empty</p>
@@ -175,8 +171,7 @@ export default async function MyStackPage() {
           </>
         )}
 
-          </>)}
-        </StackSearch>
+
 
         {/* Add from database */}
         <Link
