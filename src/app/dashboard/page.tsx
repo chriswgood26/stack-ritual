@@ -331,8 +331,7 @@ export default async function Dashboard() {
                         {item.dose && <div className="text-xs text-stone-400 truncate max-w-[160px]">{item.dose.split(".")[0]}</div>}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                      <EditStackItemButton itemId={item.id} name={name} currentDose={item.dose} currentTiming={item.timing} currentBrand={item.brand} currentNotes={item.notes} currentFrequency={item.frequency_type} currentQuantityTotal={item.quantity_total} currentQuantityRemaining={item.quantity_remaining} currentQuantityUnit={item.quantity_unit} currentAutoDecrement={item.auto_decrement} asLabel labelClassName="font-medium text-sm text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer" />
+                    <div className="flex flex-col items-end gap-0.5 ml-2 flex-shrink-0">
                       <CheckoffButton stackItemId={item.id} userId={userId} isChecked={isChecked} date={today} doseIndex={item.doseIndex ?? 0} takenAt={takenAtMap[checkId] || null} />
                     </div>
                   </div>
