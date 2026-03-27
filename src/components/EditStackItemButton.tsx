@@ -159,14 +159,19 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                   <select value={form.quantity_unit} onChange={e => setForm(f => ({ ...f, quantity_unit: e.target.value }))}
                     className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                     <option>capsules</option>
-                    <option>injection</option>
                     <option>tablets</option>
                     <option>softgels</option>
                     <option>gummies</option>
-                    <option>supplies</option>
+                    <option>drops</option>
                     <option>ml</option>
                     <option>scoops</option>
-                    <option>drops</option>
+                    <option>doses</option>
+                    <option>patches</option>
+                    <option>sprays</option>
+                    <option>injection</option>
+                    <option>pen doses</option>
+                    <option>vials</option>
+                    <option>supplies</option>
                   </select>
                 </div>
               </div>
