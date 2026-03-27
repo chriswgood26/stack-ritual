@@ -326,9 +326,9 @@ export default async function Dashboard() {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${item.category === "ritual" ? "bg-amber-100" : "bg-stone-100"}`}>
                         {icon}
                       </div>
-                      <div className="min-w-0">
-                        <div className={`font-medium text-sm ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>{name}</div>
-                        {item.dose && <div className="text-xs text-stone-400 truncate max-w-[160px]">{item.dose.split(".")[0]}</div>}
+                      <div className="min-w-0 overflow-hidden">
+                        <div className={`font-medium text-sm truncate ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>{name}</div>
+                        {item.dose && <div className="text-xs text-stone-400 truncate">{item.dose.split(".")[0]}</div>}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-0.5 ml-2 flex-shrink-0">

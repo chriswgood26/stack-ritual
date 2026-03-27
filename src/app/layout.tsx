@@ -24,6 +24,7 @@ export const viewport = {
 export const metadata: Metadata = {
   title: "Stack Ritual — Stack your habits. Own your health.",
   description: "Build consistent supplement and wellness habits with smart scheduling, daily check-offs, streak tracking, and doctor-ready summaries.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
