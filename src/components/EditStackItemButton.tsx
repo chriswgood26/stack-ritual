@@ -136,7 +136,8 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 <div>
                   <label className="text-xs text-stone-400 block mb-1">Total qty</label>
                   <input type="number" value={form.quantity_total}
-                    onChange={e => setForm(f => ({ ...f, quantity_total: e.target.value, quantity_remaining: f.quantity_remaining || e.target.value }))}
+                    onChange={e => setForm(f => ({ ...f, quantity_total: e.target.value }))}
+                    onBlur={e => setForm(f => ({ ...f, quantity_remaining: f.quantity_remaining || e.target.value }))}
                     placeholder="90"
                     className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                 </div>
@@ -158,6 +159,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                   <select value={form.quantity_unit} onChange={e => setForm(f => ({ ...f, quantity_unit: e.target.value }))}
                     className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                     <option>capsules</option>
+                    <option>injection</option>
                     <option>tablets</option>
                     <option>softgels</option>
                     <option>gummies</option>
