@@ -342,6 +342,12 @@ export default async function Dashboard() {
           </div>
         )}
 
+        {/* Add to stack link */}
+        <Link href="/dashboard/stack"
+          className="flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-600 rounded-2xl py-3 text-sm font-medium hover:border-emerald-300 hover:text-emerald-700 transition-colors">
+          + Add or manage my stack
+        </Link>
+
         {/* Mood slider */}
         <div className="mt-6">
           <MoodSlider date={today} initialScore={moodData?.mood_score ?? null} initialNotes={moodData?.notes ?? null} />
