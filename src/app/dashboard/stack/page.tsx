@@ -7,6 +7,7 @@ import DeleteStackItemButton from "@/components/DeleteStackItemButton";
 import QuantityAdjuster from "@/components/QuantityAdjuster";
 import EditStackItemButton from "@/components/EditStackItemButton";
 import { currentUser } from "@clerk/nextjs/server";
+import StackSearchBar from "@/components/StackSearchBar";
 import StackSearch from "@/components/StackSearch";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -66,6 +67,8 @@ export default async function MyStackPage() {
           </div>
         </div>
 
+        <StackSearchBar />
+
         {total === 0 ? (
           <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
             <div className="text-4xl mb-3">🌿</div>
@@ -80,7 +83,7 @@ export default async function MyStackPage() {
           <>
             {/* Supplements */}
             {supplements.length > 0 && (
-              <div>
+              <div data-stack-section="supplements">
                 <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
                   💊 Supplements ({supplements.length})
                 </h2>
@@ -90,7 +93,7 @@ export default async function MyStackPage() {
                     const name = supp?.name || item.custom_name || "Unknown";
                     const icon = supp?.icon || item.custom_icon || "💊";
                     return (
-                      <div key={item.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
+                      <div key={item.id} data-stack-name={name.toLowerCase()} data-stack-brand={(item.brand || "").toLowerCase()} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
                         <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
                           {icon}
                         </div>
@@ -133,7 +136,7 @@ export default async function MyStackPage() {
 
             {/* Rituals */}
             {rituals.length > 0 && (
-              <div>
+              <div data-stack-section="rituals">
                 <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
                   🧘 Rituals ({rituals.length})
                 </h2>
@@ -141,7 +144,7 @@ export default async function MyStackPage() {
                   {rituals.map(item => {
                     const icon = item.custom_icon || "🧘";
                     return (
-                      <div key={item.id} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
+                      <div key={item.id} data-stack-name={name.toLowerCase()} data-stack-brand={(item.brand || "").toLowerCase()} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">
                         <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
                           {icon}
                         </div>
