@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -46,17 +47,17 @@ export default function AddToStackButton({ supplementId, supplementName, default
 
   if (status === "added") {
     return (
-      <div className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2">
-        ✓ Added to your stack!
-      </div>
+      <Link href="/dashboard/stack" className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-emerald-100 transition-colors">
+        ✓ Added to your stack — View My Stack →
+      </Link>
     );
   }
 
   if (status === "exists") {
     return (
-      <div className="w-full bg-stone-50 border border-stone-200 text-stone-600 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2">
-        ✓ Already in your stack
-      </div>
+      <Link href="/dashboard/stack" className="w-full bg-stone-50 border border-stone-200 text-stone-600 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-stone-100 transition-colors">
+        ✓ Already in your stack — View My Stack →
+      </Link>
     );
   }
 
