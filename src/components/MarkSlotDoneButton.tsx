@@ -31,19 +31,17 @@ export default function MarkSlotDoneButton({ items, date, allDone }: Props) {
     }
   }
 
-  if (allDone) {
-    return (
-      <span className="text-xs text-emerald-600 font-medium">✓ Done</span>
-    );
-  }
-
   return (
     <button
       onClick={handleMark}
       disabled={loading}
-      className="text-xs text-emerald-600 font-medium hover:text-emerald-800 transition-colors disabled:opacity-50"
+      className={`text-xs font-medium transition-colors disabled:opacity-50 ${
+        allDone
+          ? "text-emerald-600 hover:text-stone-500"
+          : "text-emerald-600 hover:text-emerald-800"
+      }`}
     >
-      {loading ? "..." : "Mark done"}
+      {loading ? "..." : allDone ? "✓ Done" : "Mark done"}
     </button>
   );
 }
