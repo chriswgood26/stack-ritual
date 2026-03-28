@@ -7,6 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
 import MarkAllDoneButton from "@/components/MarkAllDoneButton";
+import ResetTodayButton from "@/components/ResetTodayButton";
 import EditStackItemButton from "@/components/EditStackItemButton";
 import MarkSlotDoneButton from "@/components/MarkSlotDoneButton";
 import QuantityAdjuster from "@/components/QuantityAdjuster";
