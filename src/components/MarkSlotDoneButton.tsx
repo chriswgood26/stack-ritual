@@ -16,15 +16,15 @@ export default function MarkSlotDoneButton({ items, date, allDone }: Props) {
   async function handleMark() {
     setLoading(true);
     try {
-      await Promise.all(
-        items.map(item =>
-          fetch("/api/stack/checkoff", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stack_item_id: item.id, date, checked: !allDone, dose_index: item.doseIndex }),
-          })
-        )
-      );
+      await fetch("/api/stack/checkoff-bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map(item => ({ stack_item_id: item.id, dose_index: item.doseIndex ?? 0 })),
+          date,
+          checked: !allDone,
+        }),
+      });
       router.refresh();
     } finally {
       setLoading(false);
