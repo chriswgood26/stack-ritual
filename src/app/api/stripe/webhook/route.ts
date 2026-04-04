@@ -60,15 +60,26 @@ export async function POST(req: NextRequest) {
     case "customer.subscription.updated":
       await upsertSubscription(event.data.object as Stripe.Subscription);
       break;
-    case "customer.subscription.deleted":
+    case "customer.subscription.deleted": {
       const sub = event.data.object as Stripe.Subscription;
-      const userId = sub.metadata?.clerk_user_id;
+      let userId = sub.metadata?.clerk_user_id;
+      if (!userId) {
+        const { data: existing } = await supabaseAdmin
+          .from("subscriptions")
+          .select("user_id")
+          .eq("stripe_customer_id", sub.customer as string)
+          .single();
+        userId = existing?.user_id;
+      }
       if (userId) {
         await supabaseAdmin.from("subscriptions")
           .update({ plan: "free", status: "canceled", updated_at: new Date().toISOString() })
           .eq("user_id", userId);
+      } else {
+        console.error("subscription.deleted: No user found for customer:", sub.customer);
       }
       break;
+    }
   }
 
   return NextResponse.json({ received: true });

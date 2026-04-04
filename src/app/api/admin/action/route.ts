@@ -66,6 +66,18 @@ export async function POST(req: NextRequest) {
       .update({ status: "rejected" })
       .eq("id", itemId);
   } else if (action === "delete") {
+    const ALLOWED_TABLES = [
+      "supplements",
+      "experiences",
+      "feedback",
+      "brands",
+      "user_submitted_supplements",
+      "stack_items",
+      "daily_logs",
+    ];
+    if (!ALLOWED_TABLES.includes(table)) {
+      return NextResponse.json({ error: "Invalid table name" }, { status: 400 });
+    }
     await supabaseAdmin.from(table).delete().eq("id", itemId);
   }
 

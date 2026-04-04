@@ -21,6 +21,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 
+  // Check token expiry — reject if date is older than 24 hours
+  const tokenDate = new Date(date);
+  const now = new Date();
+  const hoursDiff = (now.getTime() - tokenDate.getTime()) / (1000 * 60 * 60);
+  if (isNaN(tokenDate.getTime()) || hoursDiff > 24) {
+    return NextResponse.json({ error: "Token expired" }, { status: 403 });
+  }
+
   // Check if already done
   const { count } = await supabaseAdmin
     .from("daily_logs")

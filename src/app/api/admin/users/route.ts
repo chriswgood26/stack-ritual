@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
-const ADMIN_IDS = ["user_3BGCbiChIFduGWHj5gzAmUxoK51"];
+const ADMIN_IDS = process.env.ADMIN_USER_IDS?.split(",") || [];
 
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
