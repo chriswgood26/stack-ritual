@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ScanLabelButton from "./ScanLabelButton";
+import ScanResultsModal from "./ScanResultsModal";
+import type { ScanResult } from "./ScanLabelButton";
 
 interface SearchResult {
   id: string;
@@ -57,6 +60,9 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
   const [message, setMessage] = useState("");
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [scanError, setScanError] = useState("");
 
   const [form, setForm] = useState({
     name: initialName,
@@ -143,6 +149,15 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
         <>
           {/* Search first */}
           <div className="relative">
+            <div className="flex items-center gap-3 mb-3">
+              <ScanLabelButton
+                isPlusOrPro={true}
+                onScanComplete={data => { setScanError(""); setScanResult(data); }}
+                onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
+                variant="link"
+              />
+              {scanError && <span className="text-xs text-red-500">{scanError}</span>}
+            </div>
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">🔍</span>
             <input
               type="text"
@@ -297,6 +312,7 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
           {status === "error" && <p className="text-red-500 text-xs text-center">Something went wrong. Try again.</p>}
         </>
       )}
+      {scanResult && <ScanResultsModal data={scanResult} onClose={() => setScanResult(null)} />}
     </div>
   );
 }
