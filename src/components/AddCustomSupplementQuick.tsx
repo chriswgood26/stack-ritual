@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ScanLabelButton from "./ScanLabelButton";
+import type { ScanResult } from "./ScanLabelButton";
 
 export default function AddCustomSupplementQuick({ name }: { name: string }) {
   const [open, setOpen] = useState(false);
@@ -16,7 +18,18 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
     isRitual: false,
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [scanError, setScanError] = useState("");
   const router = useRouter();
+
+  function handleScanComplete(data: ScanResult) {
+    setScanError("");
+    setForm(f => ({
+      ...f,
+      dose: data.dosePerServing || f.dose,
+      brand: data.brand || f.brand,
+      category: data.category || f.category,
+    }));
+  }
 
   async function handleSubmit() {
     setStatus("loading");
@@ -92,6 +105,16 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
           className={`flex-1 py-2 rounded-xl text-sm font-medium border transition-colors ${form.isRitual ? "bg-amber-600 text-white border-amber-600" : "bg-white text-stone-600 border-stone-200"}`}>
           🧘 Ritual
         </button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <ScanLabelButton
+          isPlusOrPro={true}
+          onScanComplete={handleScanComplete}
+          onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
+          variant="link"
+        />
+        {scanError && <span className="text-xs text-red-500">{scanError}</span>}
       </div>
 
       <div>
