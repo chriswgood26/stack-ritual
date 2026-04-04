@@ -52,15 +52,17 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
   // Check if in user's stack
   const user = await currentUser();
   let inStack = false;
+  let existingStackItem: { id: string; dose: string | null; timing: string | null; brand: string | null; notes: string | null; frequency_type: string | null; quantity_total: number | null; quantity_remaining: number | null; quantity_unit: string | null; auto_decrement: boolean | null } | null = null;
   if (user) {
     const { data: existing } = await supabaseAdmin
       .from("user_stacks")
-      .select("id")
+      .select("id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit, auto_decrement")
       .eq("user_id", user.id)
       .eq("supplement_id", supp.id)
       .eq("is_active", true)
       .single();
     inStack = !!existing;
+    existingStackItem = existing;
   }
 
   // Fetch interactions
@@ -113,6 +115,7 @@ export default async function SupplementPage({ params }: { params: Promise<{ slu
           defaultTiming={supp.timing_recommendation}
           defaultDose={supp.dose_recommendation}
           alreadyInStack={inStack}
+          existingItem={existingStackItem}
         />
 
         {/* Timing & Dose */}

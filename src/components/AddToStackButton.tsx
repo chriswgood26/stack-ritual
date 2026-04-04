@@ -5,6 +5,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
+import EditStackItemButton from "./EditStackItemButton";
+
+interface ExistingItem {
+  id: string;
+  dose: string | null;
+  timing: string | null;
+  brand: string | null;
+  notes: string | null;
+  frequency_type: string | null;
+  quantity_total: number | null;
+  quantity_remaining: number | null;
+  quantity_unit: string | null;
+  auto_decrement: boolean | null;
+}
 
 interface Props {
   supplementId: string;
@@ -12,9 +26,10 @@ interface Props {
   defaultTiming?: string;
   defaultDose?: string;
   alreadyInStack?: boolean;
+  existingItem?: ExistingItem | null;
 }
 
-export default function AddToStackButton({ supplementId, supplementName, defaultTiming, defaultDose, alreadyInStack }: Props) {
+export default function AddToStackButton({ supplementId, supplementName, defaultTiming, defaultDose, alreadyInStack, existingItem }: Props) {
   const [status, setStatus] = useState<"idle" | "loading" | "added" | "exists" | "error">(alreadyInStack ? "exists" : "idle");
   const [showForm, setShowForm] = useState(false);
   const [dose, setDose] = useState(defaultDose || "");
@@ -59,6 +74,30 @@ export default function AddToStackButton({ supplementId, supplementName, default
       <Link href="/dashboard/stack" className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-emerald-100 transition-colors">
         ✓ Added to your stack — View My Stack →
       </Link>
+    );
+  }
+
+  if (status === "exists" && existingItem) {
+    return (
+      <div className="w-full bg-stone-50 border border-stone-200 rounded-2xl py-3.5 flex items-center justify-center gap-2">
+        <span className="text-stone-500 text-sm">✓ In your stack</span>
+        <span className="text-stone-300">·</span>
+        <EditStackItemButton
+          itemId={existingItem.id}
+          name={supplementName}
+          currentDose={existingItem.dose}
+          currentTiming={existingItem.timing}
+          currentBrand={existingItem.brand}
+          currentNotes={existingItem.notes}
+          currentFrequency={existingItem.frequency_type}
+          currentQuantityTotal={existingItem.quantity_total}
+          currentQuantityRemaining={existingItem.quantity_remaining}
+          currentQuantityUnit={existingItem.quantity_unit}
+          currentAutoDecrement={existingItem.auto_decrement}
+          asLabel
+          labelClassName="text-emerald-700 font-semibold text-sm hover:text-emerald-800"
+        />
+      </div>
     );
   }
 
