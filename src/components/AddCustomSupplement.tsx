@@ -230,6 +230,25 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
             </button>
           </div>
 
+          <div className="flex items-center gap-2">
+            <ScanLabelButton
+              isPlusOrPro={true}
+              onScanComplete={data => {
+                setScanError("");
+                setForm(f => ({
+                  ...f,
+                  name: data.productName || f.name,
+                  dose: data.dosePerServing || f.dose,
+                  brand: data.brand || f.brand,
+                  category: data.category || f.category,
+                }));
+              }}
+              onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
+              variant="link"
+            />
+            {scanError && <span className="text-xs text-red-500">{scanError}</span>}
+          </div>
+
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Name *</label>
             <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
