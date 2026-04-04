@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ScanLabelButton from "./ScanLabelButton";
+import type { ScanResult } from "./ScanLabelButton";
 
 interface Props {
   supplementId: string;
@@ -19,7 +21,14 @@ export default function AddToStackButton({ supplementId, supplementName, default
   const [timing, setTiming] = useState(defaultTiming || "");
   const [brand, setBrand] = useState("");
   const [purchasedFrom, setPurchasedFrom] = useState("");
+  const [scanError, setScanError] = useState("");
   const router = useRouter();
+
+  function handleScanComplete(data: ScanResult) {
+    setScanError("");
+    setDose(data.dosePerServing || dose);
+    setBrand(data.brand || brand);
+  }
 
   async function handleAdd() {
     setStatus("loading");
@@ -65,6 +74,16 @@ export default function AddToStackButton({ supplementId, supplementName, default
     return (
       <div className="bg-white rounded-2xl border border-emerald-200 shadow-sm p-5 space-y-4">
         <h3 className="font-semibold text-stone-900">Add {supplementName} to stack</h3>
+
+        <div className="flex items-center gap-2">
+          <ScanLabelButton
+            isPlusOrPro={true}
+            onScanComplete={handleScanComplete}
+            onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
+            variant="link"
+          />
+          {scanError && <span className="text-xs text-red-500">{scanError}</span>}
+        </div>
 
         <div>
           <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose</label>

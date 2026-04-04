@@ -7,7 +7,6 @@ import DeleteStackItemButton from "@/components/DeleteStackItemButton";
 import QuantityAdjuster from "@/components/QuantityAdjuster";
 import EditStackItemButton from "@/components/EditStackItemButton";
 import { currentUser } from "@clerk/nextjs/server";
-import StackScanButton from "@/components/StackScanButton";
 import StackSearchBar from "@/components/StackSearchBar";
 import StackSearch from "@/components/StackSearch";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -32,13 +31,6 @@ export default async function MyStackPage() {
       return (s as { name?: string })?.name || item.custom_name || "";
     } catch { return item.custom_name || ""; }
   };
-
-  const { data: subscription } = await supabaseAdmin
-    .from("subscriptions")
-    .select("plan, status")
-    .eq("user_id", user.id)
-    .single();
-  const isPlusOrPro = subscription?.status === "active" && ["plus", "pro"].includes(subscription?.plan || "");
 
   const supplements = (stackItems || [])
     .filter(i => i.category === "supplement")
@@ -72,7 +64,6 @@ export default async function MyStackPage() {
               className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center">
               + Add to My Stack
             </Link>
-            <StackScanButton isPlusOrPro={isPlusOrPro} />
           </div>
         </div>
 

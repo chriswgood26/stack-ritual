@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendWeeklySummaryEmail } from "@/lib/emails";
+import { clerkClient } from "@clerk/nextjs/server";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -16,16 +17,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Not Monday, skipping" });
   }
 
-  // Get all Plus/Pro users with email preferences enabled
+  // Get all users with terms accepted and weekly summary enabled
   const { data: profiles } = await supabaseAdmin
     .from("user_profiles")
-    .select("user_id, terms_accepted_at")
+    .select("user_id, terms_accepted_at, email_weekly_summary")
     .not("terms_accepted_at", "is", null);
 
   let sent = 0;
+  let errors = 0;
+  const client = await clerkClient();
 
   for (const profile of profiles || []) {
     try {
+      // Check weekly summary preference
+      if (profile.email_weekly_summary === false) continue;
+
       // Check subscription
       const { data: sub } = await supabaseAdmin
         .from("subscriptions")
@@ -34,6 +40,12 @@ export async function GET(req: NextRequest) {
         .single();
 
       if (!sub || !["plus", "pro"].includes(sub.plan) || sub.status !== "active") continue;
+
+      // Get user email from Clerk
+      const user = await client.users.getUser(profile.user_id);
+      const email = user.emailAddresses?.[0]?.emailAddress;
+      const firstName = user.firstName || "there";
+      if (!email) continue;
 
       // Calculate last 7 days stats
       const sevenDaysAgo = new Date();
@@ -63,13 +75,43 @@ export async function GET(req: NextRequest) {
       const perfectDays = Object.values(logsByDate).filter(c => c >= totalStack).length;
       const completionPct = activeDays > 0 ? Math.round((totalCheckins / (activeDays * totalStack)) * 100) : 0;
 
-      // Get user email from Clerk (skip for now — use profile data)
-      // For MVP, skip users without email — we'll add Clerk lookup later
+      // Get streak
+      const { data: streakLogs } = await supabaseAdmin
+        .from("daily_logs")
+        .select("logged_date")
+        .eq("user_id", profile.user_id)
+        .order("logged_date", { ascending: false })
+        .limit(30);
+
+      let streak = 0;
+      if (streakLogs && streakLogs.length > 0) {
+        const uniqueDates = [...new Set(streakLogs.map(l => l.logged_date))].sort().reverse();
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        let checkDate = yesterday.toISOString().split("T")[0];
+        for (const d of uniqueDates) {
+          if (d === checkDate) {
+            streak++;
+            const prev = new Date(checkDate);
+            prev.setDate(prev.getDate() - 1);
+            checkDate = prev.toISOString().split("T")[0];
+          } else break;
+        }
+      }
+
+      await sendWeeklySummaryEmail(email, firstName, {
+        completionPct,
+        perfectDays,
+        totalCheckins,
+        streak,
+      });
+
       sent++;
     } catch (e) {
       console.error(`Error processing user ${profile.user_id}:`, e);
+      errors++;
     }
   }
 
-  return NextResponse.json({ message: "done", sent });
+  return NextResponse.json({ message: "done", sent, errors });
 }

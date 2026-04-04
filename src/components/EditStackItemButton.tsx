@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ScanLabelButton from "./ScanLabelButton";
+import type { ScanResult } from "./ScanLabelButton";
 
 interface Props {
   itemId: string;
@@ -60,7 +62,20 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     quantity_unit: currentQuantityUnit || "capsules",
     auto_decrement: currentAutoDecrement !== false,
   });
+  const [scanError, setScanError] = useState("");
   const router = useRouter();
+
+  function handleScanComplete(data: ScanResult) {
+    setScanError("");
+    setForm(f => ({
+      ...f,
+      dose: data.dosePerServing || f.dose,
+      brand: data.brand || f.brand,
+      quantity_total: data.totalQuantity ? data.totalQuantity.toString() : f.quantity_total,
+      quantity_remaining: data.totalQuantity ? data.totalQuantity.toString() : f.quantity_remaining,
+      quantity_unit: data.quantityUnit || f.quantity_unit,
+    }));
+  }
 
   async function handleSave() {
     setLoading(true);
@@ -89,6 +104,16 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-stone-900">Edit — {name}</h2>
               <button onClick={() => setOpen(false)} className="text-stone-400 hover:text-stone-700 text-xl">✕</button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <ScanLabelButton
+                isPlusOrPro={true}
+                onScanComplete={handleScanComplete}
+                onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
+                variant="link"
+              />
+              {scanError && <span className="text-xs text-red-500">{scanError}</span>}
             </div>
 
             <div>
