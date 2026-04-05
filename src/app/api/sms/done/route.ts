@@ -29,19 +29,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Token expired" }, { status: 403 });
   }
 
-  // Check if already done
-  const { count } = await supabaseAdmin
+  // Check how many are already done
+  const { count: alreadyDoneCount } = await supabaseAdmin
     .from("daily_logs")
     .select("*", { count: "exact", head: true })
     .eq("user_id", uid)
     .eq("logged_date", date)
     .in("stack_item_id", ids);
 
-  if ((count || 0) >= ids.length) {
-    return NextResponse.json({ message: "already_done" });
-  }
+  // Delete any existing logs for these items (handles partial done state)
+  await supabaseAdmin
+    .from("daily_logs")
+    .delete()
+    .eq("user_id", uid)
+    .eq("logged_date", date)
+    .in("stack_item_id", ids);
 
-  // Mark all as done
+  // Insert new logs for all items
   const logsToInsert = ids.map((id: string) => ({
     user_id: uid,
     stack_item_id: id,
@@ -50,7 +54,16 @@ export async function POST(req: NextRequest) {
     taken_at: new Date().toISOString(),
   }));
 
-  await supabaseAdmin.from("daily_logs").upsert(logsToInsert, { ignoreDuplicates: true });
+  const { error } = await supabaseAdmin.from("daily_logs").insert(logsToInsert);
+  if (error) {
+    console.error("Email done insert error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // If all items were already done before we re-inserted, report as already done
+  if ((alreadyDoneCount || 0) >= ids.length) {
+    return NextResponse.json({ message: "already_done" });
+  }
 
   return NextResponse.json({ message: "success", count: ids.length });
 }
