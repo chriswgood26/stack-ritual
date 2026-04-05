@@ -215,6 +215,11 @@ const features = [
     title: "Community Experiences",
     description: "See what real people report from their stacks. Community-sourced effectiveness data alongside clinical evidence.",
   },
+  {
+    icon: "📷",
+    title: "Scan Any Label",
+    description: "Point your camera at any supplement bottle and AI instantly reads the label — product name, brand, dose, ingredients, and quantity — to add or update your stack in seconds.",
+  },
 ];
 
 const steps = [
@@ -246,6 +251,7 @@ const plusTier = [
   "Unlimited supplements",
   "Smart timing engine",
   "Interactions checker",
+  "📷 Label scanner (AI-powered)",
   "Daily email reminders",
   "Weekly progress summary",
   "Rituals & activities tracker",
