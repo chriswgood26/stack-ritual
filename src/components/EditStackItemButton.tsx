@@ -13,6 +13,7 @@ interface Props {
   currentNotes?: string | null;
   currentFrequency?: string | null;
   name: string;
+  displayName?: string;
   currentQuantityTotal?: number | null;
   currentQuantityRemaining?: number | null;
   currentQuantityUnit?: string | null;
@@ -48,7 +49,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, asLabel = false, labelClassName }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, asLabel = false, labelClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -95,7 +96,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     <>
       <button onClick={() => setOpen(true)}
         className={asLabel ? (labelClassName || "font-medium text-sm text-stone-900") : "text-stone-300 hover:text-emerald-500 transition-colors text-lg p-1"}>
-        {asLabel ? name : "✏️"}
+        {asLabel ? (displayName ?? name) : "✏️"}
       </button>
 
       {open && (

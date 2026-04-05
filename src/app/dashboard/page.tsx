@@ -241,6 +241,7 @@ export default async function Dashboard() {
                       const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
                       const checkId = item.checkoffId || item.id;
                       const isChecked = checkedIds.has(checkId);
+                      const displayName = isChecked && name.length > 18 ? name.slice(0, 18) + "…" : name;
 
                       return (
                         <div key={checkId} className="flex items-center justify-between px-4 py-3.5">
@@ -254,6 +255,7 @@ export default async function Dashboard() {
                               <EditStackItemButton
                                 itemId={item.id}
                                 name={name}
+                                displayName={displayName}
                                 currentDose={item.dose}
                                 currentTiming={item.timing}
                                 currentBrand={item.brand}
