@@ -65,10 +65,7 @@ export async function GET(req: NextRequest) {
       const itemRows = items.map(item => {
         const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
         const name = supp?.name || item.custom_name || "Supplement";
-        const slug = supp?.slug;
-        const reorderUrl = slug
-          ? `https://www.iherb.com/search?q=${encodeURIComponent(name)}&rcode=7113351`
-          : `https://www.amazon.com/s?k=${encodeURIComponent(name + ' supplement')}&tag=stackritual-20`;
+        const reorderUrl = `https://www.amazon.com/s?k=${encodeURIComponent(name + ' supplement')}&tag=stackritual-20`;
         return `<tr>
           <td style="padding:8px 0;border-bottom:1px solid #f3f4f6;font-weight:600">${name}</td>
           <td style="padding:8px 0;border-bottom:1px solid #f3f4f6;color:#6b7280">${item.quantity_remaining} ${item.quantity_unit || "doses"} left</td>
