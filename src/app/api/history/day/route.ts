@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const [{ data: logs }, { data: mood }] = await Promise.all([
     supabaseAdmin
       .from("daily_logs")
-      .select("stack_item_id, dose_index, taken_at, stack_item:stack_item_id(custom_name, dose, category, custom_icon, supplement:supplement_id(name, icon))")
+      .select("id, stack_item_id, dose_index, taken_at, stack_item:stack_item_id(custom_name, dose, category, custom_icon, supplement:supplement_id(name, icon))")
       .eq("user_id", userId)
       .eq("logged_date", date),
     supabaseAdmin

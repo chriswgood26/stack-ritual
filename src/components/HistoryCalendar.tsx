@@ -2,6 +2,15 @@
 
 import { useState, useCallback } from "react";
 
+interface StackItem {
+  id: string;
+  custom_name: string | null;
+  dose: string | null;
+  category: string;
+  custom_icon: string | null;
+  supplement: { name: string; icon: string } | null;
+}
+
 interface Props {
   logsByDate: Record<string, number>;
   totalStack: number;
@@ -94,9 +103,17 @@ function MonthCalendar({ year, month, label, logsByDate, totalStack, today, mood
   );
 }
 
+interface DayLog {
+  id?: string;
+  stack_item_id: string;
+  taken_at: string;
+  dose_index: number;
+  stack_item: { custom_name: string | null; dose: string | null; category: string; custom_icon: string | null; supplement: { name: string; icon: string } | { name: string; icon: string }[] | null } | { custom_name: string | null; dose: string | null; category: string; custom_icon: string | null; supplement: { name: string; icon: string } | { name: string; icon: string }[] | null }[] | null;
+}
+
 interface DayDetail {
   date: string;
-  logs: { taken_at: string; dose_index: number; stack_item: { custom_name: string | null; dose: string | null; category: string; custom_icon: string | null; supplement: { name: string; icon: string } | null } }[];
+  logs: DayLog[];
   mood: { mood_score: number; notes: string | null } | null;
 }
 
@@ -104,16 +121,106 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
   const [showAll, setShowAll] = useState(false);
   const [selectedDay, setSelectedDay] = useState<DayDetail | null>(null);
   const [loadingDay, setLoadingDay] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [allStackItems, setAllStackItems] = useState<StackItem[]>([]);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [savingItem, setSavingItem] = useState<string | null>(null);
+  const [editTimes, setEditTimes] = useState<Record<string, string>>({}); // stack_item_id -> HH:MM
   const now = new Date();
+
+  const refreshDayData = useCallback(async (dateStr: string) => {
+    const res = await fetch(`/api/history/day?date=${dateStr}`);
+    const data = await res.json();
+    setSelectedDay({ date: dateStr, ...data });
+    return data;
+  }, []);
 
   const handleDayClick = useCallback(async (dateStr: string) => {
     if (dateStr > today || !logsByDate[dateStr]) return; // skip future and empty days
     setLoadingDay(dateStr);
+    setEditMode(false);
     const res = await fetch(`/api/history/day?date=${dateStr}`);
     const data = await res.json();
     setSelectedDay({ date: dateStr, ...data });
     setLoadingDay(null);
   }, [today, logsByDate]);
+
+  const enterEditMode = useCallback(async () => {
+    if (!selectedDay) return;
+    setLoadingEdit(true);
+    // Fetch full stack item list
+    const res = await fetch("/api/stack/list");
+    const data = await res.json();
+    setAllStackItems(data.items || []);
+    // Initialize edit times from existing logs
+    const times: Record<string, string> = {};
+    selectedDay.logs.forEach((log) => {
+      const d = new Date(log.taken_at);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      times[log.stack_item_id] = `${hh}:${mm}`;
+    });
+    setEditTimes(times);
+    setEditMode(true);
+    setLoadingEdit(false);
+  }, [selectedDay]);
+
+  const togglePastItem = useCallback(async (stackItemId: string, currentlyChecked: boolean) => {
+    if (!selectedDay) return;
+    setSavingItem(stackItemId);
+    await fetch("/api/stack/checkoff", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stack_item_id: stackItemId,
+        date: selectedDay.date,
+        checked: !currentlyChecked,
+        dose_index: 0,
+      }),
+    });
+    const data = await refreshDayData(selectedDay.date);
+    // Update edit times if newly checked
+    if (!currentlyChecked) {
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      setEditTimes(prev => ({ ...prev, [stackItemId]: `${hh}:${mm}` }));
+    } else {
+      setEditTimes(prev => {
+        const next = { ...prev };
+        delete next[stackItemId];
+        return next;
+      });
+    }
+    // Update logsByDate count estimate
+    if (data.logs) {
+      logsByDate[selectedDay.date] = data.logs.length;
+    }
+    setSavingItem(null);
+  }, [selectedDay, refreshDayData, logsByDate]);
+
+  const updateTime = useCallback(async (stackItemId: string, timeStr: string) => {
+    if (!selectedDay) return;
+    setEditTimes(prev => ({ ...prev, [stackItemId]: timeStr }));
+    await fetch("/api/history/update-log", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stack_item_id: stackItemId,
+        date: selectedDay.date,
+        time: timeStr,
+        dose_index: 0,
+      }),
+    });
+    await refreshDayData(selectedDay.date);
+  }, [selectedDay, refreshDayData]);
+
+  const closeModal = useCallback(() => {
+    setSelectedDay(null);
+    setEditMode(false);
+    setAllStackItems([]);
+    setEditTimes({});
+  }, []);
 
   // Current month
   const currentMonth = {
@@ -182,7 +289,25 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
             <h2 className="font-bold text-stone-900">
               {new Date(selectedDay.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
             </h2>
-            <button onClick={() => setSelectedDay(null)} className="text-stone-400 hover:text-stone-700 text-xl">✕</button>
+            <div className="flex items-center gap-2">
+              {!editMode ? (
+                <button
+                  onClick={enterEditMode}
+                  disabled={loadingEdit}
+                  className="text-xs font-medium text-emerald-700 border border-emerald-200 rounded-lg px-2.5 py-1 hover:bg-emerald-50 transition-colors disabled:opacity-50"
+                >
+                  {loadingEdit ? "Loading…" : "✏️ Edit"}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setEditMode(false)}
+                  className="text-xs font-medium text-stone-600 border border-stone-200 rounded-lg px-2.5 py-1 hover:bg-stone-50 transition-colors"
+                >
+                  Done
+                </button>
+              )}
+              <button onClick={closeModal} className="text-stone-400 hover:text-stone-700 text-xl">✕</button>
+            </div>
           </div>
 
           {selectedDay.mood && (
@@ -199,34 +324,86 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
             </div>
           )}
 
-          <div>
-            <h3 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">
-              Completed ({selectedDay.logs.length} items)
-            </h3>
-            {selectedDay.logs.length === 0 ? (
-              <p className="text-stone-400 text-sm text-center py-3">Nothing logged this day.</p>
-            ) : (
-              <div className="space-y-2">
-                {selectedDay.logs.map((log: { taken_at: string; dose_index: number; stack_item: { custom_name: string | null; dose: string | null; category: string; custom_icon: string | null; supplement: { name: string; icon: string } | { name: string; icon: string }[] | null } | { custom_name: string | null; dose: string | null; category: string; custom_icon: string | null; supplement: { name: string; icon: string } | { name: string; icon: string }[] | null }[] | null }, i: number) => {
-                  const si = Array.isArray(log.stack_item) ? log.stack_item[0] : log.stack_item;
-                  const supp = si ? (Array.isArray(si.supplement) ? si.supplement[0] : si.supplement) : null;
-                  const name = supp?.name || si?.custom_name || "Unknown";
-                  const icon = supp?.icon || si?.custom_icon || (si?.category === "ritual" ? "🧘" : "💊");
-                  const time = new Date(log.taken_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-                  return (
-                    <div key={i} className="flex items-center gap-3 bg-stone-50 rounded-xl px-4 py-2.5">
-                      <span className="text-base">{icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-medium text-stone-900 text-sm">{name}</span>
-                        {si?.dose && <span className="text-xs text-stone-400 ml-1">· {si.dose}</span>}
+          {/* Edit mode: show all stack items with toggle + time edit */}
+          {editMode ? (
+            <div>
+              <h3 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">
+                Edit Selections
+              </h3>
+              {allStackItems.length === 0 ? (
+                <p className="text-stone-400 text-sm text-center py-3">No stack items found.</p>
+              ) : (
+                <div className="space-y-2">
+                  {allStackItems.map((item) => {
+                    const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
+                    const name = supp?.name || item.custom_name || "Unknown";
+                    const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
+                    const isChecked = selectedDay.logs.some(l => l.stack_item_id === item.id);
+                    const isSaving = savingItem === item.id;
+                    const timeVal = editTimes[item.id] || "";
+
+                    return (
+                      <div key={item.id} className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors ${isChecked ? "bg-emerald-50" : "bg-stone-50"}`}>
+                        <button
+                          onClick={() => togglePastItem(item.id, isChecked)}
+                          disabled={isSaving}
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                            isChecked
+                              ? "bg-emerald-700 border-emerald-700 text-white"
+                              : "border-stone-300 hover:border-emerald-400"
+                          } ${isSaving ? "opacity-50" : ""}`}
+                        >
+                          {isChecked && <span className="text-xs font-bold">✓</span>}
+                        </button>
+                        <span className="text-base">{icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className={`font-medium text-sm ${isChecked ? "text-stone-900" : "text-stone-400"}`}>{name}</span>
+                          {item.dose && <span className="text-xs text-stone-400 ml-1">· {item.dose}</span>}
+                        </div>
+                        {isChecked && (
+                          <input
+                            type="time"
+                            value={timeVal}
+                            onChange={(e) => updateTime(item.id, e.target.value)}
+                            className="text-xs text-emerald-700 font-medium border border-emerald-200 rounded-lg px-1.5 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 w-[90px]"
+                          />
+                        )}
                       </div>
-                      <span className="text-xs text-emerald-600 font-medium">{time}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">
+                Completed ({selectedDay.logs.length} items)
+              </h3>
+              {selectedDay.logs.length === 0 ? (
+                <p className="text-stone-400 text-sm text-center py-3">Nothing logged this day.</p>
+              ) : (
+                <div className="space-y-2">
+                  {selectedDay.logs.map((log, i) => {
+                    const si = Array.isArray(log.stack_item) ? log.stack_item[0] : log.stack_item;
+                    const supp = si ? (Array.isArray(si.supplement) ? si.supplement[0] : si.supplement) : null;
+                    const name = (supp as { name: string; icon: string } | null)?.name || si?.custom_name || "Unknown";
+                    const icon = (supp as { name: string; icon: string } | null)?.icon || si?.custom_icon || (si?.category === "ritual" ? "🧘" : "💊");
+                    const time = new Date(log.taken_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+                    return (
+                      <div key={i} className="flex items-center gap-3 bg-stone-50 rounded-xl px-4 py-2.5">
+                        <span className="text-base">{icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium text-stone-900 text-sm">{name}</span>
+                          {si?.dose && <span className="text-xs text-stone-400 ml-1">· {si.dose}</span>}
+                        </div>
+                        <span className="text-xs text-emerald-600 font-medium">{time}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     )}
