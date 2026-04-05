@@ -6,6 +6,14 @@ import crypto from "crypto";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
+// Map slot names to the timing values stored in user_stacks
+const SLOT_TIMINGS: Record<string, string[]> = {
+  morning: ["morning-fasted", "morning-food"],
+  afternoon: ["afternoon"],
+  evening: ["evening"],
+  bedtime: ["bedtime"],
+};
+
 function generateToken(userId: string, date: string, itemIds: string[]) {
   const secret = process.env.CLERK_SECRET_KEY!;
   const payload = `${userId}:${date}:${itemIds.join(",")}`;
@@ -17,6 +25,12 @@ export async function GET(req: NextRequest) {
   if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Determine which timing slot to send reminders for.
+  // Pass ?slot=morning|afternoon|evening|bedtime, or defaults to "morning".
+  const { searchParams } = new URL(req.url);
+  const slot = searchParams.get("slot") || "morning";
+  const timings = SLOT_TIMINGS[slot] ?? SLOT_TIMINGS.morning;
 
   const now = new Date();
   const today = now.toISOString().split("T")[0];
@@ -42,12 +56,13 @@ export async function GET(req: NextRequest) {
 
       if (!sub || !["plus", "pro"].includes(sub.plan) || sub.status !== "active") continue;
 
-      // Get active stack items
+      // Get active stack items for this timing slot only
       const { data: stackItems } = await supabaseAdmin
         .from("user_stacks")
         .select("id, custom_name, dose, timing, supplement:supplement_id(name)")
         .eq("user_id", profile.user_id)
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .in("timing", timings);
 
       if (!stackItems || stackItems.length === 0) continue;
 
@@ -75,7 +90,7 @@ export async function GET(req: NextRequest) {
         const supp = Array.isArray(i.supplement) ? i.supplement[0] : i.supplement;
         return {
           name: supp?.name || i.custom_name || "Supplement",
-          timing: i.timing || "daily",
+          timing: i.timing || slot,
           dose: i.dose || undefined,
         };
       });
@@ -93,5 +108,5 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ message: "done", sent, errors });
+  return NextResponse.json({ message: "done", slot, sent, errors });
 }
