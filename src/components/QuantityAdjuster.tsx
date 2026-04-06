@@ -17,6 +17,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState(currentRemaining?.toString() || "");
   const [saving, setSaving] = useState(false);
+  const [confirmStop, setConfirmStop] = useState(false);
   const router = useRouter();
 
   const unitLabel = unit || "capsules";
@@ -34,6 +35,19 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
       }),
     });
     setOpen(false);
+    router.refresh();
+    setSaving(false);
+  }
+
+  async function handleStopTracking() {
+    setSaving(true);
+    await fetch("/api/stack/inventory", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item_id: itemId }),
+    });
+    setOpen(false);
+    setConfirmStop(false);
     router.refresh();
     setSaving(false);
   }
@@ -130,6 +144,36 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
                   Amazon →
                 </a>
               </div>
+            </div>
+
+            <div className="border-t border-stone-100 pt-3">
+              {!confirmStop ? (
+                <button
+                  onClick={() => setConfirmStop(true)}
+                  className="w-full text-xs text-stone-400 hover:text-red-500 transition-colors py-1"
+                >
+                  Stop tracking inventory
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-stone-500 text-center">Remove inventory tracking for <strong>{name}</strong>?</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setConfirmStop(false)}
+                      className="flex-1 py-2 rounded-xl text-xs font-semibold bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleStopTracking}
+                      disabled={saving}
+                      className="flex-1 py-2 rounded-xl text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                    >
+                      {saving ? "..." : "Stop tracking"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
