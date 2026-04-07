@@ -93,11 +93,12 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
     <div className="flex items-center gap-2">
       {checked && timeStr && !editingTime && (
         <button
-          onClick={startEditTime}
-          className="text-xs font-medium text-emerald-700 whitespace-nowrap hover:text-emerald-500 transition-colors cursor-pointer"
+          type="button"
+          onClick={(e) => { e.stopPropagation(); startEditTime(); }}
+          className="text-xs font-medium text-emerald-700 whitespace-nowrap hover:text-emerald-500 hover:underline transition-colors cursor-pointer select-none"
           title="Click to edit time"
         >
-          Complete {timeStr}
+          ✎ {timeStr}
         </button>
       )}
       {editingTime && (
