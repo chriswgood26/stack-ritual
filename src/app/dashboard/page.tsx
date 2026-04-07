@@ -4,6 +4,7 @@ import TopNav from "@/components/TopNav";
 import { currentUser } from "@clerk/nextjs/server";
 import { getToday } from "@/lib/timezone";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getRitualIcon } from "@/lib/ritual-icons";
 import Disclaimer from "@/components/Disclaimer";
 import CheckoffButton from "@/components/CheckoffButton";
 import MarkAllDoneButton from "@/components/MarkAllDoneButton";
@@ -238,7 +239,7 @@ export default async function Dashboard() {
                     {group.items.map(item => {
                       const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
                       const name = supp?.name || item.custom_name || "Unknown";
-                      const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
+                      const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? getRitualIcon(item.custom_name || "") : "💊");
                       const checkId = item.checkoffId || item.id;
                       const isChecked = checkedIds.has(checkId);
                       const displayName = isChecked && name.length > 18 ? name.slice(0, 18) + "…" : name;
@@ -320,7 +321,7 @@ export default async function Dashboard() {
               {asNeededItems.map(item => {
                 const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
                 const name = supp?.name || item.custom_name || "Unknown";
-                const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
+                const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? getRitualIcon(item.custom_name || "") : "💊");
                 const checkId = item.checkoffId || item.id;
                 const isChecked = checkedIds.has(checkId);
                 return (

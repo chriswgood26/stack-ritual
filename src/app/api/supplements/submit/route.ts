@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getRitualIcon } from "@/lib/ritual-icons";
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
     user_id: userId,
     supplement_id: null,
     custom_name: name.trim(),
-    custom_icon: icon || "💊",
+    custom_icon: body.isRitual ? (icon || getRitualIcon(name.trim())) : (icon || "💊"),
     category: body.isRitual ? "ritual" : "supplement",
     dose: dose || null,
     timing: timing || null,

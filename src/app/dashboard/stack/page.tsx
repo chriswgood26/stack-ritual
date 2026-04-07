@@ -10,6 +10,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import StackSearchBar from "@/components/StackSearchBar";
 import StackSearch from "@/components/StackSearch";
 import { supabaseAdmin } from "@/lib/supabase";
+import { getRitualIcon } from "@/lib/ritual-icons";
 
 export const dynamic = "force-dynamic";
 
@@ -142,7 +143,7 @@ export default async function MyStackPage() {
                 </h2>
                 <div className="space-y-2">
                   {rituals.map(item => {
-                    const icon = item.custom_icon || "🧘";
+                    const icon = item.custom_icon || getRitualIcon(item.custom_name || "");
                     const ritualName = item.custom_name || "Ritual";
                     return (
                       <div key={item.id} data-stack-name={ritualName.toLowerCase()} data-stack-brand={(item.brand || "").toLowerCase()} className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4 flex items-center gap-3">

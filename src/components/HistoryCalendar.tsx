@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { getRitualIcon } from "@/lib/ritual-icons";
 
 interface StackItem {
   id: string;
@@ -347,7 +348,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
                   {allStackItems.map((item) => {
                     const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
                     const name = supp?.name || item.custom_name || "Unknown";
-                    const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? "🧘" : "💊");
+                    const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? getRitualIcon(item.custom_name || "") : "💊");
                     const isChecked = selectedDay.logs.some(l => l.stack_item_id === item.id);
                     const isSaving = savingItem === item.id;
                     const timeVal = editTimes[item.id] || "";
@@ -397,7 +398,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
                     const si = Array.isArray(log.stack_item) ? log.stack_item[0] : log.stack_item;
                     const supp = si ? (Array.isArray(si.supplement) ? si.supplement[0] : si.supplement) : null;
                     const name = (supp as { name: string; icon: string } | null)?.name || si?.custom_name || "Unknown";
-                    const icon = (supp as { name: string; icon: string } | null)?.icon || si?.custom_icon || (si?.category === "ritual" ? "🧘" : "💊");
+                    const icon = (supp as { name: string; icon: string } | null)?.icon || si?.custom_icon || (si?.category === "ritual" ? getRitualIcon(si?.custom_name || "") : "💊");
                     const time = new Date(log.taken_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
                     return (
                       <div key={i} className="flex items-center gap-3 bg-stone-50 rounded-xl px-4 py-2.5">
