@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface Props {
   stackItems: { id: string; doseIndex: number }[];
@@ -11,22 +10,27 @@ interface Props {
 
 export default function MarkAllDoneButton({ stackItems, date, allDone }: Props) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleMarkAll() {
     setLoading(true);
     try {
+      // Only send unchecked items when marking done, all items when unmarking
+      const itemsToSend = allDone
+        ? stackItems
+        : stackItems; // Send all — API will delete existing first then re-insert
+
       await fetch("/api/stack/checkoff-bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: stackItems.map(item => ({ stack_item_id: item.id, dose_index: item.doseIndex ?? 0 })),
+          items: itemsToSend.map(item => ({ stack_item_id: item.id, dose_index: item.doseIndex ?? 0 })),
           date,
           checked: !allDone,
         }),
       });
-      router.refresh();
-    } finally {
+      // Full page reload to ensure all checkbox states update
+      window.location.reload();
+    } catch {
       setLoading(false);
     }
   }
