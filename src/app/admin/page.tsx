@@ -60,6 +60,22 @@ export default async function AdminPage() {
     .from("app_feedback")
     .select("*", { count: "exact", head: true });
 
+  // Page views
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const { count: viewsToday } = await supabaseAdmin
+    .from("page_views")
+    .select("*", { count: "exact", head: true })
+    .gte("created_at", startOfToday);
+  const { count: viewsMonth } = await supabaseAdmin
+    .from("page_views")
+    .select("*", { count: "exact", head: true })
+    .gte("created_at", startOfMonth);
+  const { count: viewsTotal } = await supabaseAdmin
+    .from("page_views")
+    .select("*", { count: "exact", head: true });
+
   return (
     <div className="min-h-screen bg-stone-900 text-white font-sans">
       {/* Admin nav */}
@@ -77,12 +93,15 @@ export default async function AdminPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 lg:grid-cols-7 gap-4">
           {[
             { label: "Total Users", value: totalUsers ?? 0, icon: "👤", href: "#users" },
             { label: "Stack Items", value: totalStacks ?? 0, icon: "🧱", note: "Supplement rows across all users", href: "#users" },
             { label: "Experiences", value: totalExperiences ?? 0, icon: "⭐", href: "#experiences" },
             { label: "Feedback", value: totalFeedback ?? 0, icon: "💬", href: "#feedback" },
+            { label: "Views Today", value: viewsToday ?? 0, icon: "👁️", note: "Landing page visits today" },
+            { label: "Views (Month)", value: viewsMonth ?? 0, icon: "📊", note: "This month" },
+            { label: "Views (All Time)", value: viewsTotal ?? 0, icon: "🌐", note: "Total landing page visits" },
           ].map(s => (
             <a key={s.label} href={s.href} className="bg-stone-800 rounded-xl p-4 border border-stone-700 hover:border-emerald-600 transition-colors block">
               <div className="text-2xl mb-1">{s.icon}</div>

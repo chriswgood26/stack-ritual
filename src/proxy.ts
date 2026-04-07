@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)'])
-const isPublicApiRoute = createRouteMatcher(['/api/cron/(.*)', '/api/sms/webhook', '/api/sms/done', '/done'])
+const isPublicApiRoute = createRouteMatcher(['/api/cron/(.*)', '/api/sms/webhook', '/api/sms/done', '/api/track', '/done'])
 
 export default clerkMiddleware(async (auth, req) => {
   if (isPublicApiRoute(req)) return; // skip auth for cron, webhooks, done page
