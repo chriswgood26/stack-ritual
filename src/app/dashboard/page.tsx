@@ -330,8 +330,23 @@ export default async function Dashboard() {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${item.category === "ritual" ? "bg-amber-100" : "bg-stone-100"}`}>
                         {icon}
                       </div>
-                      <div className="min-w-0 overflow-hidden">
-                        <div className={`font-medium text-sm truncate ${isChecked ? "text-stone-400 line-through" : "text-stone-900"}`}>{name}</div>
+                      <div className="min-w-0 flex-1">
+                        <EditStackItemButton
+                          itemId={item.id}
+                          name={name}
+                          displayName={isChecked && name.length > 18 ? name.slice(0, 18) + "…" : name}
+                          currentDose={item.dose}
+                          currentTiming={item.timing}
+                          currentBrand={item.brand}
+                          currentNotes={item.notes}
+                          currentFrequency={item.frequency_type}
+                          currentQuantityTotal={item.quantity_total}
+                          currentQuantityRemaining={item.quantity_remaining}
+                          currentQuantityUnit={item.quantity_unit}
+                          currentAutoDecrement={item.auto_decrement}
+                          asLabel
+                          labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
+                        />
                         {item.dose && <div className="text-xs text-stone-400 truncate">{item.dose.split(".")[0]}</div>}
                       </div>
                     </div>
