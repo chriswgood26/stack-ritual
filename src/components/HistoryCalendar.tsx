@@ -75,11 +75,11 @@ function MonthCalendar({ year, month, label, logsByDate, totalStack, today, mood
           const isFuture = dateStr > today;
           const mood = moodByDate[dateStr];
 
-          const isClickable = !isFuture && count > 0;
+          const isClickable = !isFuture;
           return (
             <div key={day}
               onClick={() => isClickable && onDayClick?.(dateStr)}
-              title={isFuture ? "" : count > 0 ? `${count}/${totalStack} taken${mood ? ` · Mood: ${mood}/10` : ""} — tap for details` : ""}
+              title={isFuture ? "" : count > 0 ? `${count}/${totalStack} taken${mood ? ` · Mood: ${mood}/10` : ""} — tap for details` : "Tap to log items"}
               className={`aspect-square rounded-md flex flex-col items-center justify-center relative ${
                 isFuture ? "bg-stone-50 text-stone-200" : getCompletionColor(pct)
               } ${isToday ? "ring-2 ring-emerald-600 ring-offset-1" : ""} ${
@@ -136,12 +136,22 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
   }, []);
 
   const handleDayClick = useCallback(async (dateStr: string) => {
-    if (dateStr > today || !logsByDate[dateStr]) return; // skip future and empty days
+    if (dateStr > today) return; // skip future days
     setLoadingDay(dateStr);
     setEditMode(false);
     const res = await fetch(`/api/history/day?date=${dateStr}`);
     const data = await res.json();
     setSelectedDay({ date: dateStr, ...data });
+
+    // If no logs for this day, auto-enter edit mode so user can check off items
+    if (!logsByDate[dateStr] || logsByDate[dateStr] === 0) {
+      const stackRes = await fetch("/api/stack/list");
+      const stackData = await stackRes.json();
+      setAllStackItems(stackData.items || []);
+      setEditTimes({});
+      setEditMode(true);
+    }
+
     setLoadingDay(null);
   }, [today, logsByDate]);
 
