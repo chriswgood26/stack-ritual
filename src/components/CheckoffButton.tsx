@@ -16,6 +16,9 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
   const [checked, setChecked] = useState(initialChecked);
   const [takenAt, setTakenAt] = useState(initialTakenAt || null);
   const [loading, setLoading] = useState(false);
+  const [editingTime, setEditingTime] = useState(false);
+  const [timeValue, setTimeValue] = useState("");
+  const [savingTime, setSavingTime] = useState(false);
   const router = useRouter();
 
   async function toggle() {
@@ -46,16 +49,80 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
     }
   }
 
+  function startEditTime() {
+    if (!takenAt) return;
+    const d = new Date(takenAt);
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    setTimeValue(`${hh}:${mm}`);
+    setEditingTime(true);
+  }
+
+  async function saveTime() {
+    if (!timeValue) return;
+    setSavingTime(true);
+    try {
+      const res = await fetch("/api/history/update-log", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stack_item_id: stackItemId,
+          date,
+          time: timeValue,
+          dose_index: doseIndex,
+        }),
+      });
+      if (res.ok) {
+        // Update local takenAt with the new time
+        const [hours, mins] = timeValue.split(":");
+        const newDate = new Date(takenAt!);
+        newDate.setHours(parseInt(hours), parseInt(mins), 0, 0);
+        setTakenAt(newDate.toISOString());
+      }
+    } finally {
+      setSavingTime(false);
+      setEditingTime(false);
+    }
+  }
+
   const timeStr = takenAt
     ? new Date(takenAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
     : null;
 
   return (
     <div className="flex items-center gap-2">
-      {checked && timeStr && (
-        <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
+      {checked && timeStr && !editingTime && (
+        <button
+          onClick={startEditTime}
+          className="text-xs font-medium text-emerald-700 whitespace-nowrap hover:text-emerald-500 transition-colors cursor-pointer"
+          title="Click to edit time"
+        >
           Complete {timeStr}
-        </span>
+        </button>
+      )}
+      {editingTime && (
+        <div className="flex items-center gap-1">
+          <input
+            type="time"
+            value={timeValue}
+            onChange={(e) => setTimeValue(e.target.value)}
+            className="text-xs text-emerald-700 font-medium border border-emerald-200 rounded-lg px-1.5 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 w-[90px]"
+            autoFocus
+          />
+          <button
+            onClick={saveTime}
+            disabled={savingTime}
+            className="text-xs text-emerald-700 font-medium hover:text-emerald-500 disabled:opacity-50"
+          >
+            {savingTime ? "..." : "✓"}
+          </button>
+          <button
+            onClick={() => setEditingTime(false)}
+            className="text-xs text-stone-400 hover:text-stone-600"
+          >
+            ✕
+          </button>
+        </div>
       )}
       <button
         onClick={toggle}

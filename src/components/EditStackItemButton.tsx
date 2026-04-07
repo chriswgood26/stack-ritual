@@ -72,8 +72,8 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
       ...f,
       dose: data.dosePerServing || f.dose,
       brand: data.brand || f.brand,
-      quantity_total: data.totalQuantity ? data.totalQuantity.toString() : f.quantity_total,
-      quantity_remaining: data.totalQuantity ? data.totalQuantity.toString() : f.quantity_remaining,
+      quantity_total: data.totalQuantity ? (parseFloat(f.quantity_remaining || "0") + parseFloat(data.totalQuantity)).toString() : f.quantity_total,
+      quantity_remaining: data.totalQuantity ? (parseFloat(f.quantity_remaining || "0") + parseFloat(data.totalQuantity)).toString() : f.quantity_remaining,
       quantity_unit: data.quantityUnit || f.quantity_unit,
     }));
   }

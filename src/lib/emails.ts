@@ -31,7 +31,7 @@ export async function sendDailyReminderEmail(to: string, firstName: string, item
           </div>
           <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
             <p style="color: #a8a29e; font-size: 11px; margin: 0;">
-              <a href="sms:?body=Check%20out%20Stack%20Ritual%20%E2%80%94%20it%20helps%20you%20track%20and%20time%20your%20supplements.%20https%3A%2F%2Fstackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend.</a><br><br>
+              <a href="https://stackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend → stackritual.com</a><br><br>
               ⚕️ Nothing in this email constitutes medical advice.<br>
               <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Unsubscribe from emails</a>
             </p>
@@ -85,7 +85,7 @@ export async function sendWeeklySummaryEmail(to: string, firstName: string, stat
           </div>
           <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
             <p style="color: #a8a29e; font-size: 11px; margin: 0;">
-              <a href="sms:?body=Check%20out%20Stack%20Ritual%20%E2%80%94%20it%20helps%20you%20track%20and%20time%20your%20supplements.%20https%3A%2F%2Fstackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend.</a><br><br>
+              <a href="https://stackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend → stackritual.com</a><br><br>
               ⚕️ Nothing in this email constitutes medical advice.<br>
               <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Manage email preferences</a>
             </p>
