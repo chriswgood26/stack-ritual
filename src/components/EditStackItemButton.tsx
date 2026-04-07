@@ -162,8 +162,17 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 <div>
                   <label className="text-xs text-stone-400 block mb-1">Total qty</label>
                   <input type="number" value={form.quantity_total}
-                    onChange={e => setForm(f => ({ ...f, quantity_total: e.target.value }))}
-                    onBlur={e => setForm(f => ({ ...f, quantity_remaining: f.quantity_remaining || e.target.value }))}
+                    onChange={e => {
+                      const val = e.target.value;
+                      const newTotal = parseInt(val);
+                      const currentRemaining = parseInt(form.quantity_remaining);
+                      setForm(f => ({
+                        ...f,
+                        quantity_total: val,
+                        quantity_remaining: (!isNaN(newTotal) && !isNaN(currentRemaining) && currentRemaining > newTotal)
+                          ? val : f.quantity_remaining || val,
+                      }));
+                    }}
                     placeholder="90"
                     className="w-full border border-stone-200 rounded-xl px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                 </div>

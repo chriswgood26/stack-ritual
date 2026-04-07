@@ -6,8 +6,16 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { item_id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit, auto_decrement } = await req.json();
+  const body = await req.json();
+  let { item_id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit, auto_decrement } = body;
   if (!item_id) return NextResponse.json({ error: "item_id required" }, { status: 400 });
+
+  // Ensure remaining never exceeds total
+  const total = quantity_total !== "" && quantity_total !== null && quantity_total !== undefined ? Number(quantity_total) : null;
+  const remaining = quantity_remaining !== "" && quantity_remaining !== null && quantity_remaining !== undefined ? Number(quantity_remaining) : null;
+  if (total !== null && remaining !== null && remaining > total) {
+    quantity_remaining = quantity_total;
+  }
 
   const { error } = await supabaseAdmin
     .from("user_stacks")
