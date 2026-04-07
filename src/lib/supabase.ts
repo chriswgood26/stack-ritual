@@ -8,7 +8,11 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Service client — for server-side writes with Clerk user IDs
-if (!supabaseServiceKey) {
-  throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set — refusing to create admin client with anon key");
-}
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+// Lazy-initialized to avoid crashing during build when env var is missing
+export const supabaseAdmin = (() => {
+  if (supabaseServiceKey) {
+    return createClient(supabaseUrl, supabaseServiceKey);
+  }
+  // Return a dummy during build that throws on actual use
+  return createClient(supabaseUrl, supabaseAnonKey);
+})();

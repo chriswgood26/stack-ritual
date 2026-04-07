@@ -26,27 +26,23 @@ export default async function AdminPage() {
     .order("created_at", { ascending: false })
     .limit(50);
 
-  // Fetch recent experiences (last 20)
   const { data: experiences } = await supabaseAdmin
     .from("experiences")
     .select("*, supplement:supplement_id(name, icon)")
     .order("created_at", { ascending: false })
     .limit(20);
 
-  // Fetch recent app feedback
   const { data: feedback } = await supabaseAdmin
     .from("app_feedback")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(20);
 
-  // Fetch all supplements
   const { data: allSupplements } = await supabaseAdmin
     .from("supplements")
     .select("id, name, slug, category, icon, tagline, evidence_level, description, benefits, side_effects, timing_recommendation, dose_recommendation")
     .order("name");
 
-  // Stats
   const { count: totalUsers } = await supabaseAdmin
     .from("user_profiles")
     .select("*", { count: "exact", head: true });
