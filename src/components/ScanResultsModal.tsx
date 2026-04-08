@@ -15,6 +15,10 @@ export default function ScanResultsModal({ data, onClose }: Props) {
   const [productName, setProductName] = useState(data.productName || "");
   const [brand, setBrand] = useState(data.brand || "");
   const [dose, setDose] = useState(data.dosePerServing || "");
+  const [timing, setTiming] = useState("");
+  const [quantityTotal, setQuantityTotal] = useState(data.totalQuantity ? String(data.totalQuantity) : "");
+  const [quantityRemaining, setQuantityRemaining] = useState(data.totalQuantity ? String(data.totalQuantity) : "");
+  const [quantityUnit, setQuantityUnit] = useState(data.quantityUnit || "capsules");
   const [selectedIngredients, setSelectedIngredients] = useState<Set<number>>(
     () => new Set(data.ingredients.map((_, i) => i))
   );
@@ -42,7 +46,11 @@ export default function ScanResultsModal({ data, onClose }: Props) {
           body: JSON.stringify({
             supplement_id: data.matchedSupplement.id,
             dose,
+            timing,
             brand,
+            quantity_total: quantityTotal,
+            quantity_remaining: quantityRemaining,
+            quantity_unit: quantityUnit,
           }),
         });
         const result = await res.json();
@@ -60,8 +68,12 @@ export default function ScanResultsModal({ data, onClose }: Props) {
             name: productName,
             category: data.category || "other",
             dose,
+            timing,
             brand,
             icon: "💊",
+            quantity_total: quantityTotal,
+            quantity_remaining: quantityRemaining,
+            quantity_unit: quantityUnit,
           }),
         });
       }
@@ -88,6 +100,7 @@ export default function ScanResultsModal({ data, onClose }: Props) {
             name: ing.name,
             category: data.category || "vitamins",
             dose: ing.amount,
+            timing,
             brand,
             icon: "💊",
           }),
@@ -139,11 +152,60 @@ export default function ScanResultsModal({ data, onClose }: Props) {
               <input value={dose} onChange={e => setDose(e.target.value)} className={inputClass} />
             </div>
           </div>
-          {data.totalQuantity > 0 && (
-            <div className="text-xs text-stone-500">
-              📦 {data.totalQuantity} {data.quantityUnit} in container
+          <div>
+            <label className="text-xs text-stone-500 mb-1 block">When to take</label>
+            <select value={timing} onChange={e => setTiming(e.target.value)} className={`${inputClass} bg-white`}>
+              <option value="">Select timing...</option>
+              <optgroup label="Daily">
+                <option value="morning-fasted">Morning — Fasted</option>
+                <option value="morning-food">Morning — With Food</option>
+                <option value="afternoon">Afternoon</option>
+                <option value="evening">Evening</option>
+                <option value="bedtime">Bedtime</option>
+                <option value="split">Split Dose (AM + PM)</option>
+              </optgroup>
+              <optgroup label="Multiple times daily">
+                <option value="2x-daily">2x Daily (AM + PM)</option>
+                <option value="2x-with-meals">2x Daily with Meals</option>
+                <option value="3x-daily">3x Daily</option>
+                <option value="3x-with-meals">3x Daily with Meals</option>
+                <option value="4x-daily">4x Daily</option>
+              </optgroup>
+              <optgroup label="Less than daily">
+                <option value="weekly">Weekly</option>
+                <option value="biweekly">Twice a week</option>
+                <option value="3x-week">3x per week</option>
+                <option value="monthly">Monthly</option>
+                <option value="cycle-5-2">Cycle — 5 days on, 2 off</option>
+                <option value="cycle-8-2w">Cycle — 8 weeks on, 2 weeks off</option>
+                <option value="as-needed">As needed</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs text-stone-500 mb-1 block">Inventory</label>
+            <div className="grid grid-cols-3 gap-2">
+              <input type="number" inputMode="decimal" min="0" value={quantityTotal}
+                onChange={e => { setQuantityTotal(e.target.value); if (!quantityRemaining) setQuantityRemaining(e.target.value); }}
+                placeholder="Total" className={inputClass} />
+              <input type="number" inputMode="decimal" min="0" value={quantityRemaining}
+                onChange={e => setQuantityRemaining(e.target.value)}
+                placeholder="Remaining" className={inputClass} />
+              <select value={quantityUnit} onChange={e => setQuantityUnit(e.target.value)} className={`${inputClass} bg-white`}>
+                <option value="capsules">capsules</option>
+                <option value="tablets">tablets</option>
+                <option value="softgels">softgels</option>
+                <option value="gummies">gummies</option>
+                <option value="scoops">scoops</option>
+                <option value="ml">ml</option>
+                <option value="drops">drops</option>
+                <option value="g">g</option>
+                <option value="oz">oz</option>
+                <option value="servings">servings</option>
+              </select>
             </div>
-          )}
+          </div>
 
           {data.ingredients.length > 1 && (
             <div className="pt-2 border-t border-stone-100">

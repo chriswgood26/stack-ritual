@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
     .select("id, custom_name, dose, supplement:supplement_id(name)")
     .eq("user_id", userId)
     .eq("is_active", true)
+    .or("is_paused.is.null,is_paused.eq.false")
     .eq("timing", timing_slot);
 
   if (!stackItems || stackItems.length === 0) {

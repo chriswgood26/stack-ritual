@@ -6,6 +6,7 @@ import AddCustomSupplement from "@/components/AddCustomSupplement";
 import DeleteStackItemButton from "@/components/DeleteStackItemButton";
 import QuantityAdjuster from "@/components/QuantityAdjuster";
 import EditStackItemButton from "@/components/EditStackItemButton";
+import PauseStackItemButton from "@/components/PauseStackItemButton";
 import { currentUser } from "@clerk/nextjs/server";
 import StackSearchBar from "@/components/StackSearchBar";
 import StackSearch from "@/components/StackSearch";
@@ -33,11 +34,17 @@ export default async function MyStackPage() {
     } catch { return item.custom_name || ""; }
   };
 
-  const supplements = (stackItems || [])
+  const activeItems = (stackItems || []).filter(i => !i.is_paused);
+  const pausedItems = (stackItems || [])
+    .filter(i => i.is_paused)
+    .sort((a, b) => getDisplayName(a).localeCompare(getDisplayName(b)));
+  const supplements = activeItems
     .filter(i => i.category === "supplement")
     .sort((a, b) => getDisplayName(a).localeCompare(getDisplayName(b)));
-  const rituals = (stackItems || []).filter(i => i.category === "ritual").sort((a, b) => (a.custom_name || "").localeCompare(b.custom_name || ""));
-  const total = (stackItems || []).length;
+  const rituals = activeItems
+    .filter(i => i.category === "ritual")
+    .sort((a, b) => (a.custom_name || "").localeCompare(b.custom_name || ""));
+  const total = activeItems.length;
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
@@ -63,14 +70,16 @@ export default async function MyStackPage() {
             </Link>
             <Link href="/dashboard/search"
               className="flex-1 bg-white/20 hover:bg-white/30 transition-colors text-white text-sm font-medium py-2.5 rounded-xl text-center">
-              + Add to My Stack
+              🔬 Research New
             </Link>
           </div>
         </div>
 
         <StackSearchBar />
 
-        {total === 0 ? (
+        <AddCustomSupplement asLink />
+
+        {total === 0 && pausedItems.length === 0 ? (
           <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
             <div className="text-4xl mb-3">🌿</div>
             <p className="font-semibold text-stone-900 mb-1">Your stack is empty</p>
@@ -126,6 +135,7 @@ export default async function MyStackPage() {
                             currentQuantityRemaining={item.quantity_remaining}
                             currentQuantityUnit={item.quantity_unit}
                           />
+                          <PauseStackItemButton itemId={item.id} paused={false} />
                           <DeleteStackItemButton itemId={item.id} />
                         </div>
                       </div>
@@ -165,6 +175,44 @@ export default async function MyStackPage() {
                             currentNotes={item.notes}
                             currentFrequency={item.frequency_type}
                           />
+                          <PauseStackItemButton itemId={item.id} paused={false} />
+                          <DeleteStackItemButton itemId={item.id} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Inactive (paused) */}
+            {pausedItems.length > 0 && (
+              <div data-stack-section="inactive">
+                <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
+                  ⏸ Inactive ({pausedItems.length})
+                </h2>
+                <p className="text-xs text-stone-400 -mt-2 mb-3">Hidden from Today and reminders. Resume any time.</p>
+                <div className="space-y-2">
+                  {pausedItems.map(item => {
+                    const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
+                    const isRitual = item.category === "ritual";
+                    const name = supp?.name || item.custom_name || "Unknown";
+                    const icon = isRitual
+                      ? (item.custom_icon || getRitualIcon(item.custom_name || ""))
+                      : (supp?.icon || item.custom_icon || "💊");
+                    return (
+                      <div key={item.id} data-stack-name={(name || "").toLowerCase()} data-stack-brand={(item.brand || "").toLowerCase()} className="bg-stone-100/70 rounded-2xl border border-stone-200 px-4 py-4 flex items-center gap-3 opacity-80">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0 grayscale ${isRitual ? "bg-amber-100" : "bg-emerald-100"}`}>
+                          {icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-stone-600 text-sm">{name}</div>
+                          <div className="text-xs text-stone-400 mt-0.5">
+                            {[item.dose, item.timing, item.brand].filter(Boolean).join(" · ") || "Paused"}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <PauseStackItemButton itemId={item.id} paused={true} />
                           <DeleteStackItemButton itemId={item.id} />
                         </div>
                       </div>
@@ -177,17 +225,6 @@ export default async function MyStackPage() {
         )}
 
 
-
-        {/* Add from database */}
-        <Link
-          href="/dashboard/search"
-          className="flex items-center justify-center gap-2 bg-emerald-700 text-white rounded-2xl py-4 font-medium text-sm hover:bg-emerald-800 transition-colors"
-        >
-          + Add to My Stack
-        </Link>
-
-        {/* Add custom */}
-        <AddCustomSupplement />
 
         <Disclaimer compact />
       </div>

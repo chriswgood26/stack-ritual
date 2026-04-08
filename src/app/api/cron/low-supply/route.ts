@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     .from("user_stacks")
     .select("id, user_id, custom_name, dose, quantity_remaining, quantity_total, quantity_unit, doses_per_serving, supplement:supplement_id(name, slug)")
     .eq("is_active", true)
+    .or("is_paused.is.null,is_paused.eq.false")
     .eq("low_supply_alert", true)
     .not("quantity_remaining", "is", null)
     .lte("quantity_remaining", 14); // rough threshold — ≤14 doses left
@@ -104,7 +105,7 @@ export async function GET(req: NextRequest) {
               </div>
               <div style="background:#fafaf9;padding:16px;text-align:center;border-top:1px solid #e7e5e4;">
                 <p style="color:#a8a29e;font-size:11px;margin:0;">
-                  <a href="sms:?body=Check%20out%20Stack%20Ritual%20%E2%80%94%20it%20helps%20you%20track%20and%20time%20your%20supplements.%20https%3A%2F%2Fstackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend.</a><br><br>
+                  <a href="https://stackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend → stackritual.com</a><br><br>
                   ⚕️ Nothing on Stack Ritual constitutes medical advice.<br>
                   <a href="https://stackritual.com/dashboard/profile" style="color:#a8a29e;">Manage email preferences</a>
                 </p>

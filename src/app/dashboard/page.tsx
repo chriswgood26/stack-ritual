@@ -45,6 +45,7 @@ export default async function Dashboard() {
     .select("*, supplement:supplement_id(name, icon, slug)")
     .eq("user_id", userId)
     .eq("is_active", true)
+    .or("is_paused.is.null,is_paused.eq.false")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 

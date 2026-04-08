@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { name, category, icon, tagline, dose, timing, brand, purchased_from } = body;
+  const { name, category, icon, tagline, dose, timing, brand, purchased_from, quantity_total, quantity_remaining, quantity_unit } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "Name required" }, { status: 400 });
@@ -71,6 +71,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message, details: error }, { status: 500 });
   }
 
+  // Inventory: if a starting total is provided, default remaining to total
+  const totalNum = quantity_total !== undefined && quantity_total !== null && quantity_total !== "" ? Number(quantity_total) : null;
+  const remainingNum = quantity_remaining !== undefined && quantity_remaining !== null && quantity_remaining !== ""
+    ? Number(quantity_remaining)
+    : totalNum;
+
   // Also add directly to user's stack as a custom item
   await supabaseAdmin.from("user_stacks").insert({
     user_id: userId,
@@ -83,6 +89,9 @@ export async function POST(req: NextRequest) {
     brand: brand || null,
     purchased_from: purchased_from || null,
     notes: tagline || null,
+    quantity_total: totalNum,
+    quantity_remaining: remainingNum,
+    quantity_unit: quantity_unit || (totalNum !== null ? "capsules" : null),
     is_active: true,
   });
 

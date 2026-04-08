@@ -15,6 +15,9 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
     timing: "",
     brand: "",
     purchasedFrom: "",
+    quantityTotal: "",
+    quantityRemaining: "",
+    quantityUnit: "capsules",
     isRitual: false,
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -28,6 +31,9 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
       dose: data.dosePerServing || f.dose,
       brand: data.brand || f.brand,
       category: data.category || f.category,
+      quantityTotal: data.totalQuantity ? String(data.totalQuantity) : f.quantityTotal,
+      quantityRemaining: data.totalQuantity ? String(data.totalQuantity) : f.quantityRemaining,
+      quantityUnit: data.quantityUnit || f.quantityUnit,
     }));
   }
 
@@ -36,7 +42,14 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
     const res = await fetch("/api/supplements/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, ...form, purchased_from: form.purchasedFrom }),
+      body: JSON.stringify({
+        name,
+        ...form,
+        purchased_from: form.purchasedFrom,
+        quantity_total: form.quantityTotal,
+        quantity_remaining: form.quantityRemaining,
+        quantity_unit: form.quantityUnit,
+      }),
     });
     const data = await res.json();
     if (data.message === "submitted" || data.message === "already_submitted") {
@@ -140,20 +153,50 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
       </div>
 
       {!form.isRitual && (
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand</label>
-            <input type="text" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
-              placeholder="e.g. Thorne"
-              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand</label>
+              <input type="text" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
+                placeholder="e.g. Thorne"
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased</label>
+              <input type="text" value={form.purchasedFrom} onChange={e => setForm(f => ({ ...f, purchasedFrom: e.target.value }))}
+                placeholder="e.g. iHerb"
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
           </div>
+
           <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Where purchased</label>
-            <input type="text" value={form.purchasedFrom} onChange={e => setForm(f => ({ ...f, purchasedFrom: e.target.value }))}
-              placeholder="e.g. iHerb"
-              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Inventory (optional)</label>
+            <div className="grid grid-cols-3 gap-2">
+              <input type="number" inputMode="decimal" min="0" value={form.quantityTotal}
+                onChange={e => setForm(f => ({ ...f, quantityTotal: e.target.value, quantityRemaining: f.quantityRemaining || e.target.value }))}
+                placeholder="Total"
+                className="border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              <input type="number" inputMode="decimal" min="0" value={form.quantityRemaining}
+                onChange={e => setForm(f => ({ ...f, quantityRemaining: e.target.value }))}
+                placeholder="Remaining"
+                className="border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              <select value={form.quantityUnit}
+                onChange={e => setForm(f => ({ ...f, quantityUnit: e.target.value }))}
+                className="border border-stone-200 rounded-xl px-2 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                <option value="capsules">capsules</option>
+                <option value="tablets">tablets</option>
+                <option value="softgels">softgels</option>
+                <option value="gummies">gummies</option>
+                <option value="scoops">scoops</option>
+                <option value="ml">ml</option>
+                <option value="drops">drops</option>
+                <option value="g">g</option>
+                <option value="oz">oz</option>
+                <option value="servings">servings</option>
+              </select>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {status === "error" && <p className="text-red-500 text-xs text-center">Something went wrong. Try again.</p>}

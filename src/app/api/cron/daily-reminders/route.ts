@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
         .select("id, custom_name, dose, timing, supplement:supplement_id(name)")
         .eq("user_id", profile.user_id)
         .eq("is_active", true)
+        .or("is_paused.is.null,is_paused.eq.false")
         .in("timing", timings);
 
       if (!stackItems || stackItems.length === 0) continue;

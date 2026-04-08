@@ -64,7 +64,8 @@ export async function GET(req: NextRequest) {
         .from("user_stacks")
         .select("*", { count: "exact", head: true })
         .eq("user_id", profile.user_id)
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .or("is_paused.is.null,is_paused.eq.false");
 
       const logsByDate: Record<string, number> = {};
       (logs || []).forEach(l => { logsByDate[l.logged_date] = (logsByDate[l.logged_date] || 0) + 1; });

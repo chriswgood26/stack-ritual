@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 ];
 
 const BOTTOM_ITEMS = [
-  { href: "/admin/releases", label: "Releases", icon: "📋" },
+  { href: "/admin/releases", label: "Releases & Roadmap", icon: "📋" },
 ];
 
 export default function AdminSidebar() {

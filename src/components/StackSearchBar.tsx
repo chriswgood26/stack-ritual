@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { setStackQuery } from "@/lib/stackSearchQuery";
 
 export default function StackSearchBar() {
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setStackQuery(query);
+  }, [query]);
 
   useEffect(() => {
     // Filter supplement/ritual items by adding/removing a CSS class
@@ -36,7 +41,7 @@ export default function StackSearchBar() {
         type="search"
         value={query}
         onChange={e => setQuery(e.target.value)}
-        placeholder="Search my stack..."
+        placeholder="Search my stack"
         className="w-full bg-white border border-stone-200 rounded-2xl pl-11 pr-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm text-sm"
       />
       {query && (

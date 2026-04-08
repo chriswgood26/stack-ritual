@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import RoadmapManager from "@/components/RoadmapManager";
 
 const ADMIN_USER_IDS = ["user_3BGCbiChIFduGWHj5gzAmUxoK51"];
 
@@ -83,17 +83,10 @@ export default async function ReleasesPage() {
   if (!ADMIN_USER_IDS.includes(user.id)) redirect("/dashboard");
 
   return (
-    <div className="min-h-screen bg-stone-900 text-white font-sans">
-      <nav className="bg-stone-800 border-b border-stone-700 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/admin" className="text-stone-400 hover:text-white text-sm transition-colors">← Admin</Link>
-          <span className="text-stone-600">|</span>
-          <span className="font-bold text-white">Release Notes</span>
-        </div>
-        <Link href="/dashboard" className="text-stone-400 hover:text-white text-sm transition-colors">← Back to app</Link>
-      </nav>
+    <div>
+      <h1 className="text-2xl font-bold text-white mb-6">Releases & Roadmap</h1>
 
-      <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-3xl space-y-6">
         {releases.map(release => (
           <div key={release.version} className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
             <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
@@ -118,30 +111,7 @@ export default async function ReleasesPage() {
           </div>
         ))}
 
-        {/* Roadmap */}
-        <div className="bg-stone-800 rounded-2xl border border-amber-700/50 overflow-hidden">
-          <div className="px-6 py-4 border-b border-stone-700">
-            <span className="font-bold text-white text-xl">Roadmap</span>
-            <span className="ml-3 text-xs bg-amber-900 text-amber-300 px-2.5 py-1 rounded-full font-semibold">Coming Soon</span>
-          </div>
-          <ul className="px-6 py-4 space-y-2">
-            {[
-              "SMS reminders via Twilio (pending A2P carrier approval)",
-              "Supplement label scanner via phone camera (Pro feature)",
-              "Annual billing option",
-              "Dark mode",
-              "iOS/Android native app",
-              "Alexa/Google Home voice integration",
-              "Email receipt import for stack building",
-              "Testimonials on landing page",
-            ].map((f, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-stone-400">
-                <span className="text-amber-500 mt-0.5 flex-shrink-0">◦</span>
-                {f}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <RoadmapManager />
       </div>
     </div>
   );

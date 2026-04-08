@@ -6,6 +6,7 @@ import Link from "next/link";
 import ScanLabelButton from "./ScanLabelButton";
 import ScanResultsModal from "./ScanResultsModal";
 import type { ScanResult } from "./ScanLabelButton";
+import { getStackQuery } from "@/lib/stackSearchQuery";
 
 interface SearchResult {
   id: string;
@@ -50,7 +51,7 @@ const categories = [
   "longevity", "sleep", "gut-health", "hormones", "amino-acids", "herbs", "phytonutrients", "ritual", "other"
 ];
 
-export default function AddCustomSupplement({ initialName = "" }: { initialName?: string }) {
+export default function AddCustomSupplement({ initialName = "", asLink = false }: { initialName?: string; asLink?: boolean }) {
   const [query, setQuery] = useState(initialName);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -58,13 +59,14 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
   const [step, setStep] = useState<"search" | "details" | "success">(initialName ? "details" : "search");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [justAdded, setJustAdded] = useState<string | null>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [scanError, setScanError] = useState("");
 
-  const [form, setForm] = useState({
+  const initialForm = {
     name: initialName,
     category: "other",
     icon: "💊",
@@ -73,8 +75,12 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
     timing: "",
     brand: "",
     purchasedFrom: "",
+    quantityTotal: "",
+    quantityRemaining: "",
+    quantityUnit: "capsules",
     isRitual: false,
-  });
+  };
+  const [form, setForm] = useState(initialForm);
 
   useEffect(() => {
     if (query.length < 2) { setResults([]); return; }
@@ -93,7 +99,13 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
     const res = await fetch("/api/supplements/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, purchased_from: form.purchasedFrom }),
+      body: JSON.stringify({
+        ...form,
+        purchased_from: form.purchasedFrom,
+        quantity_total: form.quantityTotal,
+        quantity_remaining: form.quantityRemaining,
+        quantity_unit: form.quantityUnit,
+      }),
     });
     const data = await res.json();
 
@@ -106,7 +118,16 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
       setMessage(`Someone already submitted "${form.name}" — we'll review it soon!`);
       setStep("success");
     } else if (data.message === "submitted") {
-      setStep("success");
+      // Close form, reset state, refresh — user sees new item appear in their stack above
+      const addedName = form.name;
+      setShowForm(false);
+      setStep("search");
+      setStatus("idle");
+      setForm(initialForm);
+      setQuery("");
+      setMessage("");
+      setJustAdded(addedName);
+      setTimeout(() => setJustAdded(null), 4000);
       router.refresh();
     } else {
       setStatus("error");
@@ -114,13 +135,50 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
   }
 
   if (!showForm) {
+    const openForm = () => {
+      setShowForm(true);
+      if (initialName) {
+        setStep('details');
+        setForm(f => ({ ...f, name: initialName }));
+      } else {
+        // Carry over whatever the user typed in the My Stack search bar
+        const carryover = getStackQuery();
+        if (carryover) setQuery(carryover);
+      }
+    };
+
+    if (asLink) {
+      return (
+        <div className="-mt-2 mb-4">
+          {justAdded && (
+            <div className="mb-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl px-3 py-2">
+              ✓ Added &ldquo;{justAdded}&rdquo; to your stack
+            </div>
+          )}
+          <button
+            onClick={openForm}
+            className="text-emerald-700 text-sm font-medium hover:text-emerald-800 hover:underline inline-flex items-center gap-1"
+          >
+            + Add new supplement or ritual to my stack →
+          </button>
+        </div>
+      );
+    }
+
     return (
-      <button
-        onClick={() => { setShowForm(true); if (initialName) { setStep('details'); setForm(f => ({ ...f, name: initialName })); } }}
-        className="flex items-center justify-center gap-2 bg-white border-2 border-dashed border-stone-200 rounded-2xl py-4 w-full text-stone-500 hover:border-emerald-400 hover:text-emerald-700 transition-colors font-medium text-sm"
-      >
-        + Add supplement or ritual not in our database
-      </button>
+      <>
+        {justAdded && (
+          <div className="mb-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl px-4 py-2">
+            ✓ Added &ldquo;{justAdded}&rdquo; to your stack
+          </div>
+        )}
+        <button
+          onClick={openForm}
+          className="flex items-center justify-center gap-2 bg-white border-2 border-dashed border-stone-200 rounded-2xl py-4 w-full text-stone-500 hover:border-emerald-400 hover:text-emerald-700 transition-colors font-medium text-sm"
+        >
+          + Add supplement or ritual not in our database
+        </button>
+      </>
     );
   }
 
@@ -130,7 +188,7 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
         <div className="text-3xl mb-2">🎉</div>
         <p className="font-semibold text-emerald-800">Submitted for review!</p>
         <p className="text-emerald-700 text-sm mt-1">We&apos;ll add it to the database soon. It&apos;s been added to <Link href="/dashboard/stack" className="font-semibold underline hover:text-emerald-900">your stack</Link> in the meantime.</p>
-        <button onClick={() => { setStep("search"); setQuery(""); setStatus("idle"); setForm({ name: "", category: "other", icon: "💊", tagline: "", dose: "", timing: "", brand: "", purchasedFrom: "", isRitual: false }); }}
+        <button onClick={() => { setStep("search"); setQuery(""); setStatus("idle"); setForm(initialForm); }}
           className="mt-4 text-emerald-700 text-sm font-medium underline">
           Add another
         </button>
@@ -163,7 +221,7 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Search our database first..."
+              placeholder="Add to my stack"
               className="w-full border border-stone-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               autoFocus
             />
@@ -241,6 +299,9 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
                   dose: data.dosePerServing || f.dose,
                   brand: data.brand || f.brand,
                   category: data.category || f.category,
+                  quantityTotal: data.totalQuantity ? String(data.totalQuantity) : f.quantityTotal,
+                  quantityRemaining: data.totalQuantity ? String(data.totalQuantity) : f.quantityRemaining,
+                  quantityUnit: data.quantityUnit || f.quantityUnit,
                 }));
               }}
               onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
@@ -308,6 +369,49 @@ export default function AddCustomSupplement({ initialName = "" }: { initialName?
               ))}
             </select>
           </div>
+
+          {!form.isRitual && (
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Inventory (optional)</label>
+              <div className="grid grid-cols-3 gap-2">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  value={form.quantityTotal}
+                  onChange={e => setForm(f => ({ ...f, quantityTotal: e.target.value, quantityRemaining: f.quantityRemaining || e.target.value }))}
+                  placeholder="Total"
+                  className="border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  value={form.quantityRemaining}
+                  onChange={e => setForm(f => ({ ...f, quantityRemaining: e.target.value }))}
+                  placeholder="Remaining"
+                  className="border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <select
+                  value={form.quantityUnit}
+                  onChange={e => setForm(f => ({ ...f, quantityUnit: e.target.value }))}
+                  className="border border-stone-200 rounded-xl px-2 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                >
+                  <option value="capsules">capsules</option>
+                  <option value="tablets">tablets</option>
+                  <option value="softgels">softgels</option>
+                  <option value="gummies">gummies</option>
+                  <option value="scoops">scoops</option>
+                  <option value="ml">ml</option>
+                  <option value="drops">drops</option>
+                  <option value="g">g</option>
+                  <option value="oz">oz</option>
+                  <option value="servings">servings</option>
+                </select>
+              </div>
+              <p className="text-[11px] text-stone-400 mt-1">Leave blank if you don&rsquo;t want to track inventory.</p>
+            </div>
+          )}
 
           <div>
             <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brief description (optional)</label>
