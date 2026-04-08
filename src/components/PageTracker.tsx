@@ -7,7 +7,14 @@ export default function PageTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Only track public pages (landing, FAQ, etc.) — not dashboard or admin
+    // Capture affiliate ref code from URL into 90-day cookie
+    const params = new URLSearchParams(window.location.search);
+    const refFromUrl = params.get("ref");
+    if (refFromUrl) {
+      document.cookie = `affiliate_ref=${refFromUrl}; path=/; max-age=${60 * 60 * 24 * 90}; samesite=lax`;
+    }
+
+    // Only track public pages
     if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) return;
 
     fetch("/api/track", {

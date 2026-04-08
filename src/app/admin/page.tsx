@@ -1,221 +1,213 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
-import Link from "next/link";
-import AdminActions from "./AdminActions";
-import UserManager from "./UserManager";
-import EditSubmissionButton from "./EditSubmissionButton";
-import EditSupplementButton from "./EditSupplementButton";
-import AddSupplementButton from "./AddSupplementButton";
-import SupplementSearch from "./SupplementSearch";
+
+const ADMIN_USER_IDS = process.env.ADMIN_USER_IDS?.split(",") || [];
 
 export const dynamic = "force-dynamic";
 
-const ADMIN_USER_IDS = ["user_3BGCbiChIFduGWHj5gzAmUxoK51"];
-
-export default async function AdminPage() {
+export default async function AdminDashboard() {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
   if (!ADMIN_USER_IDS.includes(user.id)) redirect("/dashboard");
 
-  // Fetch pending supplement submissions
-  const { data: pendingSupps } = await supabaseAdmin
-    .from("user_submitted_supplements")
-    .select("*")
-    .eq("status", "pending")
-    .order("created_at", { ascending: false })
-    .limit(50);
-
-  const { data: experiences } = await supabaseAdmin
-    .from("experiences")
-    .select("*, supplement:supplement_id(name, icon)")
-    .order("created_at", { ascending: false })
-    .limit(20);
-
-  const { data: feedback } = await supabaseAdmin
-    .from("app_feedback")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(20);
-
-  const { data: allSupplements } = await supabaseAdmin
-    .from("supplements")
-    .select("id, name, slug, category, icon, tagline, evidence_level, description, benefits, side_effects, timing_recommendation, dose_recommendation")
-    .order("name");
-
-  const { count: totalUsers } = await supabaseAdmin
-    .from("user_profiles")
-    .select("*", { count: "exact", head: true });
-
-  const { count: totalStacks } = await supabaseAdmin
-    .from("user_stacks")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true);
-
-  const { count: totalExperiences } = await supabaseAdmin
-    .from("experiences")
-    .select("*", { count: "exact", head: true });
-
-  const { count: totalFeedback } = await supabaseAdmin
-    .from("app_feedback")
-    .select("*", { count: "exact", head: true });
+  // Quick stats
+  const [usersR, stacksR, expsR, feedbackR, suppsR, affiliatesR] = await Promise.all([
+    supabaseAdmin.from("user_profiles").select("*", { count: "exact", head: true }),
+    supabaseAdmin.from("user_stacks").select("*", { count: "exact", head: true }).eq("is_active", true),
+    supabaseAdmin.from("experiences").select("*", { count: "exact", head: true }),
+    supabaseAdmin.from("app_feedback").select("*", { count: "exact", head: true }),
+    supabaseAdmin.from("user_submitted_supplements").select("*", { count: "exact", head: true }).eq("status", "pending"),
+    supabaseAdmin.from("affiliates").select("*", { count: "exact", head: true }).eq("status", "active"),
+  ]);
 
   // Page views
   const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const { count: viewsToday } = await supabaseAdmin
-    .from("page_views")
-    .select("*", { count: "exact", head: true })
-    .gte("created_at", startOfToday);
-  const { count: viewsMonth } = await supabaseAdmin
-    .from("page_views")
-    .select("*", { count: "exact", head: true })
-    .gte("created_at", startOfMonth);
-  const { count: viewsTotal } = await supabaseAdmin
-    .from("page_views")
-    .select("*", { count: "exact", head: true });
+  const yr = now.getFullYear();
+  const mo = now.getMonth();
+  const day = now.getDate();
+  const dow = now.getDay();
+
+  const startOfToday = new Date(yr, mo, day).toISOString();
+  const startOfYesterday = new Date(yr, mo, day - 1).toISOString();
+  const endOfYesterday = new Date(yr, mo, day).toISOString();
+  const startOfWeek = new Date(yr, mo, day - dow).toISOString();
+  const startOfLastWeek = new Date(yr, mo, day - dow - 7).toISOString();
+  const endOfLastWeek = new Date(yr, mo, day - dow).toISOString();
+  const startOfMonth = new Date(yr, mo, 1).toISOString();
+  const startOfLastMonth = new Date(yr, mo - 1, 1).toISOString();
+  const endOfLastMonth = new Date(yr, mo, 1).toISOString();
+  const startOfLastYear = new Date(yr - 1, 0, 1).toISOString();
+  const endOfLastYear = new Date(yr, 0, 1).toISOString();
+
+  const [viewsTodayR, viewsYesterdayR, viewsWeekR, viewsLastWeekR, viewsMonthR, viewsLastMonthR, viewsTotalR, viewsLastYearR, referrersR] = await Promise.all([
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfToday),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfYesterday).lt("created_at", endOfYesterday),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfWeek),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfLastWeek).lt("created_at", endOfLastWeek),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfLastMonth).lt("created_at", endOfLastMonth),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }),
+    supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfLastYear).lt("created_at", endOfLastYear),
+    supabaseAdmin.from("page_views").select("referrer").gte("created_at", startOfMonth),
+  ]);
+
+  const viewsToday = viewsTodayR.count || 0;
+  const viewsYesterday = viewsYesterdayR.count || 0;
+  const viewsWeek = viewsWeekR.count || 0;
+  const viewsLastWeek = viewsLastWeekR.count || 0;
+  const viewsMonth = viewsMonthR.count || 0;
+  const viewsLastMonth = viewsLastMonthR.count || 0;
+  const viewsTotal = viewsTotalR.count || 0;
+  const viewsLastYear = viewsLastYearR.count || 0;
+
+  // Aggregate sources
+  const sourceCounts: Record<string, number> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const row of (referrersR.data as any[] || [])) {
+    let source = "Direct";
+    if (row.referrer) {
+      try {
+        const url = new URL(row.referrer);
+        const host = url.hostname.replace(/^www\./, "");
+        if (host.includes("google")) source = "Google";
+        else if (host.includes("facebook") || host.includes("fb.com")) source = "Facebook";
+        else if (host.includes("instagram")) source = "Instagram";
+        else if (host.includes("twitter") || host.includes("x.com")) source = "Twitter/X";
+        else if (host.includes("linkedin")) source = "LinkedIn";
+        else if (host.includes("tiktok")) source = "TikTok";
+        else if (host.includes("reddit")) source = "Reddit";
+        else if (host.includes("bing")) source = "Bing";
+        else if (host.includes("duckduckgo")) source = "DuckDuckGo";
+        else if (host.includes("stackritual.com")) source = "Direct";
+        else source = host;
+      } catch {
+        source = "Other";
+      }
+    }
+    sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+  }
+  const topSources = Object.entries(sourceCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([source, count]) => ({ source, count }));
+
+  function pctChange(current: number, previous: number) {
+    if (previous === 0) return { pct: current > 0 ? 100 : 0, up: current >= 0 };
+    const pct = Math.round(((current - previous) / previous) * 100);
+    return { pct: Math.abs(pct), up: pct >= 0 };
+  }
+  const dayChange = pctChange(viewsToday, viewsYesterday);
+  const weekChange = pctChange(viewsWeek, viewsLastWeek);
+  const monthChange = pctChange(viewsMonth, viewsLastMonth);
 
   return (
-    <div className="min-h-screen bg-stone-900 text-white font-sans">
-      {/* Admin nav */}
-      <nav className="bg-stone-800 border-b border-stone-700 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">🌿</span>
-          <span className="font-bold text-white">Stack Ritual Admin</span>
-          <span className="text-xs bg-emerald-700 text-emerald-100 px-2 py-0.5 rounded-full">Private</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/admin/releases" className="text-stone-400 hover:text-white text-sm transition-colors">📋 Release Notes</Link>
-          <Link href="/dashboard" className="text-stone-400 hover:text-white text-sm transition-colors">← Back to app</Link>
-        </div>
-      </nav>
+    <div>
+      <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
 
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
-        {/* Stats */}
-        <div className="grid grid-cols-4 lg:grid-cols-7 gap-4">
-          {[
-            { label: "Total Users", value: totalUsers ?? 0, icon: "👤", href: "#users" },
-            { label: "Stack Items", value: totalStacks ?? 0, icon: "🧱", note: "Supplement rows across all users", href: "#users" },
-            { label: "Experiences", value: totalExperiences ?? 0, icon: "⭐", href: "#experiences" },
-            { label: "Feedback", value: totalFeedback ?? 0, icon: "💬", href: "#feedback" },
-            { label: "Views Today", value: viewsToday ?? 0, icon: "👁️", note: "Landing page visits today" },
-            { label: "Views (Month)", value: viewsMonth ?? 0, icon: "📊", note: "This month" },
-            { label: "Views (All Time)", value: viewsTotal ?? 0, icon: "🌐", note: "Total landing page visits" },
-          ].map(s => (
-            <a key={s.label} href={s.href} className="bg-stone-800 rounded-xl p-4 border border-stone-700 hover:border-emerald-600 transition-colors block">
-              <div className="text-2xl mb-1">{s.icon}</div>
-              <div className="text-2xl font-bold text-white">{s.value}</div>
-              <div className="text-xs text-stone-400 mt-0.5">{s.label}</div>
-              {'note' in s && s.note && <div className="text-xs text-stone-500 mt-0.5 leading-tight">{s.note}</div>}
-            </a>
-          ))}
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+          <div className="text-2xl mb-1">👤</div>
+          <div className="text-2xl font-bold text-white">{usersR.count ?? 0}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Total Users</div>
         </div>
+        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+          <div className="text-2xl mb-1">🧱</div>
+          <div className="text-2xl font-bold text-white">{stacksR.count ?? 0}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Stack Items</div>
+        </div>
+        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+          <div className="text-2xl mb-1">⭐</div>
+          <div className="text-2xl font-bold text-white">{expsR.count ?? 0}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Experiences</div>
+        </div>
+        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+          <div className="text-2xl mb-1">💬</div>
+          <div className="text-2xl font-bold text-white">{feedbackR.count ?? 0}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Feedback</div>
+        </div>
+        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+          <div className="text-2xl mb-1">📝</div>
+          <div className="text-2xl font-bold text-amber-400">{suppsR.count ?? 0}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Pending Subs</div>
+        </div>
+        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+          <div className="text-2xl mb-1">🤝</div>
+          <div className="text-2xl font-bold text-white">{affiliatesR.count ?? 0}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Affiliates</div>
+        </div>
+      </div>
 
-        {/* App feedback */}
-        <div id="feedback" />
-        <details className="bg-stone-800 rounded-2xl border border-stone-700">
-          <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
-            <h2 className="font-bold text-white">App Feedback ({totalFeedback ?? 0})</h2>
-            <span className="text-stone-400 text-sm select-none">▼</span>
-          </summary>
-          {!feedback || feedback.length === 0 ? (
-            <div className="px-5 py-8 text-center text-stone-500 text-sm">No feedback yet</div>
-          ) : (
-            <div className="divide-y divide-stone-700 max-h-96 overflow-y-auto">
-              {feedback.map(fb => (
-                <div key={fb.id} className="px-5 py-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-amber-400">{"★".repeat(fb.rating || 0)}</span>
-                    <span className="text-xs text-stone-500">{new Date(fb.created_at).toLocaleDateString()}</span>
-                  </div>
-                  <p className="text-sm text-stone-300">{fb.message}</p>
-                </div>
-              ))}
+      {/* Website Traffic */}
+      <div className="bg-stone-800 rounded-2xl border border-stone-700 p-5">
+        <h2 className="font-bold text-white mb-4">Website Traffic</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">Today</div>
+            <div className="text-white text-2xl font-bold mt-1">{viewsToday}</div>
+            <div className={`text-xs mt-1 ${dayChange.up ? "text-emerald-400" : "text-red-400"}`}>
+              {dayChange.up ? "↑" : "↓"} {dayChange.pct}% vs yesterday
             </div>
-          )}
-        </details>
-
-        {/* Pending supplement submissions */}
-        <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-700 flex items-center justify-between">
-            <h2 className="font-bold text-white">Pending Supplement Submissions</h2>
-            <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full font-medium">{pendingSupps?.length ?? 0} pending</span>
+            <div className="border-t border-stone-700 mt-2 pt-2">
+              <div className="text-stone-500 text-[10px] uppercase tracking-wider">Yesterday</div>
+              <div className="text-stone-300 text-sm font-semibold">{viewsYesterday}</div>
+            </div>
           </div>
-          {!pendingSupps || pendingSupps.length === 0 ? (
-            <div className="px-5 py-8 text-center text-stone-500 text-sm">No pending submissions ✓</div>
-          ) : (
-            <div className="divide-y divide-stone-700">
-              {pendingSupps.map(supp => (
-                <div key={supp.id} className="px-5 py-4 flex items-start gap-4">
-                  <div className="text-2xl">{supp.icon || "💊"}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-white">{supp.name}</div>
-                    <div className="text-xs text-stone-400 mt-0.5">
-                      Category: {supp.category} · Dose: {supp.dose || "—"} · Timing: {supp.timing || "—"}
-                    </div>
-                    {supp.tagline && <div className="text-xs text-stone-300 mt-1">{supp.tagline}</div>}
-                    <div className="text-xs text-stone-500 mt-1">Submitted: {new Date(supp.created_at).toLocaleDateString()}</div>
-                  </div>
-                  <div className="flex gap-2">
-                    <EditSubmissionButton submission={supp} />
-                    <AdminActions itemId={supp.id} table="user_submitted_supplements" type="supplement" />
-                  </div>
-                </div>
-              ))}
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">This Week</div>
+            <div className="text-white text-2xl font-bold mt-1">{viewsWeek}</div>
+            <div className={`text-xs mt-1 ${weekChange.up ? "text-emerald-400" : "text-red-400"}`}>
+              {weekChange.up ? "↑" : "↓"} {weekChange.pct}% vs last week
             </div>
-          )}
+            <div className="border-t border-stone-700 mt-2 pt-2">
+              <div className="text-stone-500 text-[10px] uppercase tracking-wider">Last Week</div>
+              <div className="text-stone-300 text-sm font-semibold">{viewsLastWeek}</div>
+            </div>
+          </div>
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">This Month</div>
+            <div className="text-white text-2xl font-bold mt-1">{viewsMonth}</div>
+            <div className={`text-xs mt-1 ${monthChange.up ? "text-emerald-400" : "text-red-400"}`}>
+              {monthChange.up ? "↑" : "↓"} {monthChange.pct}% vs last month
+            </div>
+            <div className="border-t border-stone-700 mt-2 pt-2">
+              <div className="text-stone-500 text-[10px] uppercase tracking-wider">Last Month</div>
+              <div className="text-stone-300 text-sm font-semibold">{viewsLastMonth}</div>
+            </div>
+          </div>
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">All Time</div>
+            <div className="text-white text-2xl font-bold mt-1">{viewsTotal}</div>
+            <div className="text-stone-500 text-xs mt-1">&nbsp;</div>
+            <div className="border-t border-stone-700 mt-2 pt-2">
+              <div className="text-stone-500 text-[10px] uppercase tracking-wider">Last Year</div>
+              <div className="text-stone-300 text-sm font-semibold">{viewsLastYear}</div>
+            </div>
+          </div>
         </div>
 
-        {/* Recent experiences */}
-        <div id="experiences" />
-        <details className="bg-stone-800 rounded-2xl border border-stone-700">
-          <summary className="px-5 py-4 border-b border-stone-700 cursor-pointer flex items-center justify-between list-none">
-            <h2 className="font-bold text-white">Recent Experiences ({experiences?.length ?? 0})</h2>
-            <span className="text-stone-400 text-sm select-none">▼</span>
-          </summary>
-          {!experiences || experiences.length === 0 ? (
-            <div className="px-5 py-8 text-center text-stone-500 text-sm">No experiences yet</div>
-          ) : (
-            <div className="divide-y divide-stone-700">
-              {experiences.map(exp => {
-                const supp = Array.isArray(exp.supplement) ? exp.supplement[0] : exp.supplement;
+        {topSources.length > 0 && (
+          <div>
+            <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-2">Traffic Sources (This Month)</h3>
+            <div className="space-y-1.5">
+              {topSources.map((s) => {
+                const pct = viewsMonth > 0 ? Math.round((s.count / viewsMonth) * 100) : 0;
                 return (
-                  <div key={exp.id} className="px-5 py-4 flex items-start gap-4">
-                    <div className="text-xl">{supp?.icon || "💊"}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-sm">{supp?.name || "Custom"}</span>
-                        <span className="text-amber-400">{"★".repeat(exp.rating)}</span>
-                      </div>
-                      {exp.title && <div className="text-xs font-medium text-stone-300 mt-0.5">{exp.title}</div>}
-                      <div className="text-xs text-stone-400 mt-1 line-clamp-2">{exp.body}</div>
-                      <div className="text-xs text-stone-500 mt-1">{new Date(exp.created_at).toLocaleDateString()}</div>
+                  <div key={s.source}>
+                    <div className="flex justify-between text-sm mb-0.5">
+                      <span className="text-stone-300">{s.source}</span>
+                      <span className="text-stone-400">{s.count} ({pct}%)</span>
                     </div>
-                    <AdminActions itemId={exp.id} table="experiences" type="experience" />
+                    <div className="bg-stone-900 rounded h-1.5 overflow-hidden">
+                      <div className="bg-emerald-600 h-full rounded" style={{ width: `${pct}%` }} />
+                    </div>
                   </div>
                 );
               })}
             </div>
-          )}
-        </details>
-
-        {/* Supplement Library */}
-        <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-700 flex items-center justify-between">
-            <h2 className="font-bold text-white">Supplement Library</h2>
-            <div className="flex items-center gap-2">
-              <span className="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-medium">{allSupplements?.length ?? 0}</span>
-              <AddSupplementButton />
-            </div>
           </div>
-          <SupplementSearch supplements={allSupplements || []} />
-        </div>
-
-        {/* User Management */}
-        <div id="users" />
-        <UserManager />
-
+        )}
       </div>
     </div>
   );
