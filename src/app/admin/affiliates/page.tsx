@@ -16,6 +16,14 @@ interface Affiliate {
   referral_count?: number;
 }
 
+interface InterestItem {
+  id: string;
+  name: string;
+  email: string;
+  message: string | null;
+  created_at: string;
+}
+
 const INPUT_CLASS =
   "w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-sm text-white placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-emerald-500";
 
@@ -34,10 +42,12 @@ function formatCurrency(amount: number) {
 
 export default function AffiliatesPage() {
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
+  const [pending, setPending] = useState<InterestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [actingOn, setActingOn] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "", code: "", email: "", phone: "",
@@ -47,11 +57,35 @@ export default function AffiliatesPage() {
   });
 
   useEffect(() => {
-    fetch("/api/affiliates")
-      .then((r) => r.json())
-      .then((d) => setAffiliates(d.affiliates || []))
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/affiliates", { credentials: "include" }).then((r) => r.json()).then((d) => setAffiliates(d.affiliates || [])),
+      fetch("/api/affiliates/interest", { credentials: "include" }).then((r) => r.json()).then((d) => setPending(d.items || [])),
+    ]).finally(() => setLoading(false));
   }, []);
+
+  async function handleInterest(id: string, action: "approve" | "reject") {
+    if (action === "reject" && !confirm("Reject this application?")) return;
+    setActingOn(id);
+    const res = await fetch(`/api/affiliates/interest/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    if (res.ok) {
+      setPending((prev) => prev.filter((p) => p.id !== id));
+      if (action === "approve") {
+        const data = await res.json();
+        if (data.affiliate) {
+          setAffiliates((prev) => [{ ...data.affiliate, total_paid: 0, referral_count: 0 }, ...prev]);
+        }
+      }
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || "Failed");
+    }
+    setActingOn(null);
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -149,6 +183,43 @@ export default function AffiliatesPage() {
             {saving ? "Creating..." : "Create Affiliate"}
           </button>
         </form>
+      )}
+
+      {pending.length > 0 && (
+        <div className="bg-stone-800 border border-amber-700/50 rounded-lg overflow-hidden mb-4">
+          <div className="px-4 py-2 border-b border-stone-700 flex items-center justify-between">
+            <span className="text-sm font-semibold text-amber-300">📥 Pending Applications</span>
+            <span className="text-xs bg-amber-900 text-amber-300 px-2 py-0.5 rounded-full">{pending.length}</span>
+          </div>
+          <div className="divide-y divide-stone-700/50">
+            {pending.map((p) => (
+              <div key={p.id} className="px-4 py-3 flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="text-white font-medium text-sm">{p.name}</div>
+                  <div className="text-stone-400 text-xs">{p.email}</div>
+                  {p.message && <div className="text-stone-500 text-xs mt-1 italic">&ldquo;{p.message}&rdquo;</div>}
+                  <div className="text-stone-600 text-[10px] mt-1">Applied {new Date(p.created_at).toLocaleDateString()}</div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => handleInterest(p.id, "approve")}
+                    disabled={actingOn === p.id}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg disabled:opacity-50"
+                  >
+                    {actingOn === p.id ? "..." : "✓ Approve"}
+                  </button>
+                  <button
+                    onClick={() => handleInterest(p.id, "reject")}
+                    disabled={actingOn === p.id}
+                    className="bg-stone-700 hover:bg-stone-600 text-stone-300 text-xs font-semibold px-3 py-1.5 rounded-lg disabled:opacity-50"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="bg-stone-800 border border-stone-700 rounded-lg overflow-hidden">
