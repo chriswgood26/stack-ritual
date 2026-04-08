@@ -95,14 +95,19 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
 
   async function saveEdit() {
     setSaving(true);
+    // Strip derived fields that aren't real columns
+    const { total_paid, referral_count, ...updates } = form as Record<string, unknown> & { total_paid?: number; referral_count?: number };
+    void total_paid; void referral_count;
     const res = await fetch(`/api/affiliates/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(updates),
     });
     if (res.ok) {
-      await loadData();
-      setEditing(false);
+      router.push("/admin/affiliates");
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || "Failed to save");
     }
     setSaving(false);
   }
