@@ -87,6 +87,10 @@ export default async function ReleasesPage() {
       <h1 className="text-2xl font-bold text-white mb-6">Releases & Roadmap</h1>
 
       <div className="max-w-3xl space-y-6">
+        <RoadmapManager />
+
+        <h2 className="text-lg font-bold text-stone-300 pt-4">Release Notes</h2>
+
         {releases.map(release => (
           <div key={release.version} className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden">
             <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
@@ -110,8 +114,6 @@ export default async function ReleasesPage() {
             </ul>
           </div>
         ))}
-
-        <RoadmapManager />
       </div>
     </div>
   );

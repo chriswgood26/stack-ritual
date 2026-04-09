@@ -120,6 +120,57 @@ Cuts through everything shipped in this batch: affiliate program, admin sidebar 
 - [ ] Print summary still loads
 - [ ] Stripe billing portal still works (Manage Billing button)
 
+## 8b. SMS Reminders (once A2P campaign is approved)
+
+**Prerequisites:**
+- Run `database-sms-timezone.sql` in Supabase
+- Set `NEXT_PUBLIC_SMS_ENABLED=true` in Vercel env
+- Set `TWILIO_MESSAGING_SERVICE_SID` in Vercel env
+- Confirm A2P campaign status = "Approved" in Twilio console
+
+**Opt-in flow:**
+- [ ] Profile → SMS Reminders → opens modal with working form (not "Coming Soon")
+- [ ] Toggle Enable → phone number input + consent checkbox appear
+- [ ] Try to Save with consent unchecked → save button disabled, error if bypassed
+- [ ] Enter phone, check consent, Save → confirmation text arrives within seconds
+- [ ] Confirmation text says "Reply YES to confirm..." with Msg&data disclosure
+- [ ] Text YES back → receive thank-you text within seconds
+- [ ] Profile → SMS settings now shows "✓ Your number is confirmed"
+- [ ] "Send test message" button appears and works
+- [ ] Test SMS arrives with 🌿 emoji and correct copy
+- [ ] Row appears in `user_profiles` with `sms_consent_at`, `sms_consent_ip`, `sms_consent_text` populated
+
+**STOP/HELP keywords:**
+- [ ] Text STOP → receive unsubscribe confirmation, `sms_opted_out=true`
+- [ ] Profile SMS modal now shows "You've unsubscribed" banner
+- [ ] Text START → receive welcome-back, `sms_opted_out=false`
+- [ ] Text HELP → receive help text with support email
+
+**Timezone handling:**
+- [ ] User in Pacific time sets morning reminder to 08:00
+- [ ] Wait for the 08:00 PT cron tick → SMS arrives ~8:00 PT, not 08:00 UTC
+- [ ] User in Eastern time sets evening to 19:00 → arrives at 19:00 ET, not UTC
+- [ ] `timezone` column populated in `user_profiles` for logged-in users
+
+**Reminder content:**
+- [ ] Reminder includes "Reply STOP to unsubscribe, HELP for help"
+- [ ] "Mark all done" link works and marks items done via the /done page
+- [ ] Paused items do NOT appear in reminders
+- [ ] Already-checked items do NOT appear in reminders
+- [ ] User with all items done for the day gets NO reminder
+
+**Admin SMS monitor:**
+- [ ] Sidebar shows "📱 SMS" link
+- [ ] `/admin/sms` shows stats: Enabled, Confirmed, Opted Out, Sent Today, Failed Today
+- [ ] Recent Activity section lists last 50 messages with kind/status/body
+- [ ] Recent Errors section only appears when there are failures
+- [ ] Every outbound SMS creates a row in `sms_logs` with correct kind
+
+**Terms & Privacy:**
+- [ ] `/terms` includes Section 8 "SMS / Text Messaging" with all disclosures
+- [ ] `/privacy` includes Section 7 "SMS / Text Messaging"
+- [ ] Subsequent sections are renumbered correctly (no gaps or duplicates)
+
 ## 9. Smoke Tests
 
 - [ ] Sign out / sign in flow works

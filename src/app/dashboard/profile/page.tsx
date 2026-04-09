@@ -12,12 +12,14 @@ import UpgradeButton from "@/components/UpgradeButton";
 import ManageBillingButton from "@/components/ManageBillingButton";
 import SMSSettings from "@/components/SMSSettings";
 import EmailSettings from "@/components/EmailSettings";
+import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const user = await currentUser();
   if (!user) return null;
+  const annualUnlocked = await visitorHasAnnualPerk();
 
   const userId = user.id;
   const firstName = user.firstName || user.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "Friend";
@@ -129,6 +131,27 @@ export default async function ProfilePage() {
               <UpgradeButton priceKey="pro_monthly" label="Go Pro →" />
             )}
           </div>
+
+          {annualUnlocked && plan === "free" && (
+            <div className="bg-gradient-to-r from-amber-50 to-emerald-50 border border-amber-200 rounded-xl p-3 mt-3">
+              <div className="text-xs font-semibold text-amber-900 mb-1">✨ Affiliate perk unlocked — save with annual</div>
+              <p className="text-xs text-stone-600 mb-2">
+                Plus <strong>$39.99/yr</strong> (save 33%) · Pro <strong>$79.99/yr</strong> (save 33%)
+              </p>
+              <div className="flex gap-2">
+                <UpgradeButton priceKey="plus_yearly" label="Plus — Annual" className="flex-1 bg-stone-800 text-white py-2 rounded-xl text-xs font-semibold hover:bg-stone-900 transition-colors" />
+                <UpgradeButton priceKey="pro_yearly" label="Pro — Annual" className="flex-1 bg-emerald-700 text-white py-2 rounded-xl text-xs font-semibold hover:bg-emerald-800 transition-colors" />
+              </div>
+            </div>
+          )}
+
+          {annualUnlocked && plan === "plus" && (
+            <div className="bg-gradient-to-r from-amber-50 to-emerald-50 border border-amber-200 rounded-xl p-3 mt-3">
+              <div className="text-xs font-semibold text-amber-900 mb-1">✨ Affiliate perk — upgrade to Pro Annual</div>
+              <p className="text-xs text-stone-600 mb-2">Pro <strong>$79.99/yr</strong> (save 33% vs monthly)</p>
+              <UpgradeButton priceKey="pro_yearly" label="Upgrade to Pro Annual" className="w-full bg-emerald-700 text-white py-2 rounded-xl text-xs font-semibold hover:bg-emerald-800 transition-colors" />
+            </div>
+          )}
 
           {plan === "plus" && (
             <div className="bg-emerald-50 rounded-xl p-3 mt-2">
@@ -257,12 +280,29 @@ export default async function ProfilePage() {
             <EmailSettings isPlusOrPro={plan === "plus" || plan === "pro"} />
             <SMSSettings isPro={plan === "pro"} />
             <ShareAppButton />
+            <Link href="/affiliate-program" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">💰</span>
+                <div className="text-left">
+                  <span className="font-medium text-stone-900 text-sm block">Earn by sharing</span>
+                  <span className="text-xs text-stone-400">Become a Stack Ritual affiliate</span>
+                </div>
+              </div>
+              <span className="text-stone-300">›</span>
+            </Link>
             <FeedbackButton />
             {plan !== "free" && <ManageBillingButton />}
             <div className="flex items-center justify-between px-4 py-4">
               <span className="text-sm text-stone-600">Version</span>
               <span className="text-sm text-stone-400">v1.3</span>
             </div>
+            <Link href="/help" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📖</span>
+                <span className="text-sm text-stone-900 font-medium">User Guide</span>
+              </div>
+              <span className="text-stone-300">›</span>
+            </Link>
             <Link href="https://stackritual.com" target="_blank" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
               <span className="text-sm text-stone-600">stackritual.com</span>
               <span className="text-stone-300">›</span>

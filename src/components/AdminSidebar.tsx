@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/admin/experiences", label: "Experiences", icon: "⭐" },
   { href: "/admin/feedback", label: "Feedback", icon: "💬" },
   { href: "/admin/affiliates", label: "Affiliates", icon: "🤝" },
+  { href: "/admin/sms", label: "SMS", icon: "📱" },
 ];
 
 const BOTTOM_ITEMS = [

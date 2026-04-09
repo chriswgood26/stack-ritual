@@ -7,6 +7,7 @@ import ScanLabelButton from "./ScanLabelButton";
 import ScanResultsModal from "./ScanResultsModal";
 import type { ScanResult } from "./ScanLabelButton";
 import { getStackQuery } from "@/lib/stackSearchQuery";
+import { parseServingCount } from "@/lib/serving";
 
 interface SearchResult {
   id: string;
@@ -78,6 +79,7 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
     quantityTotal: "",
     quantityRemaining: "",
     quantityUnit: "capsules",
+    dosesPerServing: "1",
     isRitual: false,
   };
   const [form, setForm] = useState(initialForm);
@@ -105,6 +107,7 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
         quantity_total: form.quantityTotal,
         quantity_remaining: form.quantityRemaining,
         quantity_unit: form.quantityUnit,
+        doses_per_serving: form.dosesPerServing,
       }),
     });
     const data = await res.json();
@@ -293,6 +296,7 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
               isPlusOrPro={true}
               onScanComplete={data => {
                 setScanError("");
+                const serving = parseServingCount(data.servingSize);
                 setForm(f => ({
                   ...f,
                   name: data.productName || f.name,
@@ -302,6 +306,7 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
                   quantityTotal: data.totalQuantity ? String(data.totalQuantity) : f.quantityTotal,
                   quantityRemaining: data.totalQuantity ? String(data.totalQuantity) : f.quantityRemaining,
                   quantityUnit: data.quantityUnit || f.quantityUnit,
+                  dosesPerServing: serving > 1 ? serving.toString() : f.dosesPerServing,
                 }));
               }}
               onError={msg => { setScanError(msg); setTimeout(() => setScanError(""), 5000); }}
@@ -329,13 +334,24 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
               </select>
             </div>
 
-          <div>
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">
-              {form.isRitual ? "Duration" : "Dose"}
-            </label>
-            <input type="text" value={form.dose} onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
-              placeholder={form.isRitual ? "e.g. 10 min, 20 min" : "e.g. 500mg"}
-              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          <div className={form.isRitual ? "" : "grid grid-cols-[1fr_auto] gap-2 items-end"}>
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">
+                {form.isRitual ? "Duration" : "Dose"}
+              </label>
+              <input type="text" value={form.dose} onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
+                placeholder={form.isRitual ? "e.g. 10 min, 20 min" : "e.g. 500mg"}
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+            {!form.isRitual && (
+              <div>
+                <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5" title="If the label says 'Serving size: 2 capsules', enter 2">Per serving</label>
+                <input type="number" min="1" value={form.dosesPerServing}
+                  onChange={e => setForm(f => ({ ...f, dosesPerServing: e.target.value }))}
+                  placeholder="1"
+                  className="w-20 border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+            )}
           </div>
 
           {!form.isRitual && (

@@ -18,7 +18,7 @@ interface Supplement {
   dose_recommendation: string;
 }
 
-export default function EditSupplementButton({ supplement }: { supplement: Supplement }) {
+export default function EditSupplementButton({ supplement, categories = [] }: { supplement: Supplement; categories?: string[] }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: supplement.name || "",
@@ -32,8 +32,13 @@ export default function EditSupplementButton({ supplement }: { supplement: Suppl
     timing_recommendation: supplement.timing_recommendation || "",
     dose_recommendation: supplement.dose_recommendation || "",
   });
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
   const [saving, setSaving] = useState(false);
   const router = useRouter();
+
+  // If the current supplement's category isn't in the known list, include it
+  const allCategories = Array.from(new Set([...categories, form.category].filter(Boolean))).sort();
 
   async function handleSave() {
     setSaving(true);
@@ -71,8 +76,6 @@ export default function EditSupplementButton({ supplement }: { supplement: Suppl
               {[
                 { key: "name", label: "Name" },
                 { key: "icon", label: "Icon" },
-                { key: "category", label: "Category" },
-                { key: "tagline", label: "Tagline" },
               ].map(({ key, label }) => (
                 <div key={key}>
                   <label className="text-xs font-semibold text-stone-400 uppercase tracking-wide block mb-1">{label}</label>
@@ -81,6 +84,64 @@ export default function EditSupplementButton({ supplement }: { supplement: Suppl
                     className="w-full bg-stone-700 border border-stone-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
                 </div>
               ))}
+              <div>
+                <label className="text-xs font-semibold text-stone-400 uppercase tracking-wide block mb-1">Category</label>
+                {addingCategory ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newCategory}
+                      onChange={e => setNewCategory(e.target.value)}
+                      placeholder="New category name"
+                      className="flex-1 bg-stone-700 border border-stone-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newCategory.trim()) {
+                          setForm(f => ({ ...f, category: newCategory.trim().toLowerCase() }));
+                          setAddingCategory(false);
+                          setNewCategory("");
+                        }
+                      }}
+                      className="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-2 rounded-xl"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setAddingCategory(false); setNewCategory(""); }}
+                      className="text-stone-400 hover:text-white text-xs px-2"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={form.category}
+                    onChange={e => {
+                      if (e.target.value === "__new__") {
+                        setAddingCategory(true);
+                      } else {
+                        setForm(f => ({ ...f, category: e.target.value }));
+                      }
+                    }}
+                    className="w-full bg-stone-700 border border-stone-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    {allCategories.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                    <option value="__new__">+ Add new category...</option>
+                  </select>
+                )}
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-stone-400 uppercase tracking-wide block mb-1">Tagline</label>
+                <input type="text" value={form.tagline}
+                  onChange={e => setForm(f => ({ ...f, tagline: e.target.value }))}
+                  className="w-full bg-stone-700 border border-stone-600 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
             </div>
 
             <div>

@@ -98,7 +98,22 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">8. Binding Arbitration</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">8. SMS / Text Messaging</h2>
+            <p className="mb-3">Stack Ritual offers optional SMS reminders to paid (Pro) subscribers. If you enable this feature:</p>
+            <ul className="list-disc pl-5 space-y-1.5">
+              <li><strong>You must expressly consent</strong> by checking the consent box in your profile settings. Consent is not a condition of purchase or of using any other Stack Ritual feature.</li>
+              <li>You agree to receive recurring automated text messages from Stack Ritual at the phone number you provide. Message frequency varies based on your reminder settings (typically 0–4 messages per day).</li>
+              <li>Message and data rates may apply depending on your carrier and mobile plan.</li>
+              <li><strong>Reply STOP</strong> to any message to unsubscribe immediately. Reply <strong>HELP</strong> for help.</li>
+              <li>Stack Ritual is not responsible for delays, failures, or misrouting of text messages caused by carriers, third-party networks, or device issues.</li>
+              <li>You are responsible for the accuracy of the phone number you provide. If your number changes, update your profile or reply STOP to avoid messages being sent to an unintended recipient.</li>
+              <li>Supported carriers include all major US networks. Delivery is not guaranteed in all areas or on all devices.</li>
+              <li>Message content is generated based on your configured stack and current day progress; Stack Ritual does not send marketing or third-party promotional messages via SMS.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">9. Binding Arbitration</h2>
             <p className="mb-3"><strong>PLEASE READ THIS SECTION CAREFULLY. IT AFFECTS YOUR LEGAL RIGHTS.</strong></p>
             <p className="mb-3">Any dispute, controversy, or claim arising out of or relating to these Terms or the Service, or the breach, termination, or invalidity thereof, shall be resolved by binding arbitration rather than in court, except that you may assert claims in small claims court if your claims qualify.</p>
             <p className="mb-3"><strong>Arbitration Process:</strong> Arbitration shall be conducted by a single arbitrator under the rules of the American Arbitration Association (AAA) Consumer Arbitration Rules. The arbitration shall take place in Los Angeles, California, or by video conference at either party's request. The arbitrator's decision shall be final and binding.</p>
@@ -107,17 +122,17 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">9. Governing Law</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">10. Governing Law</h2>
             <p>These Terms shall be governed by the laws of the State of Washington, without regard to conflict of law principles. Any disputes not subject to arbitration shall be resolved in the state or federal courts located in Washington State. Stack Ritual LLC is a Washington limited liability company (EIN: 41-5158692).</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">10. Changes to Terms</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">11. Changes to Terms</h2>
             <p>Stack Ritual LLC reserves the right to modify these Terms at any time. Material changes will be communicated via email or in-app notification. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">11. Contact</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">12. Contact</h2>
             <p>Questions about these Terms? Contact us at <a href="mailto:legal@stackritual.com" className="text-emerald-600 underline">legal@stackritual.com</a></p>
           </section>
 

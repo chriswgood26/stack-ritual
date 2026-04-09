@@ -77,7 +77,8 @@ export async function POST(req: NextRequest) {
 
   const message = `🌿 Stack Ritual: Time for your ${slotLabel[timing_slot] || timing_slot} stack: ${itemNames}. Tap to mark done: ${doneUrl}\n\nReply STOP to unsubscribe.`;
 
-  await sendSMS(profile.phone_number, message);
+  const result = await sendSMS(profile.phone_number, message, { kind: "reminder", userId });
+  if (!result.ok) return NextResponse.json({ error: result.error || "Send failed" }, { status: 500 });
 
   return NextResponse.json({ message: "sent", count: pending.length });
 }

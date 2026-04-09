@@ -21,6 +21,7 @@ interface Affiliate {
   payout_details?: string | null;
   status: string;
   notes?: string | null;
+  offers_annual_perk?: boolean;
   total_paid?: number;
   referral_count?: number;
 }
@@ -225,6 +226,20 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                 <option value="terminated">Terminated</option>
               </select>
             </div>
+            <label className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/20 rounded-lg p-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!form.offers_annual_perk}
+                onChange={(e) => setForm((f) => ({ ...f, offers_annual_perk: e.target.checked }))}
+                className="mt-0.5 w-4 h-4 accent-amber-500"
+              />
+              <div>
+                <div className="text-sm text-white font-semibold">✨ Annual perk unlocked</div>
+                <div className="text-xs text-stone-400 mt-0.5">
+                  Referrals from this affiliate can access annual billing ($39.99/yr Plus, $79.99/yr Pro). Use this as a special incentive — let the affiliate advertise it in their marketing.
+                </div>
+              </div>
+            </label>
             <div className="flex gap-2">
               <button onClick={saveEdit} disabled={saving} className="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-50">
                 {saving ? "Saving..." : "Save"}

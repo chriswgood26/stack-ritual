@@ -22,16 +22,20 @@ export async function sendDailyReminderEmail(to: string, firstName: string, item
               ${itemList}
             </ul>
             <a href="${doneUrl}" style="display: block; background: #065f46; color: white; text-align: center; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 16px;">
-              ✓ Mark all done
+              ✓ Mark these all done
             </a>
+            <p style="color: #a8a29e; font-size: 11px; text-align: center; margin-top: 8px; margin-bottom: 0;">
+              This link expires at end of day.
+            </p>
             <p style="color: #a8a29e; font-size: 12px; text-align: center; margin-top: 16px;">
-              <a href="https://stackritual.com/dashboard" style="color: #a8a29e;">Open app</a> · 
+              <a href="https://stackritual.com/dashboard" style="color: #a8a29e;">Open app</a> ·
               <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Manage settings</a>
             </p>
           </div>
           <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
             <p style="color: #a8a29e; font-size: 11px; margin: 0;">
-              <a href="https://stackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend → stackritual.com</a><br><br>
+              <a href="https://stackritual.com/share" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend</a><br><br>
+              <a href="https://stackritual.com/affiliate-program" style="color: #065f46; font-weight: 600; text-decoration: none;">💰 Earn by sharing — become an affiliate</a><br><br>
               ⚕️ Nothing in this email constitutes medical advice.<br>
               <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Unsubscribe from emails</a>
             </p>
@@ -85,7 +89,8 @@ export async function sendWeeklySummaryEmail(to: string, firstName: string, stat
           </div>
           <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
             <p style="color: #a8a29e; font-size: 11px; margin: 0;">
-              <a href="https://stackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend → stackritual.com</a><br><br>
+              <a href="https://stackritual.com/share" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend</a><br><br>
+              <a href="https://stackritual.com/affiliate-program" style="color: #065f46; font-weight: 600; text-decoration: none;">💰 Earn by sharing — become an affiliate</a><br><br>
               ⚕️ Nothing in this email constitutes medical advice.<br>
               <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Manage email preferences</a>
             </p>

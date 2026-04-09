@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  let { item_id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit, auto_decrement } = body;
+  let { item_id, dose, timing, brand, notes, frequency_type, quantity_total, quantity_remaining, quantity_unit, auto_decrement, doses_per_serving } = body;
   if (!item_id) return NextResponse.json({ error: "item_id required" }, { status: 400 });
 
   // Ensure remaining never exceeds total
@@ -34,6 +34,9 @@ export async function POST(req: NextRequest) {
         : {}),
       ...(quantity_unit ? { quantity_unit } : {}),
       ...(auto_decrement !== undefined ? { auto_decrement: !!auto_decrement } : {}),
+      ...(doses_per_serving !== undefined && doses_per_serving !== null && doses_per_serving !== ""
+        ? { doses_per_serving: Math.max(1, Number(doses_per_serving) || 1) }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", item_id)

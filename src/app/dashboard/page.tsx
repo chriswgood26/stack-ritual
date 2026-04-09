@@ -267,6 +267,7 @@ export default async function Dashboard() {
                                 currentQuantityRemaining={item.quantity_remaining}
                                 currentQuantityUnit={item.quantity_unit}
                                 currentAutoDecrement={item.auto_decrement}
+                                currentDosesPerServing={item.doses_per_serving}
                                 asLabel
                                 labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
                               />
@@ -292,6 +293,7 @@ export default async function Dashboard() {
                                 unit={item.quantity_unit}
                                 name={name}
                                 compact
+                                dosesPerServing={item.doses_per_serving}
                               />
                             )}
                           </div>
@@ -345,6 +347,7 @@ export default async function Dashboard() {
                           currentQuantityRemaining={item.quantity_remaining}
                           currentQuantityUnit={item.quantity_unit}
                           currentAutoDecrement={item.auto_decrement}
+                                currentDosesPerServing={item.doses_per_serving}
                           asLabel
                           labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
                         />

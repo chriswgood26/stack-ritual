@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, PRICE_IDS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase";
+import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
@@ -13,6 +14,14 @@ export async function POST(req: NextRequest) {
   const { priceKey } = await req.json();
   const priceId = PRICE_IDS[priceKey as keyof typeof PRICE_IDS];
   if (!priceId) return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+
+  // Annual plans are an affiliate perk — gate access by affiliate_ref cookie
+  if (priceKey === "plus_yearly" || priceKey === "pro_yearly") {
+    const unlocked = await visitorHasAnnualPerk();
+    if (!unlocked) {
+      return NextResponse.json({ error: "Annual plans are available through select affiliate partners only." }, { status: 403 });
+    }
+  }
 
   // Get or create Stripe customer — check DB first, then search Stripe
   const { data: sub } = await supabaseAdmin

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
+import { parseServingCount } from "@/lib/serving";
 
 interface Props {
   itemId: string;
@@ -18,6 +19,7 @@ interface Props {
   currentQuantityRemaining?: number | null;
   currentQuantityUnit?: string | null;
   currentAutoDecrement?: boolean | null;
+  currentDosesPerServing?: number | null;
   asLabel?: boolean;
   labelClassName?: string;
 }
@@ -49,7 +51,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, asLabel = false, labelClassName }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, currentDosesPerServing, asLabel = false, labelClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -61,6 +63,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     quantity_total: currentQuantityTotal?.toString() || "",
     quantity_remaining: currentQuantityRemaining?.toString() || "",
     quantity_unit: currentQuantityUnit || "capsules",
+    doses_per_serving: (currentDosesPerServing ?? 1).toString(),
     auto_decrement: currentAutoDecrement !== false,
   });
   const [scanError, setScanError] = useState("");
@@ -68,6 +71,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
 
   function handleScanComplete(data: ScanResult) {
     setScanError("");
+    const serving = parseServingCount(data.servingSize);
     setForm(f => ({
       ...f,
       dose: data.dosePerServing || f.dose,
@@ -75,6 +79,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
       quantity_total: data.totalQuantity ? (parseFloat(f.quantity_remaining || "0") + Number(data.totalQuantity)).toString() : f.quantity_total,
       quantity_remaining: data.totalQuantity ? (parseFloat(f.quantity_remaining || "0") + Number(data.totalQuantity)).toString() : f.quantity_remaining,
       quantity_unit: data.quantityUnit || f.quantity_unit,
+      doses_per_serving: serving > 1 ? serving.toString() : f.doses_per_serving,
     }));
   }
 
@@ -83,7 +88,7 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     const res = await fetch("/api/stack/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit, auto_decrement: form.auto_decrement }),
+      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit, auto_decrement: form.auto_decrement, doses_per_serving: form.doses_per_serving }),
     });
     if (res.ok) {
       setOpen(false);
@@ -117,13 +122,27 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
               {scanError && <span className="text-xs text-red-500">{scanError}</span>}
             </div>
 
-            <div>
-              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose</label>
-              <input type="text" value={form.dose}
-                onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
-                placeholder="e.g. 500mg, 5000 IU"
-                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
+              <div>
+                <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose</label>
+                <input type="text" value={form.dose}
+                  onChange={e => setForm(f => ({ ...f, dose: e.target.value }))}
+                  placeholder="e.g. 500mg, 5000 IU"
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5" title={`If the label says "Serving size: 2 capsules", enter 2`}>Per serving</label>
+                <input type="number" min="1" value={form.doses_per_serving}
+                  onChange={e => setForm(f => ({ ...f, doses_per_serving: e.target.value }))}
+                  placeholder="1"
+                  className="w-20 border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
             </div>
+            <p className="text-[11px] text-stone-400 -mt-2">
+              {parseInt(form.doses_per_serving || "1", 10) > 1
+                ? `You take ${form.doses_per_serving} ${form.quantity_unit} per dose. Inventory will decrement by ${form.doses_per_serving} when checked off.`
+                : "If a label says \"Serving size: 2 capsules\", enter 2 — we'll decrement inventory correctly."}
+            </p>
 
             <div>
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">When to take</label>

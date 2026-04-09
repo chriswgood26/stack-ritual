@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -40,7 +41,7 @@ export default async function AdminDashboard() {
   const startOfLastYear = new Date(yr - 1, 0, 1).toISOString();
   const endOfLastYear = new Date(yr, 0, 1).toISOString();
 
-  const [viewsTodayR, viewsYesterdayR, viewsWeekR, viewsLastWeekR, viewsMonthR, viewsLastMonthR, viewsTotalR, viewsLastYearR, referrersR] = await Promise.all([
+  const [viewsTodayR, viewsYesterdayR, viewsWeekR, viewsLastWeekR, viewsMonthR, viewsLastMonthR, viewsTotalR, viewsLastYearR, sourcesR] = await Promise.all([
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfToday),
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfYesterday).lt("created_at", endOfYesterday),
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfWeek),
@@ -49,7 +50,7 @@ export default async function AdminDashboard() {
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfLastMonth).lt("created_at", endOfLastMonth),
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }),
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfLastYear).lt("created_at", endOfLastYear),
-    supabaseAdmin.from("page_views").select("referrer").gte("created_at", startOfMonth),
+    supabaseAdmin.from("page_views").select("referrer, utm_source, utm_medium, utm_campaign").gte("created_at", startOfMonth),
   ]);
 
   const viewsToday = viewsTodayR.count || 0;
@@ -61,12 +62,16 @@ export default async function AdminDashboard() {
   const viewsTotal = viewsTotalR.count || 0;
   const viewsLastYear = viewsLastYearR.count || 0;
 
-  // Aggregate sources
+  // Aggregate sources: prefer utm_source when present, fall back to referrer hostname parsing
   const sourceCounts: Record<string, number> = {};
+  const campaignCounts: Record<string, number> = {};
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const row of (referrersR.data as any[] || [])) {
+  for (const row of (sourcesR.data as any[] || [])) {
     let source = "Direct";
-    if (row.referrer) {
+    if (row.utm_source) {
+      // Normalize UTM source to Title Case for display
+      source = row.utm_source.charAt(0).toUpperCase() + row.utm_source.slice(1).toLowerCase();
+    } else if (row.referrer) {
       try {
         const url = new URL(row.referrer);
         const host = url.hostname.replace(/^www\./, "");
@@ -86,11 +91,20 @@ export default async function AdminDashboard() {
       }
     }
     sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+
+    // Also aggregate campaigns when utm_campaign is set
+    if (row.utm_campaign) {
+      campaignCounts[row.utm_campaign] = (campaignCounts[row.utm_campaign] || 0) + 1;
+    }
   }
   const topSources = Object.entries(sourceCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10)
     .map(([source, count]) => ({ source, count }));
+  const topCampaigns = Object.entries(campaignCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([campaign, count]) => ({ campaign, count }));
 
   function pctChange(current: number, previous: number) {
     if (previous === 0) return { pct: current > 0 ? 100 : 0, up: current >= 0 };
@@ -107,36 +121,36 @@ export default async function AdminDashboard() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+        <Link href="/admin/users" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">👤</div>
           <div className="text-2xl font-bold text-white">{usersR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Total Users</div>
-        </div>
-        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+        </Link>
+        <Link href="/admin/users" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">🧱</div>
           <div className="text-2xl font-bold text-white">{stacksR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Stack Items</div>
-        </div>
-        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+        </Link>
+        <Link href="/admin/experiences" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">⭐</div>
           <div className="text-2xl font-bold text-white">{expsR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Experiences</div>
-        </div>
-        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+        </Link>
+        <Link href="/admin/feedback" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">💬</div>
           <div className="text-2xl font-bold text-white">{feedbackR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Feedback</div>
-        </div>
-        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+        </Link>
+        <Link href="/admin/supplements?filter=pending" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-amber-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">📝</div>
           <div className="text-2xl font-bold text-amber-400">{suppsR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Pending Subs</div>
-        </div>
-        <div className="bg-stone-800 border border-stone-700 rounded-xl p-4">
+        </Link>
+        <Link href="/admin/affiliates" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">🤝</div>
           <div className="text-2xl font-bold text-white">{affiliatesR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Affiliates</div>
-        </div>
+        </Link>
       </div>
 
       {/* Website Traffic */}
@@ -187,27 +201,51 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {topSources.length > 0 && (
-          <div>
-            <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-2">Traffic Sources (This Month)</h3>
-            <div className="space-y-1.5">
-              {topSources.map((s) => {
-                const pct = viewsMonth > 0 ? Math.round((s.count / viewsMonth) * 100) : 0;
-                return (
-                  <div key={s.source}>
-                    <div className="flex justify-between text-sm mb-0.5">
-                      <span className="text-stone-300">{s.source}</span>
-                      <span className="text-stone-400">{s.count} ({pct}%)</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {topSources.length > 0 && (
+            <div>
+              <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-2">Traffic Sources (This Month)</h3>
+              <div className="space-y-1.5">
+                {topSources.map((s) => {
+                  const pct = viewsMonth > 0 ? Math.round((s.count / viewsMonth) * 100) : 0;
+                  return (
+                    <div key={s.source}>
+                      <div className="flex justify-between text-sm mb-0.5">
+                        <span className="text-stone-300">{s.source}</span>
+                        <span className="text-stone-400">{s.count} ({pct}%)</span>
+                      </div>
+                      <div className="bg-stone-900 rounded h-1.5 overflow-hidden">
+                        <div className="bg-emerald-600 h-full rounded" style={{ width: `${pct}%` }} />
+                      </div>
                     </div>
-                    <div className="bg-stone-900 rounded h-1.5 overflow-hidden">
-                      <div className="bg-emerald-600 h-full rounded" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {topCampaigns.length > 0 && (
+            <div>
+              <h3 className="text-xs text-stone-400 uppercase tracking-wider mb-2">Campaigns (This Month)</h3>
+              <div className="space-y-1.5">
+                {topCampaigns.map((c) => {
+                  const pct = viewsMonth > 0 ? Math.round((c.count / viewsMonth) * 100) : 0;
+                  return (
+                    <div key={c.campaign}>
+                      <div className="flex justify-between text-sm mb-0.5">
+                        <span className="text-stone-300">{c.campaign}</span>
+                        <span className="text-stone-400">{c.count} ({pct}%)</span>
+                      </div>
+                      <div className="bg-stone-900 rounded h-1.5 overflow-hidden">
+                        <div className="bg-amber-500 h-full rounded" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

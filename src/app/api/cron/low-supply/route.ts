@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
               </div>
               <div style="background:#fafaf9;padding:16px;text-align:center;border-top:1px solid #e7e5e4;">
                 <p style="color:#a8a29e;font-size:11px;margin:0;">
-                  <a href="https://stackritual.com" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend → stackritual.com</a><br><br>
+                  <a href="https://stackritual.com/share" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend</a><br><br>
                   ⚕️ Nothing on Stack Ritual constitutes medical advice.<br>
                   <a href="https://stackritual.com/dashboard/profile" style="color:#a8a29e;">Manage email preferences</a>
                 </p>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
 import EditStackItemButton from "./EditStackItemButton";
+import { parseServingCount } from "@/lib/serving";
 
 interface ExistingItem {
   id: string;
@@ -39,6 +40,7 @@ export default function AddToStackButton({ supplementId, supplementName, default
   const [quantityTotal, setQuantityTotal] = useState("");
   const [quantityRemaining, setQuantityRemaining] = useState("");
   const [quantityUnit, setQuantityUnit] = useState("capsules");
+  const [dosesPerServing, setDosesPerServing] = useState("1");
   const [scanError, setScanError] = useState("");
   const router = useRouter();
 
@@ -51,6 +53,8 @@ export default function AddToStackButton({ supplementId, supplementName, default
       setQuantityRemaining(String(data.totalQuantity));
     }
     if (data.quantityUnit) setQuantityUnit(data.quantityUnit);
+    const serving = parseServingCount(data.servingSize);
+    if (serving > 1) setDosesPerServing(serving.toString());
   }
 
   async function handleAdd() {
@@ -68,6 +72,7 @@ export default function AddToStackButton({ supplementId, supplementName, default
           quantity_total: quantityTotal,
           quantity_remaining: quantityRemaining,
           quantity_unit: quantityUnit,
+          doses_per_serving: dosesPerServing,
         }),
       });
       const data = await res.json();
@@ -141,15 +146,28 @@ export default function AddToStackButton({ supplementId, supplementName, default
           {scanError && <span className="text-xs text-red-500">{scanError}</span>}
         </div>
 
-        <div>
-          <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose</label>
-          <input
-            type="text"
-            value={dose}
-            onChange={e => setDose(e.target.value)}
-            placeholder={defaultDose || "e.g. 500mg"}
-            className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
+        <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose</label>
+            <input
+              type="text"
+              value={dose}
+              onChange={e => setDose(e.target.value)}
+              placeholder={defaultDose || "e.g. 500mg"}
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5" title="If the label says 'Serving size: 2 capsules', enter 2">Per serving</label>
+            <input
+              type="number"
+              min="1"
+              value={dosesPerServing}
+              onChange={e => setDosesPerServing(e.target.value)}
+              placeholder="1"
+              className="w-20 border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
         </div>
 
         <div>

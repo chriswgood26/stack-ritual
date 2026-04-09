@@ -31,6 +31,9 @@ export default function RoadmapManager() {
   const [description, setDescription] = useState("");
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   async function load() {
     try {
@@ -72,6 +75,32 @@ export default function RoadmapManager() {
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
+    });
+  }
+
+  function startEdit(item: RoadmapItem) {
+    setEditingId(item.id);
+    setEditTitle(item.title);
+    setEditDescription(item.description || "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditTitle("");
+    setEditDescription("");
+  }
+
+  async function saveEdit(id: string) {
+    if (!editTitle.trim()) return;
+    const newTitle = editTitle.trim();
+    const newDescription = editDescription.trim() || null;
+    setItems(prev => prev.map(i => i.id === id ? { ...i, title: newTitle, description: newDescription } : i));
+    setEditingId(null);
+    await fetch(`/api/admin/roadmap/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: newTitle, description: newDescription }),
     });
   }
 
@@ -145,30 +174,70 @@ export default function RoadmapManager() {
             <ul className="space-y-2">
               {group.items.map(item => (
                 <li key={item.id} className="bg-stone-900/40 border border-stone-700 rounded-xl px-4 py-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-stone-200 font-medium">{item.title}</p>
-                      {item.description && <p className="text-xs text-stone-400 mt-1 whitespace-pre-wrap">{item.description}</p>}
+                  {editingId === item.id ? (
+                    <div className="space-y-2">
+                      <input
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                        autoFocus
+                      />
+                      <textarea
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                        placeholder="Description (optional)"
+                        rows={2}
+                        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-xs text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-600 resize-none"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={cancelEdit}
+                          className="text-xs border border-stone-700 text-stone-400 px-3 py-1 rounded-lg hover:bg-stone-800"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => saveEdit(item.id)}
+                          disabled={!editTitle.trim()}
+                          className="text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg disabled:opacity-50"
+                        >
+                          Save
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <select
-                        value={item.status}
-                        onChange={e => updateStatus(item.id, e.target.value as RoadmapItem["status"])}
-                        className="bg-stone-800 border border-stone-700 text-stone-300 text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-600"
-                      >
-                        <option value="idea">💡 Idea</option>
-                        <option value="vetted">✓ Vetted</option>
-                        <option value="in_progress">🚧 In Progress</option>
-                      </select>
-                      <button
-                        onClick={() => remove(item.id)}
-                        className="text-stone-500 hover:text-red-400 text-sm px-1.5"
-                        title="Remove"
-                      >
-                        ✕
-                      </button>
+                  ) : (
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-stone-200 font-medium">{item.title}</p>
+                        {item.description && <p className="text-xs text-stone-400 mt-1 whitespace-pre-wrap">{item.description}</p>}
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => startEdit(item)}
+                          className="text-stone-500 hover:text-emerald-400 text-sm px-1.5"
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                        <select
+                          value={item.status}
+                          onChange={e => updateStatus(item.id, e.target.value as RoadmapItem["status"])}
+                          className="bg-stone-800 border border-stone-700 text-stone-300 text-xs rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+                        >
+                          <option value="idea">💡 Idea</option>
+                          <option value="vetted">✓ Vetted</option>
+                          <option value="in_progress">🚧 In Progress</option>
+                        </select>
+                        <button
+                          onClick={() => remove(item.id)}
+                          className="text-stone-500 hover:text-red-400 text-sm px-1.5"
+                          title="Remove"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </li>
               ))}
             </ul>

@@ -100,6 +100,54 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section id="testimonials" className="max-w-6xl mx-auto px-8 py-24">
+        <h2 className="text-3xl font-bold text-center mb-4">Loved by wellness enthusiasts</h2>
+        <p className="text-stone-600 text-center mb-16">What early users are saying about Stack Ritual.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              quote: "I finally stopped forgetting my afternoon vitamins. The reminders with tap-to-done links are a game changer.",
+              author: "Sarah M.",
+              role: "Biohacker, Portland OR",
+              initial: "S",
+              color: "bg-emerald-100 text-emerald-700",
+            },
+            {
+              quote: "Being able to see my mood correlate with which supplements I actually took was a lightbulb moment. Haven't missed a day in 3 weeks.",
+              author: "Marcus K.",
+              role: "Personal Trainer",
+              initial: "M",
+              color: "bg-amber-100 text-amber-700",
+            },
+            {
+              quote: "The inventory tracking alone is worth it. No more running out of magnesium at midnight.",
+              author: "Priya R.",
+              role: "Nurse Practitioner",
+              initial: "P",
+              color: "bg-stone-100 text-stone-700",
+            },
+          ].map((t, i) => (
+            <div key={i} className="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
+              <div className="text-emerald-600 text-3xl leading-none mb-2">&ldquo;</div>
+              <p className="text-stone-700 text-sm leading-relaxed mb-6">{t.quote}</p>
+              <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${t.color}`}>
+                  {t.initial}
+                </div>
+                <div>
+                  <div className="font-semibold text-stone-900 text-sm">{t.author}</div>
+                  <div className="text-stone-500 text-xs">{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-stone-400 text-xs mt-12">
+          Want to share your story? <Link href="mailto:hello@stackritual.com" className="text-emerald-700 underline">Email us</Link> — we&rsquo;d love to feature you.
+        </p>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="max-w-6xl mx-auto px-8 py-24">
         <h2 className="text-3xl font-bold text-center mb-4">Simple pricing</h2>
@@ -167,6 +215,7 @@ export default function Home() {
           <Link href="/affiliate-program" className="hover:text-stone-700 transition-colors">Affiliates</Link>
           <Link href="/privacy" className="hover:text-stone-700 transition-colors">Privacy Policy</Link>
           <Link href="/faq" className="hover:text-stone-700 transition-colors">FAQ</Link>
+          <Link href="/help" className="hover:text-stone-700 transition-colors">User Guide</Link>
           <Link href="/terms" className="hover:text-stone-700 transition-colors">Terms</Link>
         </div>
       </footer>

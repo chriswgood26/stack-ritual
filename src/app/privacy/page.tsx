@@ -92,7 +92,23 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">7. Cookies</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">7. SMS / Text Messaging</h2>
+            <p className="mb-3">If you opt in to SMS reminders, the following terms apply:</p>
+            <ul className="list-disc pl-5 space-y-1.5">
+              <li><strong>Consent is not a condition of purchase.</strong> You can use Stack Ritual fully without receiving any text messages.</li>
+              <li><strong>Message types:</strong> Transactional reminders based on your configured stack times, plus confirmation and service messages (e.g., double opt-in).</li>
+              <li><strong>Message frequency:</strong> Varies based on your reminder settings — typically 0–4 messages per day.</li>
+              <li><strong>Carriers:</strong> Messages are sent via Twilio, a licensed US messaging provider. Carriers are not liable for delayed or undelivered messages.</li>
+              <li><strong>Rates:</strong> Message and data rates may apply depending on your mobile plan.</li>
+              <li><strong>Opt-out:</strong> Reply <strong>STOP</strong> to any SMS to unsubscribe immediately. You&rsquo;ll receive a final confirmation and no further messages.</li>
+              <li><strong>Help:</strong> Reply <strong>HELP</strong> for help, or email <a href="mailto:hello@stackritual.com" className="text-emerald-600 underline">hello@stackritual.com</a>.</li>
+              <li><strong>Phone number sharing:</strong> Your phone number is only shared with Twilio for the purpose of delivering messages you&rsquo;ve opted into. It is never sold or shared with marketers.</li>
+              <li><strong>Proof of consent:</strong> We record when and how you opted in (timestamp, IP address, exact consent language shown) to comply with TCPA requirements.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">8. Cookies</h2>
             <p>We use cookies and similar tracking technologies to:</p>
             <ul className="list-disc pl-5 space-y-1.5 mt-2">
               <li>Keep you logged in (authentication cookies via Clerk)</li>
@@ -103,7 +119,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">8. Data Security</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">9. Data Security</h2>
             <p>We implement industry-standard security measures including:</p>
             <ul className="list-disc pl-5 space-y-1.5 mt-2">
               <li>SSL/TLS encryption for all data in transit</li>
@@ -115,22 +131,22 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">9. Children's Privacy</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">10. Children&apos;s Privacy</h2>
             <p>Stack Ritual is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, please contact us immediately.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">10. California Privacy Rights (CCPA)</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">11. California Privacy Rights (CCPA)</h2>
             <p>California residents have additional rights under the California Consumer Privacy Act (CCPA), including the right to know what personal information is collected, the right to delete personal information, and the right to opt-out of the sale of personal information. We do not sell personal information. To exercise your rights, contact <a href="mailto:privacy@stackritual.com" className="text-emerald-600 underline">privacy@stackritual.com</a>.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">11. Changes to This Policy</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">12. Changes to This Policy</h2>
             <p>We may update this Privacy Policy from time to time. We will notify you of material changes via email or in-app notification. Continued use of the Service after changes constitutes acceptance of the updated policy.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-stone-900 mb-3">12. Contact Us</h2>
+            <h2 className="text-lg font-bold text-stone-900 mb-3">13. Contact Us</h2>
             <p>Questions about this Privacy Policy? Contact us:</p>
             <ul className="list-none mt-2 space-y-1">
               <li>📧 <a href="mailto:privacy@stackritual.com" className="text-emerald-600 underline">privacy@stackritual.com</a></li>

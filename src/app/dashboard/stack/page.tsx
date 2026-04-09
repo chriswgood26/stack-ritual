@@ -118,6 +118,7 @@ export default async function MyStackPage() {
                             currentTotal={item.quantity_total ?? null}
                             unit={item.quantity_unit ?? null}
                             name={name}
+                            dosesPerServing={item.doses_per_serving}
                           />
                           <div className="hidden">
                           </div>
@@ -134,6 +135,7 @@ export default async function MyStackPage() {
                             currentQuantityTotal={item.quantity_total}
                             currentQuantityRemaining={item.quantity_remaining}
                             currentQuantityUnit={item.quantity_unit}
+                            currentDosesPerServing={item.doses_per_serving}
                           />
                           <PauseStackItemButton itemId={item.id} paused={false} />
                           <DeleteStackItemButton itemId={item.id} />

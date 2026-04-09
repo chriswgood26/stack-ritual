@@ -11,9 +11,10 @@ interface Props {
   name: string;
   compact?: boolean;
   supplementSlug?: string | null;
+  dosesPerServing?: number | null;
 }
 
-export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false, supplementSlug }: Props) {
+export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false, supplementSlug, dosesPerServing }: Props) {
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState(currentRemaining?.toString() || "");
   const [saving, setSaving] = useState(false);
@@ -82,7 +83,11 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
     <>
       <button onClick={() => setOpen(true)}
         className={`rounded-full border font-medium transition-colors ${color} ${sizeClass}`}>
-        {currentRemaining} {unitLabel} remaining
+        {currentRemaining} {unitLabel}
+        {dosesPerServing && dosesPerServing > 1 && (
+          <span className="opacity-70"> · {Math.floor(currentRemaining / dosesPerServing)} servings</span>
+        )}
+        {" remaining"}
       </button>
 
       {open && (
@@ -128,6 +133,11 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
             <div className="bg-stone-50 rounded-xl px-4 py-3 text-xs text-stone-500">
               Current: <strong>{currentRemaining}</strong> {unitLabel} remaining
               {currentTotal && <span> of {currentTotal}</span>}
+              {dosesPerServing && dosesPerServing > 1 && (
+                <div className="mt-1 text-stone-400">
+                  ≈ {Math.floor(currentRemaining / dosesPerServing)} servings (you take {dosesPerServing} per dose)
+                </div>
+              )}
             </div>
 
             <div>

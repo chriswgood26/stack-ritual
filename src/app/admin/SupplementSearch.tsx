@@ -28,6 +28,10 @@ export default function SupplementSearch({ supplements }: { supplements: Supplem
         s.category.toLowerCase().includes(query.toLowerCase())
       ).sort((a, b) => a.name.localeCompare(b.name));
 
+  const existingCategories = Array.from(
+    new Set(supplements.map(s => s.category).filter(Boolean))
+  ).sort();
+
   return (
     <>
       <div className="px-5 py-3 border-b border-stone-700">
@@ -50,7 +54,7 @@ export default function SupplementSearch({ supplements }: { supplements: Supplem
                 <div className="font-medium text-white text-sm">{supp.name}</div>
                 <div className="text-xs text-stone-400">{supp.category} · {supp.evidence_level}</div>
               </div>
-              <EditSupplementButton supplement={supp} />
+              <EditSupplementButton supplement={supp} categories={existingCategories} />
             </div>
           ))
         )}
