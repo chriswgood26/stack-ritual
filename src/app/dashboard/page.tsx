@@ -354,8 +354,19 @@ export default async function Dashboard() {
                         {item.dose && <div className="text-xs text-stone-400 truncate">{item.dose.split(".")[0]}</div>}
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-0.5 ml-2 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-0.5 ml-2 flex-shrink-0 min-w-fit">
                       <CheckoffButton stackItemId={item.id} userId={userId} isChecked={isChecked} date={today} doseIndex={item.doseIndex ?? 0} takenAt={takenAtMap[checkId] || null} />
+                      {item.quantity_remaining !== null && item.quantity_remaining !== undefined && (
+                        <QuantityAdjuster
+                          itemId={item.id}
+                          currentRemaining={item.quantity_remaining}
+                          currentTotal={item.quantity_total}
+                          unit={item.quantity_unit}
+                          name={name}
+                          compact
+                          dosesPerServing={item.doses_per_serving}
+                        />
+                      )}
                     </div>
                   </div>
                 );
