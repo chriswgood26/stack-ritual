@@ -106,7 +106,7 @@ function MoodReportContent() {
                   <div className="text-xs text-stone-500">Best score</div>
                 </div>
                 <div className="bg-stone-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-stone-500">{Math.min(...data.map(d => d.score))}/10</div>
+                  <div className="text-2xl font-bold text-stone-700">{Math.min(...data.map(d => d.score))}/10</div>
                   <div className="text-xs text-stone-500">Lowest score</div>
                 </div>
               </div>
@@ -121,7 +121,7 @@ function MoodReportContent() {
                       <div className="text-xs text-stone-500">Avg mood when ≥80% stack completed</div>
                     </div>
                     <div className="bg-white rounded-lg p-3 text-center">
-                      <div className="text-xl font-bold text-stone-500">{avgLowComp}/10</div>
+                      <div className="text-xl font-bold text-stone-700">{avgLowComp}/10</div>
                       <div className="text-xs text-stone-500">Avg mood on other days</div>
                     </div>
                   </div>
