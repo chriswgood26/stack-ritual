@@ -128,10 +128,17 @@ export default async function Dashboard() {
     });
   }
 
+  // Less-than-daily timings should not be checked off by "Mark all done"
+  const LESS_THAN_DAILY_TIMINGS = new Set(["weekly", "biweekly", "3x-week", "monthly", "cycle-5-2", "cycle-8-2w"]);
+  const dailyScheduledItems = scheduledItems.filter(i => !LESS_THAN_DAILY_TIMINGS.has(i.timing || ""));
+
   const totalItems = scheduledItems.length;
   const checkedCount = scheduledItems.filter(i => checkedIds.has(i.checkoffId || i.id)).length;
   const supplements = scheduledItems.filter(i => i.category === "supplement").length;
   const rituals = scheduledItems.filter(i => i.category === "ritual").length;
+
+  const dailyCheckedCount = dailyScheduledItems.filter(i => checkedIds.has(i.checkoffId || i.id)).length;
+  const allDailyDone = dailyScheduledItems.length > 0 && dailyCheckedCount === dailyScheduledItems.length;
 
   // Use UTC offset for LA time (PDT = UTC-7, PST = UTC-8)
   const laHour = (now.getUTCHours() - 7 + 24) % 24; // PDT
@@ -195,9 +202,9 @@ export default async function Dashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
                     <MarkAllDoneButton
-                      stackItems={scheduledItems.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
+                      stackItems={dailyScheduledItems.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
                       date={today}
-                      allDone={checkedCount === totalItems}
+                      allDone={allDailyDone}
                     />
                   </div>
                 </div>
