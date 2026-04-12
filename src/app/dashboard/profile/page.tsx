@@ -12,6 +12,7 @@ import UpgradeButton from "@/components/UpgradeButton";
 import ManageBillingButton from "@/components/ManageBillingButton";
 import SMSSettings from "@/components/SMSSettings";
 import EmailSettings from "@/components/EmailSettings";
+import ReferralCodeInput from "@/components/ReferralCodeInput";
 import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
 
 export const dynamic = "force-dynamic";
@@ -105,6 +106,12 @@ export default async function ProfilePage() {
           </div>
           <div className="text-2xl font-bold text-emerald-700">{logCount ?? 0}</div>
         </Link>
+
+        {/* Referral code — hidden unless clicked. Lets visitors who arrived
+            without the ref cookie (e.g. from a physical postcard) claim
+            attribution and potentially unlock annual plans. Only shown on
+            the free plan since paid users already past the attribution point. */}
+        {plan === "free" && !annualUnlocked && <ReferralCodeInput />}
 
         {/* Plan card */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
