@@ -301,6 +301,7 @@ export default async function Dashboard() {
                                 name={name}
                                 compact
                                 dosesPerServing={item.doses_per_serving}
+                                resupplyOrdered={item.resupply_ordered}
                               />
                             )}
                           </div>
@@ -372,6 +373,7 @@ export default async function Dashboard() {
                           name={name}
                           compact
                           dosesPerServing={item.doses_per_serving}
+                          resupplyOrdered={item.resupply_ordered}
                         />
                       )}
                     </div>

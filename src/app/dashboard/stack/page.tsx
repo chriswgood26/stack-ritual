@@ -119,6 +119,7 @@ export default async function MyStackPage() {
                             unit={item.quantity_unit ?? null}
                             name={name}
                             dosesPerServing={item.doses_per_serving}
+                            resupplyOrdered={item.resupply_ordered}
                           />
                           <div className="hidden">
                           </div>

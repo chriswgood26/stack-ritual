@@ -12,27 +12,33 @@ interface Props {
   compact?: boolean;
   supplementSlug?: string | null;
   dosesPerServing?: number | null;
+  resupplyOrdered?: boolean | null;
 }
 
-export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false, supplementSlug, dosesPerServing }: Props) {
+export default function QuantityAdjuster({ itemId, currentRemaining, currentTotal, unit, name, compact = false, supplementSlug, dosesPerServing, resupplyOrdered }: Props) {
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState(currentRemaining?.toString() || "");
   const [saving, setSaving] = useState(false);
   const [confirmStop, setConfirmStop] = useState(false);
+  const [localResupplyOrdered, setLocalResupplyOrdered] = useState(!!resupplyOrdered);
   const router = useRouter();
 
   const unitLabel = unit || "capsules";
 
   async function handleSave() {
+    const newQty = parseInt(qty) || 0;
+    const shouldClearResupply = newQty > (currentRemaining || 0);
+    if (shouldClearResupply) setLocalResupplyOrdered(false);
     setSaving(true);
     await fetch("/api/stack/inventory", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         item_id: itemId,
-        quantity_remaining: parseInt(qty) || 0,
+        quantity_remaining: newQty,
         quantity_total: currentTotal,
         quantity_unit: unit,
+        resupply_ordered: shouldClearResupply ? false : localResupplyOrdered,
       }),
     });
     setOpen(false);
@@ -49,6 +55,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
     });
     setOpen(false);
     setConfirmStop(false);
+    setLocalResupplyOrdered(false);
     router.refresh();
     setSaving(false);
   }
@@ -56,6 +63,8 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
   async function adjust(delta: number) {
     const current = currentRemaining || 0;
     const newQty = Math.max(0, current + delta);
+    const shouldClearResupply = delta > 0;
+    if (shouldClearResupply) setLocalResupplyOrdered(false);
     setSaving(true);
     await fetch("/api/stack/inventory", {
       method: "POST",
@@ -65,10 +74,27 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
         quantity_remaining: newQty,
         quantity_total: currentTotal,
         quantity_unit: unit,
+        resupply_ordered: shouldClearResupply ? false : localResupplyOrdered,
       }),
     });
     router.refresh();
     setSaving(false);
+  }
+
+  async function handleResupplyToggle(checked: boolean) {
+    setLocalResupplyOrdered(checked);
+    await fetch("/api/stack/inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        item_id: itemId,
+        quantity_remaining: currentRemaining,
+        quantity_total: currentTotal,
+        quantity_unit: unit,
+        resupply_ordered: checked,
+      }),
+    });
+    router.refresh();
   }
 
   if (currentRemaining === null || currentRemaining === undefined) return null;
@@ -88,6 +114,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
           <span className="opacity-70"> · {Math.floor(currentRemaining / dosesPerServing)} servings</span>
         )}
         {" remaining"}
+        {localResupplyOrdered && <span className="ml-1 opacity-80">📦</span>}
       </button>
 
       {open && (
@@ -139,6 +166,22 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
                 </div>
               )}
             </div>
+
+            {/* Resupply ordered */}
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={localResupplyOrdered}
+                onChange={e => handleResupplyToggle(e.target.checked)}
+                className="w-4 h-4 rounded accent-emerald-700"
+              />
+              <span className="text-sm text-stone-700">
+                📦 Resupply ordered
+              </span>
+              {localResupplyOrdered && (
+                <span className="text-xs text-stone-400 ml-auto">Clears when qty added</span>
+              )}
+            </label>
 
             <div>
               <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Reorder</p>

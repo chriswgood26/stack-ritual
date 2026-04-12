@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { item_id, quantity_total, quantity_remaining, quantity_unit, low_supply_alert } = await req.json();
+  const { item_id, quantity_total, quantity_remaining, quantity_unit, low_supply_alert, resupply_ordered } = await req.json();
   if (!item_id) return NextResponse.json({ error: "item_id required" }, { status: 400 });
 
   const { error } = await supabaseAdmin
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       quantity_unit: quantity_unit || "capsules",
       quantity_updated_at: new Date().toISOString(),
       low_supply_alert: low_supply_alert !== false,
+      ...(resupply_ordered !== undefined ? { resupply_ordered: !!resupply_ordered } : {}),
     })
     .eq("id", item_id)
     .eq("user_id", userId);
@@ -40,6 +41,7 @@ export async function DELETE(req: NextRequest) {
       quantity_unit: null,
       quantity_updated_at: null,
       low_supply_alert: false,
+      resupply_ordered: false,
     })
     .eq("id", item_id)
     .eq("user_id", userId);
