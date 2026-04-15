@@ -47,6 +47,68 @@ export async function sendDailyReminderEmail(to: string, firstName: string, item
   });
 }
 
+// Consolidated daily summary email — all of today's pending items in one email
+export async function sendDailySummaryEmail(
+  to: string,
+  firstName: string,
+  itemsByGroup: { label: string; items: { name: string; dose?: string }[] }[],
+  doneUrl: string,
+) {
+  const totalCount = itemsByGroup.reduce((s, g) => s + g.items.length, 0);
+  const groupHtml = itemsByGroup
+    .filter(g => g.items.length > 0)
+    .map(
+      g => `
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #065f46; margin-bottom: 6px;">${g.label}</div>
+        <ul style="color: #44403c; line-height: 1.8; margin: 0; padding-left: 20px;">
+          ${g.items.map(i => `<li><strong>${i.name}</strong>${i.dose ? ` — ${i.dose}` : ''}</li>`).join('')}
+        </ul>
+      </div>`,
+    )
+    .join('');
+
+  return resend.emails.send({
+    from: getFromEmail(),
+    to,
+    subject: `🌿 Your daily stack, ${firstName} (${totalCount} item${totalCount === 1 ? '' : 's'})`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
+        <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
+          <div style="background: #065f46; padding: 24px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px;">🌿 Stack Ritual</h1>
+          </div>
+          <div style="padding: 24px;">
+            <h2 style="color: #1c1917; margin-top: 0;">Hi ${firstName}! Here's your stack for today.</h2>
+            ${groupHtml}
+            <a href="${doneUrl}" style="display: block; background: #065f46; color: white; text-align: center; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 16px;">
+              ✓ Mark All As Done For Today
+            </a>
+            <p style="color: #a8a29e; font-size: 11px; text-align: center; margin-top: 8px; margin-bottom: 0;">
+              This link expires at end of day.
+            </p>
+            <p style="color: #a8a29e; font-size: 12px; text-align: center; margin-top: 16px;">
+              <a href="https://stackritual.com/dashboard" style="color: #a8a29e;">Open app</a> ·
+              <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Manage settings</a>
+            </p>
+          </div>
+          <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
+            <p style="color: #a8a29e; font-size: 11px; margin: 0;">
+              <a href="https://stackritual.com/share" style="color: #065f46; font-weight: 600; text-decoration: none;">Love Stack Ritual? Share the app with a friend</a><br><br>
+              <a href="https://stackritual.com/affiliate-program" style="color: #065f46; font-weight: 600; text-decoration: none;">💰 Earn by sharing — become an affiliate</a><br><br>
+              ⚕️ Nothing in this email constitutes medical advice.<br>
+              <a href="https://stackritual.com/dashboard/profile" style="color: #a8a29e;">Unsubscribe from emails</a>
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
 // Weekly summary email
 export async function sendWeeklySummaryEmail(to: string, firstName: string, stats: { completionPct: number; perfectDays: number; totalCheckins: number; streak: number }) {
   const emoji = stats.completionPct >= 90 ? '🔥' : stats.completionPct >= 70 ? '🌿' : '💪';

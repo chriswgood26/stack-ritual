@@ -10,28 +10,26 @@ async function requireAdmin() {
   return userId;
 }
 
-const ALLOWED_STATUSES = ["idea", "vetted", "in_progress", "done"];
-
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
   const body = await req.json();
-  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (typeof body.title === "string") updates.title = body.title.trim();
-  if (typeof body.description === "string" || body.description === null) {
-    updates.description = body.description?.trim() || null;
+
+  const update: Record<string, unknown> = {};
+  if (typeof body.display_message === "string") update.display_message = body.display_message.trim() || null;
+  if (typeof body.display_author === "string") update.display_author = body.display_author.trim() || null;
+  if (typeof body.display_role === "string") update.display_role = body.display_role.trim() || null;
+  if (typeof body.show_on_landing === "boolean") update.show_on_landing = body.show_on_landing;
+
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
-  if (typeof body.status === "string") {
-    if (!ALLOWED_STATUSES.includes(body.status)) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
-    }
-    updates.status = body.status;
-  }
-  const { error } = await supabaseAdmin.from("roadmap_items").update(updates).eq("id", id);
+
+  const { error } = await supabaseAdmin.from("app_feedback").update(update).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ message: "updated" });
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -39,7 +37,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  const { error } = await supabaseAdmin.from("roadmap_items").delete().eq("id", id);
+  const { error } = await supabaseAdmin.from("app_feedback").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ message: "deleted" });
 }

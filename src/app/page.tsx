@@ -1,8 +1,59 @@
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
 import PricingButton from "@/components/PricingButton";
+import { supabaseAdmin } from "@/lib/supabase";
+import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+const FALLBACK_TESTIMONIALS = [
+  {
+    quote: "I finally stopped forgetting my afternoon vitamins. The reminders with tap-to-done links are a game changer.",
+    author: "Sarah M.",
+    role: "Biohacker, Portland OR",
+  },
+  {
+    quote: "Being able to see my mood correlate with which supplements I actually took was a lightbulb moment. Haven't missed a day in 3 weeks.",
+    author: "Marcus K.",
+    role: "Personal Trainer",
+  },
+  {
+    quote: "The inventory tracking alone is worth it. No more running out of magnesium at midnight.",
+    author: "Priya R.",
+    role: "Nurse Practitioner",
+  },
+];
+
+const AVATAR_PALETTE = [
+  "bg-emerald-100 text-emerald-700",
+  "bg-amber-100 text-amber-700",
+  "bg-stone-100 text-stone-700",
+  "bg-sky-100 text-sky-700",
+  "bg-rose-100 text-rose-700",
+  "bg-violet-100 text-violet-700",
+];
+
+async function loadTestimonials() {
+  const { data } = await supabaseAdmin
+    .from("app_feedback")
+    .select("id, message, display_message, display_author, display_role, created_at")
+    .eq("show_on_landing", true)
+    .order("created_at", { ascending: false });
+
+  if (!data || data.length === 0) return FALLBACK_TESTIMONIALS;
+  return data.map(fb => ({
+    quote: fb.display_message || fb.message,
+    author: fb.display_author || "Anonymous",
+    role: fb.display_role || "",
+  }));
+}
+
+export default async function Home() {
+  const [testimonials, hasAnnualPerk] = await Promise.all([
+    loadTestimonials(),
+    visitorHasAnnualPerk(),
+  ]);
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 font-sans">
 
@@ -105,43 +156,25 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-4">Loved by wellness enthusiasts</h2>
         <p className="text-stone-600 text-center mb-16">What early users are saying about Stack Ritual.</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              quote: "I finally stopped forgetting my afternoon vitamins. The reminders with tap-to-done links are a game changer.",
-              author: "Sarah M.",
-              role: "Biohacker, Portland OR",
-              initial: "S",
-              color: "bg-emerald-100 text-emerald-700",
-            },
-            {
-              quote: "Being able to see my mood correlate with which supplements I actually took was a lightbulb moment. Haven't missed a day in 3 weeks.",
-              author: "Marcus K.",
-              role: "Personal Trainer",
-              initial: "M",
-              color: "bg-amber-100 text-amber-700",
-            },
-            {
-              quote: "The inventory tracking alone is worth it. No more running out of magnesium at midnight.",
-              author: "Priya R.",
-              role: "Nurse Practitioner",
-              initial: "P",
-              color: "bg-stone-100 text-stone-700",
-            },
-          ].map((t, i) => (
-            <div key={i} className="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
-              <div className="text-emerald-600 text-3xl leading-none mb-2">&ldquo;</div>
-              <p className="text-stone-700 text-sm leading-relaxed mb-6">{t.quote}</p>
-              <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${t.color}`}>
-                  {t.initial}
-                </div>
-                <div>
-                  <div className="font-semibold text-stone-900 text-sm">{t.author}</div>
-                  <div className="text-stone-500 text-xs">{t.role}</div>
+          {testimonials.map((t, i) => {
+            const initial = (t.author || "?").trim().charAt(0).toUpperCase() || "?";
+            const color = AVATAR_PALETTE[i % AVATAR_PALETTE.length];
+            return (
+              <div key={i} className="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
+                <div className="text-emerald-600 text-3xl leading-none mb-2">&ldquo;</div>
+                <p className="text-stone-700 text-sm leading-relaxed mb-6">{t.quote}</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${color}`}>
+                    {initial}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-stone-900 text-sm">{t.author}</div>
+                    {t.role && <div className="text-stone-500 text-xs">{t.role}</div>}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <p className="text-center text-stone-400 text-xs mt-12">
           Want to share your story? <Link href="mailto:hello@stackritual.com" className="text-emerald-700 underline">Email us</Link> — we&rsquo;d love to feature you.
@@ -151,7 +184,42 @@ export default function Home() {
       {/* Pricing */}
       <section id="pricing" className="max-w-6xl mx-auto px-8 py-24">
         <h2 className="text-3xl font-bold text-center mb-4">Simple pricing</h2>
-        <p className="text-stone-600 text-center mb-16">Start free. Upgrade when you&apos;re ready.</p>
+        <p className="text-stone-600 text-center mb-10">Start free. Upgrade when you&apos;re ready.</p>
+
+        {hasAnnualPerk && (
+          <div className="mb-12 max-w-3xl mx-auto bg-gradient-to-br from-emerald-50 to-amber-50 border-2 border-emerald-300 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <span className="bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">🎁 Exclusive Affiliate Offer</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-center text-stone-900 mb-2">
+              Save 33% with annual billing
+            </h3>
+            <p className="text-center text-stone-700 text-sm mb-5">
+              Because you came in through a partner link, you&rsquo;ve unlocked annual pricing on Plus and Pro:
+            </p>
+            <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mb-5">
+              <div className="bg-white rounded-xl p-4 border border-emerald-200 text-center">
+                <div className="text-xs text-stone-500 uppercase tracking-wider font-semibold">Plus Annual</div>
+                <div className="text-2xl font-bold text-stone-900 mt-1">$39.99<span className="text-sm font-normal text-stone-500">/yr</span></div>
+                <div className="text-[11px] text-emerald-700 font-semibold mt-0.5">Save $20</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 border border-emerald-200 text-center">
+                <div className="text-xs text-stone-500 uppercase tracking-wider font-semibold">Pro Annual</div>
+                <div className="text-2xl font-bold text-stone-900 mt-1">$79.99<span className="text-sm font-normal text-stone-500">/yr</span></div>
+                <div className="text-[11px] text-emerald-700 font-semibold mt-0.5">Save $40</div>
+              </div>
+            </div>
+            <div className="bg-white/70 border border-emerald-200 rounded-xl p-4 text-sm text-stone-700">
+              <p className="font-semibold text-stone-900 mb-1">How to claim:</p>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>Sign up for the free plan below.</li>
+                <li>Inside the app, go to <strong>Profile → Manage subscription</strong>.</li>
+                <li>You&rsquo;ll see the annual options unlocked there. Choose Plus or Pro yearly.</li>
+              </ol>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Free */}
           <div className="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
@@ -197,6 +265,11 @@ export default function Home() {
           </Link>
           <p className="text-stone-400 text-sm">No credit card required</p>
         </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="max-w-3xl mx-auto px-8 py-10">
+        <NewsletterSignup source="landing-footer" variant="card" />
       </section>
 
       {/* Disclaimer */}

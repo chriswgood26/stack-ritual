@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/admin/feedback", label: "Feedback", icon: "💬" },
   { href: "/admin/affiliates", label: "Affiliates", icon: "🤝" },
   { href: "/admin/sms", label: "SMS", icon: "📱" },
+  { href: "/admin/campaigns", label: "Campaigns", icon: "📧" },
 ];
 
 const BOTTOM_ITEMS = [

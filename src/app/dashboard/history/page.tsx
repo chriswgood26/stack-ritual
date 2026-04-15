@@ -90,6 +90,20 @@ export default async function HistoryPage() {
           moodByDate={Object.fromEntries((moodLogs || []).map(m => [m.logged_date, m.mood_score]))}
         />
 
+        <Link
+          href="/dashboard/mood-report?range=30"
+          className="flex items-center justify-between bg-white border border-stone-100 rounded-2xl px-4 py-3 shadow-sm hover:border-emerald-300 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-xl">📊</span>
+            <div>
+              <div className="font-semibold text-stone-900 text-sm">Mood &amp; Wellness Report</div>
+              <div className="text-xs text-stone-500">Stats, correlations, and a printable daily log</div>
+            </div>
+          </div>
+          <span className="text-stone-300">›</span>
+        </Link>
+
       </div>
       <BottomNav />
     </div>

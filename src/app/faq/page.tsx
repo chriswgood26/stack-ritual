@@ -195,7 +195,8 @@ export default function FAQPage() {
           </a>
         </div>
 
-        <div className="mt-8 flex gap-6 text-sm justify-center">
+        <div className="mt-8 flex flex-wrap gap-6 text-sm justify-center">
+          <Link href="/help" className="text-emerald-600 hover:underline">📘 User Guide</Link>
           <Link href="/terms" className="text-emerald-600 hover:underline">Terms & Conditions</Link>
           <Link href="/privacy" className="text-emerald-600 hover:underline">Privacy Policy</Link>
           <Link href="/" className="text-stone-500 hover:text-stone-700">← Home</Link>

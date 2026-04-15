@@ -17,6 +17,7 @@ export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("roadmap_items")
     .select("*")
+    .is("release_version", null)
     .order("status", { ascending: true })
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });

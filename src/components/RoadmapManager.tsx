@@ -6,7 +6,7 @@ interface RoadmapItem {
   id: string;
   title: string;
   description: string | null;
-  status: "idea" | "vetted" | "in_progress";
+  status: "idea" | "vetted" | "in_progress" | "done";
   created_at: string;
 }
 
@@ -14,14 +14,16 @@ const STATUS_LABELS: Record<RoadmapItem["status"], string> = {
   idea: "💡 Idea",
   vetted: "✓ Vetted",
   in_progress: "🚧 In Progress",
+  done: "✅ Done",
 };
 
-const STATUS_ORDER: RoadmapItem["status"][] = ["in_progress", "vetted", "idea"];
+const STATUS_ORDER: RoadmapItem["status"][] = ["in_progress", "vetted", "idea", "done"];
 
 const STATUS_BADGE: Record<RoadmapItem["status"], string> = {
   idea: "bg-stone-700 text-stone-300",
   vetted: "bg-emerald-900 text-emerald-300",
   in_progress: "bg-amber-900 text-amber-300",
+  done: "bg-emerald-700 text-emerald-100",
 };
 
 export default function RoadmapManager() {
@@ -227,6 +229,7 @@ export default function RoadmapManager() {
                           <option value="idea">💡 Idea</option>
                           <option value="vetted">✓ Vetted</option>
                           <option value="in_progress">🚧 In Progress</option>
+                          <option value="done">✅ Done</option>
                         </select>
                         <button
                           onClick={() => remove(item.id)}

@@ -8,7 +8,7 @@ export async function GET() {
 
   const { data } = await supabaseAdmin
     .from("user_profiles")
-    .select("email_reminders_enabled, email_weekly_summary, email_marketing")
+    .select("email_reminders_enabled, email_consolidated_summary, email_weekly_summary, email_marketing")
     .eq("user_id", userId)
     .single();
 
@@ -19,11 +19,12 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { email_reminders_enabled, email_weekly_summary, email_marketing } = await req.json();
+  const { email_reminders_enabled, email_consolidated_summary, email_weekly_summary, email_marketing } = await req.json();
 
   await supabaseAdmin.from("user_profiles").upsert({
     user_id: userId,
     email_reminders_enabled: !!email_reminders_enabled,
+    email_consolidated_summary: !!email_consolidated_summary,
     email_weekly_summary: !!email_weekly_summary,
     email_marketing: !!email_marketing,
   }, { onConflict: "user_id" });

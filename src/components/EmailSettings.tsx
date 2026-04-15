@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 interface EmailPrefs {
   email_reminders_enabled: boolean;
+  email_consolidated_summary: boolean;
   email_weekly_summary: boolean;
   email_marketing: boolean;
 }
@@ -12,6 +13,7 @@ export default function EmailSettings({ isPlusOrPro }: { isPlusOrPro: boolean })
   const [open, setOpen] = useState(false);
   const [prefs, setPrefs] = useState<EmailPrefs>({
     email_reminders_enabled: false,
+    email_consolidated_summary: false,
     email_weekly_summary: true,
     email_marketing: false,
   });
@@ -77,6 +79,22 @@ export default function EmailSettings({ isPlusOrPro }: { isPlusOrPro: boolean })
                   onChange={v => isPlusOrPro && setPrefs(p => ({ ...p, email_reminders_enabled: v }))}
                 />
               </div>
+
+              {/* Consolidated daily summary (sub-option) */}
+              {isPlusOrPro && prefs.email_reminders_enabled && (
+                <div className="flex items-start justify-between bg-stone-50 rounded-xl px-4 py-3 ml-6">
+                  <div className="flex-1 pr-4">
+                    <div className="font-medium text-stone-900 text-sm">One summary email per day</div>
+                    <div className="text-xs text-stone-500 mt-0.5">
+                      Get a single morning email listing your whole day instead of one per timeframe
+                    </div>
+                  </div>
+                  <Toggle
+                    value={prefs.email_consolidated_summary}
+                    onChange={v => setPrefs(p => ({ ...p, email_consolidated_summary: v }))}
+                  />
+                </div>
+              )}
 
               {/* Weekly summary */}
               <div className={`flex items-start justify-between bg-stone-50 rounded-xl px-4 py-3 ${!isPlusOrPro ? "opacity-50" : ""}`}>
