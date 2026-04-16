@@ -9,14 +9,20 @@ export async function POST(req: NextRequest) {
   const { item_id, quantity_total, quantity_remaining, quantity_unit, low_supply_alert, resupply_ordered } = await req.json();
   if (!item_id) return NextResponse.json({ error: "item_id required" }, { status: 400 });
 
+  // Resolve the final remaining qty so we can decide whether to enable auto_decrement
+  const resolvedRemaining = quantity_remaining ?? quantity_total ?? null;
+
   const { error } = await supabaseAdmin
     .from("user_stacks")
     .update({
       quantity_total: quantity_total || null,
-      quantity_remaining: quantity_remaining ?? quantity_total ?? null,
+      quantity_remaining: resolvedRemaining,
       quantity_unit: quantity_unit || "capsules",
       quantity_updated_at: new Date().toISOString(),
       low_supply_alert: low_supply_alert !== false,
+      // If user is actively setting a remaining qty via the badge, they want decrement tracking.
+      // Fixes older items that were added before auto_decrement defaulted to true.
+      ...(typeof resolvedRemaining === "number" ? { auto_decrement: true } : {}),
       ...(resupply_ordered !== undefined ? { resupply_ordered: !!resupply_ordered } : {}),
     })
     .eq("id", item_id)

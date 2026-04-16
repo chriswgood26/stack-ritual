@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       quantity_remaining: remainingNum,
       quantity_unit: quantity_unit || (totalNum !== null ? "capsules" : null),
       doses_per_serving: doses_per_serving ? Math.max(1, Number(doses_per_serving) || 1) : 1,
+      auto_decrement: remainingNum !== null,
       is_active: true,
     })
     .select()
