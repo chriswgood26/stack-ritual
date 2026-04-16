@@ -253,6 +253,17 @@ export default async function Home() {
 <PricingButton label="Subscribe" className="block text-center bg-white text-emerald-800 py-3 rounded-full font-semibold hover:bg-emerald-50 transition-colors text-sm" />
           </div>
         </div>
+
+        {/* Referral Offer */}
+        <div className="mt-10 text-center">
+          <p className="text-red-600 font-bold text-lg">Limited Time Referral Offer</p>
+          <p className="text-stone-700 text-sm mt-1">
+            Sign up for the Pro Plan &gt; Refer your friends &gt; Get your next month free!
+          </p>
+          <p className="text-stone-400 text-xs mt-2 max-w-md mx-auto">
+            Earn 1 free month of Pro for every friend who signs up for the Pro Plan. Up to 6 free months total.
+          </p>
+        </div>
       </section>
 
       {/* CTA */}
@@ -278,18 +289,23 @@ export default async function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-8 py-10 flex items-center justify-between text-stone-500 text-sm">
-        <div className="flex items-center gap-2">
-          <span>🌿</span>
-          <span className="font-semibold text-stone-700">Stack Ritual</span>
+      <footer className="max-w-6xl mx-auto px-8 py-10 text-stone-500 text-sm">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span>🌿</span>
+            <span className="font-semibold text-stone-700">Stack Ritual</span>
+          </div>
+          <p>© 2026 Stack Ritual. All rights reserved.</p>
+          <div className="grid grid-cols-3 gap-x-6 gap-y-2 text-center">
+            <Link href="/affiliate-program" className="hover:text-stone-700 transition-colors">Affiliates</Link>
+            <Link href="/privacy" className="hover:text-stone-700 transition-colors">Privacy Policy</Link>
+            <Link href="/faq" className="hover:text-stone-700 transition-colors">FAQ</Link>
+            <Link href="/help" className="hover:text-stone-700 transition-colors">User Guide</Link>
+            <Link href="/terms" className="hover:text-stone-700 transition-colors">Terms</Link>
+          </div>
         </div>
-        <p>© 2026 Stack Ritual. All rights reserved.</p>
-        <div className="flex gap-6">
-          <Link href="/affiliate-program" className="hover:text-stone-700 transition-colors">Affiliates</Link>
-          <Link href="/privacy" className="hover:text-stone-700 transition-colors">Privacy Policy</Link>
-          <Link href="/faq" className="hover:text-stone-700 transition-colors">FAQ</Link>
-          <Link href="/help" className="hover:text-stone-700 transition-colors">User Guide</Link>
-          <Link href="/terms" className="hover:text-stone-700 transition-colors">Terms</Link>
+        <div className="mt-6 pt-4 border-t border-stone-200 text-center text-xs text-stone-400">
+          Built by <a href="https://thoughtsparkai.com" target="_blank" rel="noopener noreferrer" className="text-stone-500 hover:text-stone-700 transition-colors">ThoughtSparkAI.com</a> · From the makers of <a href="https://moneyandmacros.com" target="_blank" rel="noopener noreferrer" className="text-stone-500 hover:text-stone-700 transition-colors">MoneyAndMacros.com</a>
         </div>
       </footer>
 
@@ -374,7 +390,6 @@ const plusTier = [
   "Unlimited supplements",
   "Smart timing engine",
   "Interactions checker",
-  "📷 Label scanner (AI-powered)",
   "Daily email reminders",
   "Weekly progress summary",
   "Rituals & activities tracker",
@@ -383,6 +398,7 @@ const plusTier = [
 
 const proTier = [
   "Everything in Plus",
+  "📷 Label scanner (AI-powered)",
   "📱 SMS reminders (coming soon)",
   "📱 Tap-to-mark-done via text (coming soon)",
   "Custom reminder times",

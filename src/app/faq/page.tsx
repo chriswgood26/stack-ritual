@@ -86,7 +86,7 @@ const faqs = [
       },
       {
         q: "Can I scan a supplement label to add it to my stack?",
-        a: "Yes! Plus and Pro subscribers can use the Scan Label feature (📷) to take a photo of any supplement bottle with their phone camera. AI reads the label and automatically fills in the product name, brand, dose per serving, serving size, and total quantity count. If the product matches our supplement database, it's linked automatically. For multi-ingredient products like multivitamins or greens powders, you can choose to add it as a single item or break it out into individual supplements. The scan feature is also available when editing an existing stack item — handy for updating dose, brand, or inventory count when you open a new bottle."
+        a: "Yes! Pro subscribers can use the Scan Label feature (📷) to take a photo of any supplement bottle with their phone camera. AI reads the label and automatically fills in the product name, brand, dose per serving, serving size, and total quantity count. If the product matches our supplement database, it's linked automatically. For multi-ingredient products like multivitamins or greens powders, you can choose to add it as a single item or break it out into individual supplements. The scan feature is also available when editing an existing stack item — handy for updating dose, brand, or inventory count when you open a new bottle."
       },
       {
         q: "What if the label scan doesn't read correctly?",

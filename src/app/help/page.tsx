@@ -162,7 +162,7 @@ export default function HelpPage() {
           </Section>
 
           <Section id="scan-label" title="Scan a Supplement Label">
-            <p>Plus and Pro members can scan a supplement label with their phone camera to auto-fill the name, brand, dose, serving size, and container quantity.</p>
+            <p>Pro members can scan a supplement label with their phone camera to auto-fill the name, brand, dose, serving size, and container quantity.</p>
             <p>Look for the &ldquo;📷 Scan label&rdquo; link at the top of any add/edit form. Take a clear photo of the <strong>Supplement Facts</strong> panel — Claude Vision does the rest.</p>
           </Section>
 

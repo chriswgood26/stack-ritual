@@ -14,6 +14,12 @@ export default function PageTracker() {
       document.cookie = `affiliate_ref=${refFromUrl}; path=/; max-age=${60 * 60 * 24 * 90}; samesite=lax`;
     }
 
+    // Capture user referral code from URL into 90-day cookie
+    const referralFromUrl = params.get("referral");
+    if (referralFromUrl) {
+      document.cookie = `referral_code=${referralFromUrl}; path=/; max-age=${60 * 60 * 24 * 90}; samesite=lax`;
+    }
+
     // Only track public pages
     if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) return;
 

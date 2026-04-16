@@ -7,14 +7,14 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Check subscription — Plus or Pro required
+  // Check subscription — Pro required
   const { data: sub } = await supabaseAdmin
     .from("subscriptions")
     .select("plan, status")
     .eq("user_id", userId)
     .single();
 
-  if (!sub || !["plus", "pro"].includes(sub.plan) || sub.status !== "active") {
+  if (!sub || sub.plan !== "pro" || sub.status !== "active") {
     return NextResponse.json({ error: "subscription_required" }, { status: 403 });
   }
 

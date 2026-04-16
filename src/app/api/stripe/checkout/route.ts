@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe, PRICE_IDS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase";
 import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
+import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
@@ -57,6 +58,39 @@ export async function POST(req: NextRequest) {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.stackritual.com";
+
+  // Capture referral attribution — if user has a referral_code cookie, create a pending referral row
+  const cookieStore = await cookies();
+  const referralCode = cookieStore.get("referral_code")?.value;
+  if (referralCode && (priceKey === "pro_monthly" || priceKey === "pro_yearly")) {
+    // Look up the referrer by code
+    const { data: referrerRow } = await supabaseAdmin
+      .from("user_referrals")
+      .select("referrer_user_id, referral_code")
+      .eq("referral_code", referralCode.toUpperCase())
+      .limit(1)
+      .maybeSingle();
+
+    if (referrerRow && referrerRow.referrer_user_id !== userId) {
+      // Check if this user is already referred (prevent duplicates)
+      const { data: existingRef } = await supabaseAdmin
+        .from("user_referrals")
+        .select("id")
+        .eq("referred_user_id", userId)
+        .not("referred_user_id", "is", null)
+        .maybeSingle();
+
+      if (!existingRef) {
+        await supabaseAdmin.from("user_referrals").insert({
+          referrer_user_id: referrerRow.referrer_user_id,
+          referral_code: referrerRow.referral_code,
+          referred_user_id: userId,
+          referred_email: email || null,
+          status: "pending",
+        });
+      }
+    }
+  }
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,

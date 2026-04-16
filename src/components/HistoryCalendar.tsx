@@ -9,7 +9,47 @@ interface StackItem {
   dose: string | null;
   category: string;
   custom_icon: string | null;
+  timing: string | null;
   supplement: { name: string; icon: string } | null;
+}
+
+interface ExpandedStackItem extends StackItem {
+  doseLabel?: string;
+  doseIndex: number;
+  checkoffId: string;
+}
+
+const MULTI_DOSE_MAP: Record<string, { count: number; labels: string[] }> = {
+  "2x-daily":       { count: 2, labels: ["Morning dose", "Evening dose"] },
+  "2x-with-meals":  { count: 2, labels: ["Morning dose", "Evening dose"] },
+  "split":          { count: 2, labels: ["Morning dose", "Evening dose"] },
+  "3x-daily":       { count: 3, labels: ["Morning dose", "Afternoon dose", "Evening dose"] },
+  "3x-with-meals":  { count: 3, labels: ["Morning dose", "Afternoon dose", "Evening dose"] },
+  "4x-daily":       { count: 4, labels: ["Morning dose", "Afternoon dose", "Evening dose", "Bedtime dose"] },
+};
+
+function expandStackItems(items: StackItem[]): ExpandedStackItem[] {
+  const expanded: ExpandedStackItem[] = [];
+  items.forEach((item) => {
+    const multi = MULTI_DOSE_MAP[item.timing || ""];
+    if (multi) {
+      for (let i = 0; i < multi.count; i++) {
+        expanded.push({
+          ...item,
+          doseLabel: multi.labels[i],
+          doseIndex: i,
+          checkoffId: `${item.id}_${i}`,
+        });
+      }
+    } else {
+      expanded.push({
+        ...item,
+        doseIndex: 0,
+        checkoffId: `${item.id}_0`,
+      });
+    }
+  });
+  return expanded;
 }
 
 interface Props {
@@ -123,7 +163,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
   const [selectedDay, setSelectedDay] = useState<DayDetail | null>(null);
   const [loadingDay, setLoadingDay] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [allStackItems, setAllStackItems] = useState<StackItem[]>([]);
+  const [allStackItems, setAllStackItems] = useState<ExpandedStackItem[]>([]);
   const [loadingEdit, setLoadingEdit] = useState(false);
   const [savingItem, setSavingItem] = useState<string | null>(null);
   const [editTimes, setEditTimes] = useState<Record<string, string>>({}); // stack_item_id -> HH:MM
@@ -148,7 +188,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
     if (!logsByDate[dateStr] || logsByDate[dateStr] === 0) {
       const stackRes = await fetch("/api/stack/list");
       const stackData = await stackRes.json();
-      setAllStackItems(stackData.items || []);
+      setAllStackItems(expandStackItems(stackData.items || []));
       setEditTimes({});
       setEditMode(true);
     }
@@ -159,26 +199,27 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
   const enterEditMode = useCallback(async () => {
     if (!selectedDay) return;
     setLoadingEdit(true);
-    // Fetch full stack item list
+    // Fetch full stack item list and expand multi-dose items
     const res = await fetch("/api/stack/list");
     const data = await res.json();
-    setAllStackItems(data.items || []);
-    // Initialize edit times from existing logs
+    setAllStackItems(expandStackItems(data.items || []));
+    // Initialize edit times from existing logs (keyed by checkoffId)
     const times: Record<string, string> = {};
     selectedDay.logs.forEach((log) => {
       const d = new Date(log.taken_at);
       const hh = String(d.getHours()).padStart(2, "0");
       const mm = String(d.getMinutes()).padStart(2, "0");
-      times[log.stack_item_id] = `${hh}:${mm}`;
+      const checkId = `${log.stack_item_id}_${log.dose_index ?? 0}`;
+      times[checkId] = `${hh}:${mm}`;
     });
     setEditTimes(times);
     setEditMode(true);
     setLoadingEdit(false);
   }, [selectedDay]);
 
-  const togglePastItem = useCallback(async (stackItemId: string, currentlyChecked: boolean) => {
+  const togglePastItem = useCallback(async (checkoffId: string, stackItemId: string, doseIndex: number, currentlyChecked: boolean) => {
     if (!selectedDay) return;
-    setSavingItem(stackItemId);
+    setSavingItem(checkoffId);
     await fetch("/api/stack/checkoff", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -186,7 +227,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
         stack_item_id: stackItemId,
         date: selectedDay.date,
         checked: !currentlyChecked,
-        dose_index: 0,
+        dose_index: doseIndex,
       }),
     });
     const data = await refreshDayData(selectedDay.date);
@@ -195,11 +236,11 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
       const d = new Date();
       const hh = String(d.getHours()).padStart(2, "0");
       const mm = String(d.getMinutes()).padStart(2, "0");
-      setEditTimes(prev => ({ ...prev, [stackItemId]: `${hh}:${mm}` }));
+      setEditTimes(prev => ({ ...prev, [checkoffId]: `${hh}:${mm}` }));
     } else {
       setEditTimes(prev => {
         const next = { ...prev };
-        delete next[stackItemId];
+        delete next[checkoffId];
         return next;
       });
     }
@@ -210,9 +251,9 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
     setSavingItem(null);
   }, [selectedDay, refreshDayData, logsByDate]);
 
-  const updateTime = useCallback(async (stackItemId: string, timeStr: string) => {
+  const updateTime = useCallback(async (checkoffId: string, stackItemId: string, doseIndex: number, timeStr: string) => {
     if (!selectedDay) return;
-    setEditTimes(prev => ({ ...prev, [stackItemId]: timeStr }));
+    setEditTimes(prev => ({ ...prev, [checkoffId]: timeStr }));
     await fetch("/api/history/update-log", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -220,7 +261,7 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
         stack_item_id: stackItemId,
         date: selectedDay.date,
         time: timeStr,
-        dose_index: 0,
+        dose_index: doseIndex,
       }),
     });
     await refreshDayData(selectedDay.date);
@@ -349,14 +390,14 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
                     const supp = Array.isArray(item.supplement) ? item.supplement[0] : item.supplement;
                     const name = supp?.name || item.custom_name || "Unknown";
                     const icon = supp?.icon || item.custom_icon || (item.category === "ritual" ? getRitualIcon(item.custom_name || "") : "💊");
-                    const isChecked = selectedDay.logs.some(l => l.stack_item_id === item.id);
-                    const isSaving = savingItem === item.id;
-                    const timeVal = editTimes[item.id] || "";
+                    const isChecked = selectedDay.logs.some(l => l.stack_item_id === item.id && (l.dose_index ?? 0) === item.doseIndex);
+                    const isSaving = savingItem === item.checkoffId;
+                    const timeVal = editTimes[item.checkoffId] || "";
 
                     return (
-                      <div key={item.id} className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors ${isChecked ? "bg-emerald-50" : "bg-stone-50"}`}>
+                      <div key={item.checkoffId} className={`flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors ${isChecked ? "bg-emerald-50" : "bg-stone-50"}`}>
                         <button
-                          onClick={() => togglePastItem(item.id, isChecked)}
+                          onClick={() => togglePastItem(item.checkoffId, item.id, item.doseIndex, isChecked)}
                           disabled={isSaving}
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                             isChecked
@@ -369,13 +410,17 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
                         <span className="text-base">{icon}</span>
                         <div className="flex-1 min-w-0">
                           <span className={`font-medium text-sm ${isChecked ? "text-stone-900" : "text-stone-400"}`}>{name}</span>
-                          {item.dose && <span className="text-xs text-stone-400 ml-1">· {item.dose}</span>}
+                          {item.doseLabel ? (
+                            <span className="text-xs text-stone-400 ml-1">· {item.doseLabel}</span>
+                          ) : item.dose ? (
+                            <span className="text-xs text-stone-400 ml-1">· {item.dose}</span>
+                          ) : null}
                         </div>
                         {isChecked && (
                           <input
                             type="time"
                             value={timeVal}
-                            onChange={(e) => updateTime(item.id, e.target.value)}
+                            onChange={(e) => updateTime(item.checkoffId, item.id, item.doseIndex, e.target.value)}
                             className="text-xs text-emerald-700 font-medium border border-emerald-200 rounded-lg px-1.5 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 w-[90px]"
                           />
                         )}

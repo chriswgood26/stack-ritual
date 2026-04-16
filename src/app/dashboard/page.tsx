@@ -13,6 +13,7 @@ import EditStackItemButton from "@/components/EditStackItemButton";
 import MarkSlotDoneButton from "@/components/MarkSlotDoneButton";
 import QuantityAdjuster from "@/components/QuantityAdjuster";
 import MoodSlider from "@/components/MoodSlider";
+import ReferralCard from "@/components/ReferralCard";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,14 @@ export default async function Dashboard() {
   // Build set of "itemId_doseIndex" keys and taken_at map
   const checkedIds = new Set((todayLogs || []).map((l: { stack_item_id: string; dose_index: number }) => `${l.stack_item_id}_${l.dose_index}`));
   const takenAtMap = Object.fromEntries((todayLogs || []).map((l: { stack_item_id: string; dose_index: number; taken_at: string }) => [`${l.stack_item_id}_${l.dose_index}`, l.taken_at]));
+
+  // Fetch user's subscription plan
+  const { data: subData } = await supabaseAdmin
+    .from("subscriptions")
+    .select("plan")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const userPlan = subData?.plan || "free";
 
   // Fetch today's mood
   const { data: moodData } = await supabaseAdmin
@@ -394,6 +403,9 @@ export default async function Dashboard() {
         <div className="mt-6">
           <MoodSlider date={today} initialScore={moodData?.mood_score ?? null} initialNotes={moodData?.notes ?? null} />
         </div>
+
+        {/* Referral card — Pro users only */}
+        {userPlan === "pro" && <ReferralCard />}
 
         <div className="mt-4">
           <Disclaimer compact />

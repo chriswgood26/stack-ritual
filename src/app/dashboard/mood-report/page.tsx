@@ -3,6 +3,15 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface MoodDay {
   date: string;
@@ -21,7 +30,7 @@ const moodEmoji = (score: number) => {
 
 function MoodReportContent() {
   const params = useSearchParams();
-  const range = parseInt(params.get("range") || "30");
+  const range = parseInt(params.get("range") || "180");
   const [data, setData] = useState<MoodDay[] | null>(null);
   const [userName, setUserName] = useState("");
 
@@ -110,6 +119,58 @@ function MoodReportContent() {
                   <div className="text-xs text-stone-500">Lowest score</div>
                 </div>
               </div>
+
+              {/* Mood Graph */}
+              {data.length >= 2 && (
+                <div className="mb-6">
+                  <h2 className="font-semibold text-stone-900 text-sm mb-3">Mood Over Time</h2>
+                  <div className="bg-stone-50 rounded-xl p-4 print:bg-white">
+                    <ResponsiveContainer width="100%" height={240}>
+                      <LineChart
+                        data={data.map((d) => ({
+                          date: new Date(d.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+                          score: d.score,
+                        }))}
+                        margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fontSize: 11, fill: "#a8a29e" }}
+                          tickLine={false}
+                          axisLine={{ stroke: "#d6d3d1" }}
+                          interval="preserveStartEnd"
+                        />
+                        <YAxis
+                          domain={[1, 10]}
+                          ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                          tick={{ fontSize: 11, fill: "#a8a29e" }}
+                          tickLine={false}
+                          axisLine={{ stroke: "#d6d3d1" }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #e7e5e4",
+                            borderRadius: "12px",
+                            fontSize: "13px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                          }}
+                          formatter={(value) => [`${value}/10`, "Mood"]}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="score"
+                          stroke="#047857"
+                          strokeWidth={2.5}
+                          dot={{ r: 4, fill: "#047857", strokeWidth: 0 }}
+                          activeDot={{ r: 6, fill: "#047857", stroke: "#d1fae5", strokeWidth: 2 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
 
               {/* Supplement correlation */}
               {avgHighComp !== null && avgLowComp !== null && (
