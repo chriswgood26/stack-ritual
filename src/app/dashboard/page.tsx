@@ -66,10 +66,11 @@ export default async function Dashboard() {
   // Fetch user's subscription plan
   const { data: subData } = await supabaseAdmin
     .from("subscriptions")
-    .select("plan")
+    .select("plan, stripe_customer_id")
     .eq("user_id", userId)
     .maybeSingle();
   const userPlan = subData?.plan || "free";
+  const isPayingPro = userPlan === "pro" && !!subData?.stripe_customer_id;
 
   // Fetch today's mood
   const { data: moodData } = await supabaseAdmin
@@ -404,8 +405,8 @@ export default async function Dashboard() {
           <MoodSlider date={today} initialScore={moodData?.mood_score ?? null} initialNotes={moodData?.notes ?? null} />
         </div>
 
-        {/* Referral card — Pro users only */}
-        {userPlan === "pro" && <ReferralCard />}
+        {/* Referral card — paying Pro only (comped Pros can't accrue credits) */}
+        {isPayingPro && <ReferralCard />}
 
         <div className="mt-4">
           <Disclaimer compact />

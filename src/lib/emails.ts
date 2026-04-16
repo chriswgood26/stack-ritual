@@ -205,3 +205,52 @@ export async function sendWelcomeEmail(to: string, firstName: string) {
     `,
   });
 }
+
+// Referral invite — sent when a paying Pro emails their referral link to a friend
+export async function sendReferralInviteEmail(
+  to: string,
+  fromName: string,
+  referralLink: string,
+  personalNote?: string,
+) {
+  const noteHtml = personalNote
+    ? `<div style="background:#fafaf9;border-left:3px solid #065f46;padding:12px 16px;margin:16px 0;color:#44403c;font-size:14px;line-height:1.5;white-space:pre-wrap;">${personalNote.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]!))}</div>`
+    : '';
+
+  return resend.emails.send({
+    from: getFromEmail(),
+    to,
+    subject: `${fromName} sent you an invite to Stack Ritual 🌿`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
+        <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
+          <div style="background: #065f46; padding: 24px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px;">🌿 Stack Ritual</h1>
+          </div>
+          <div style="padding: 24px;">
+            <h2 style="color: #1c1917; margin-top: 0; font-size: 18px;">${fromName} thinks you'd like Stack Ritual</h2>
+            <p style="color: #44403c; line-height: 1.6; font-size: 14px;">
+              Stack Ritual helps you track and time your supplements, log how you feel, and build a consistent wellness routine.
+            </p>
+            ${noteHtml}
+            <a href="${referralLink}" style="display: block; background: #065f46; color: white; text-align: center; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 16px;">
+              Check out Stack Ritual →
+            </a>
+            <p style="color: #a8a29e; font-size: 11px; text-align: center; margin-top: 12px; margin-bottom: 0;">
+              This invite was sent by ${fromName}. The link above credits them if you sign up for Pro.
+            </p>
+          </div>
+          <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
+            <p style="color: #a8a29e; font-size: 11px; margin: 0;">
+              ⚕️ Nothing on Stack Ritual constitutes medical advice. Always consult your doctor.<br>
+              stackritual.com
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}

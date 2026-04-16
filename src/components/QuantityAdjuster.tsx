@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -21,14 +21,20 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
   const [saving, setSaving] = useState(false);
   const [confirmStop, setConfirmStop] = useState(false);
   const [localResupplyOrdered, setLocalResupplyOrdered] = useState(!!resupplyOrdered);
+  // Optimistic display — updates instantly on user action, syncs when server data arrives
+  const [displayRemaining, setDisplayRemaining] = useState(currentRemaining);
   const router = useRouter();
+
+  useEffect(() => { setDisplayRemaining(currentRemaining); }, [currentRemaining]);
+  useEffect(() => { setLocalResupplyOrdered(!!resupplyOrdered); }, [resupplyOrdered]);
 
   const unitLabel = unit || "capsules";
 
   async function handleSave() {
     const newQty = parseInt(qty) || 0;
-    const shouldClearResupply = newQty > (currentRemaining || 0);
+    const shouldClearResupply = newQty > (displayRemaining || 0);
     if (shouldClearResupply) setLocalResupplyOrdered(false);
+    setDisplayRemaining(newQty);
     setSaving(true);
     await fetch("/api/stack/inventory", {
       method: "POST",
@@ -61,10 +67,12 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
   }
 
   async function adjust(delta: number) {
-    const current = currentRemaining || 0;
+    const current = displayRemaining ?? 0;
     const newQty = Math.max(0, current + delta);
     const shouldClearResupply = delta > 0;
     if (shouldClearResupply) setLocalResupplyOrdered(false);
+    setDisplayRemaining(newQty);
+    setQty(newQty.toString());
     setSaving(true);
     await fetch("/api/stack/inventory", {
       method: "POST",
@@ -88,7 +96,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         item_id: itemId,
-        quantity_remaining: currentRemaining,
+        quantity_remaining: displayRemaining,
         quantity_total: currentTotal,
         quantity_unit: unit,
         resupply_ordered: checked,
@@ -97,9 +105,9 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
     router.refresh();
   }
 
-  if (currentRemaining === null || currentRemaining === undefined) return null;
+  if (displayRemaining === null || displayRemaining === undefined) return null;
 
-  const pct = currentTotal ? (currentRemaining / currentTotal) * 100 : 100;
+  const pct = currentTotal ? (displayRemaining / currentTotal) * 100 : 100;
   const color = pct <= 15 ? "text-red-600 bg-red-50 border-red-200" :
     pct <= 25 ? "text-amber-600 bg-amber-50 border-amber-200" :
     "text-emerald-700 bg-emerald-50 border-emerald-200";
@@ -109,9 +117,9 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
     <>
       <button onClick={() => setOpen(true)}
         className={`rounded-full border font-medium transition-colors ${color} ${sizeClass}`}>
-        {currentRemaining} {unitLabel}
+        {displayRemaining} {unitLabel}
         {dosesPerServing && dosesPerServing > 1 && (
-          <span className="opacity-70"> · {Math.floor(currentRemaining / dosesPerServing)} servings</span>
+          <span className="opacity-70"> · {Math.floor(displayRemaining / dosesPerServing)} servings</span>
         )}
         {" remaining"}
         {localResupplyOrdered && <span className="ml-1 opacity-80">📦</span>}
@@ -158,11 +166,11 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
             </div>
 
             <div className="bg-stone-50 rounded-xl px-4 py-3 text-xs text-stone-500">
-              Current: <strong>{currentRemaining}</strong> {unitLabel} remaining
+              Current: <strong>{displayRemaining}</strong> {unitLabel} remaining
               {currentTotal && <span> of {currentTotal}</span>}
               {dosesPerServing && dosesPerServing > 1 && (
                 <div className="mt-1 text-stone-400">
-                  ≈ {Math.floor(currentRemaining / dosesPerServing)} servings (you take {dosesPerServing} per dose)
+                  ≈ {Math.floor(displayRemaining / dosesPerServing)} servings (you take {dosesPerServing} per dose)
                 </div>
               )}
             </div>

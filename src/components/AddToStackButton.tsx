@@ -231,7 +231,11 @@ export default function AddToStackButton({ supplementId, supplementName, default
           <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Inventory (optional)</label>
           <div className="grid grid-cols-3 gap-2">
             <input type="number" inputMode="decimal" min="0" value={quantityTotal}
-              onChange={e => { setQuantityTotal(e.target.value); if (!quantityRemaining) setQuantityRemaining(e.target.value); }}
+              onChange={e => {
+                const newTotal = e.target.value;
+                if (!quantityRemaining || quantityRemaining === quantityTotal) setQuantityRemaining(newTotal);
+                setQuantityTotal(newTotal);
+              }}
               placeholder="Total"
               className="border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             <input type="number" inputMode="decimal" min="0" value={quantityRemaining}

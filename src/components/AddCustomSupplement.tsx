@@ -395,7 +395,14 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
                   inputMode="decimal"
                   min="0"
                   value={form.quantityTotal}
-                  onChange={e => setForm(f => ({ ...f, quantityTotal: e.target.value, quantityRemaining: f.quantityRemaining || e.target.value }))}
+                  onChange={e => {
+                    const newTotal = e.target.value;
+                    setForm(f => ({
+                      ...f,
+                      quantityTotal: newTotal,
+                      quantityRemaining: (!f.quantityRemaining || f.quantityRemaining === f.quantityTotal) ? newTotal : f.quantityRemaining,
+                    }));
+                  }}
                   placeholder="Total"
                   className="border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />

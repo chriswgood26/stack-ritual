@@ -6,7 +6,7 @@ import { getToday } from "@/lib/timezone";
 import { supabaseAdmin } from "@/lib/supabase";
 import { SignOutButton } from "@clerk/nextjs";
 import FeedbackButton from "@/components/FeedbackButton";
-import ShareAppButton from "@/components/ShareAppButton";
+import ShareModalButton from "@/components/ShareModalButton";
 import EditProfileButton from "@/components/EditProfileButton";
 import UpgradeButton from "@/components/UpgradeButton";
 import ManageBillingButton from "@/components/ManageBillingButton";
@@ -44,11 +44,12 @@ export default async function ProfilePage() {
     { data: stackItems }
   ] = await Promise.all([
     supabaseAdmin.from("experiences").select("id, rating, title, body, created_at, supplement:supplement_id(name, icon, slug)").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
-    supabaseAdmin.from("subscriptions").select("plan, status, current_period_end").eq("user_id", userId).single(),
+    supabaseAdmin.from("subscriptions").select("plan, status, current_period_end, stripe_customer_id").eq("user_id", userId).single(),
     supabaseAdmin.from("user_stacks").select("id, custom_name, supplement:supplement_id(name, icon), timing, dose").eq("user_id", userId).eq("is_active", true).order("created_at", { ascending: false }).limit(5),
   ]);
 
   const plan = subscription?.plan || "free";
+  const isPayingPro = plan === "pro" && !!subscription?.stripe_customer_id;
 
   const memberSince = new Date(user.createdAt || Date.now()).toLocaleDateString("en-US", {
     month: "long", year: "numeric"
@@ -286,17 +287,7 @@ export default async function ProfilePage() {
           <div className="divide-y divide-stone-50">
             <EmailSettings isPlusOrPro={plan === "plus" || plan === "pro"} />
             <SMSSettings isPro={plan === "pro"} />
-            <ShareAppButton />
-            <Link href="/affiliate-program" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">💰</span>
-                <div className="text-left">
-                  <span className="font-medium text-stone-900 text-sm block">Earn by sharing</span>
-                  <span className="text-xs text-stone-400">Become a Stack Ritual affiliate</span>
-                </div>
-              </div>
-              <span className="text-stone-300">›</span>
-            </Link>
+            <ShareModalButton isPayingPro={isPayingPro} />
             <FeedbackButton />
             {plan !== "free" && <ManageBillingButton />}
             <div className="flex items-center justify-between px-4 py-4">
