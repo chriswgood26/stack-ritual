@@ -46,13 +46,8 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
 
   const unitLabel = unit || "capsules";
 
-  async function handleSave() {
-    const newQty = parseInt(qty) || 0;
-    const shouldClearResupply = newQty > (displayRemaining || 0);
-    if (shouldClearResupply) setLocalResupplyOrdered(false);
-    setDisplayRemaining(newQty);
-    setSaving(true);
-    await fetch("/api/stack/inventory", {
+  async function postInventory(newQty: number, shouldClearResupply: boolean) {
+    const res = await fetch("/api/stack/inventory", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -63,9 +58,33 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
         resupply_ordered: shouldClearResupply ? false : localResupplyOrdered,
       }),
     });
-    setOpen(false);
-    router.refresh();
-    setSaving(false);
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "Unknown error");
+      throw new Error(`Save failed (${res.status}): ${msg}`);
+    }
+    const body = await res.json().catch(() => null);
+    if (body && typeof body.quantity_remaining === "number") {
+      setDisplayRemaining(body.quantity_remaining);
+      setQty(body.quantity_remaining.toString());
+    }
+  }
+
+  async function handleSave() {
+    const newQty = parseInt(qty) || 0;
+    const shouldClearResupply = newQty > (displayRemaining || 0);
+    if (shouldClearResupply) setLocalResupplyOrdered(false);
+    setDisplayRemaining(newQty);
+    setSaving(true);
+    try {
+      await postInventory(newQty, shouldClearResupply);
+      setOpen(false);
+      router.refresh();
+    } catch (e) {
+      setDisplayRemaining(currentRemaining);
+      alert(e instanceof Error ? e.message : "Could not save. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleStopTracking() {
@@ -90,19 +109,15 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
     setDisplayRemaining(newQty);
     setQty(newQty.toString());
     setSaving(true);
-    await fetch("/api/stack/inventory", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        item_id: itemId,
-        quantity_remaining: newQty,
-        quantity_total: currentTotal,
-        quantity_unit: unit,
-        resupply_ordered: shouldClearResupply ? false : localResupplyOrdered,
-      }),
-    });
-    router.refresh();
-    setSaving(false);
+    try {
+      await postInventory(newQty, shouldClearResupply);
+      router.refresh();
+    } catch (e) {
+      setDisplayRemaining(currentRemaining);
+      alert(e instanceof Error ? e.message : "Could not save. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleResupplyToggle(checked: boolean) {

@@ -9,27 +9,45 @@ export async function POST(req: NextRequest) {
   const { item_id, quantity_total, quantity_remaining, quantity_unit, low_supply_alert, resupply_ordered } = await req.json();
   if (!item_id) return NextResponse.json({ error: "item_id required" }, { status: 400 });
 
-  // Resolve the final remaining qty so we can decide whether to enable auto_decrement
-  const resolvedRemaining = quantity_remaining ?? quantity_total ?? null;
+  // Resolve the final remaining qty so we can decide whether to enable auto_decrement.
+  // `??` preserves 0 (distinct from undefined/null fallback).
+  const resolvedRemaining =
+    typeof quantity_remaining === "number"
+      ? quantity_remaining
+      : typeof quantity_total === "number"
+        ? quantity_total
+        : null;
 
-  const { error } = await supabaseAdmin
+  // Only update quantity_total when the client actually sent one — avoids clobbering
+  // an existing total when the badge modal doesn't have it to send back.
+  const updatePayload: Record<string, unknown> = {
+    quantity_remaining: resolvedRemaining,
+    quantity_unit: quantity_unit || "capsules",
+    quantity_updated_at: new Date().toISOString(),
+    low_supply_alert: low_supply_alert !== false,
+  };
+  if (typeof quantity_total === "number") updatePayload.quantity_total = quantity_total;
+  if (typeof resolvedRemaining === "number") updatePayload.auto_decrement = true;
+  if (resupply_ordered !== undefined) updatePayload.resupply_ordered = !!resupply_ordered;
+
+  const { data, error } = await supabaseAdmin
     .from("user_stacks")
-    .update({
-      quantity_total: quantity_total || null,
-      quantity_remaining: resolvedRemaining,
-      quantity_unit: quantity_unit || "capsules",
-      quantity_updated_at: new Date().toISOString(),
-      low_supply_alert: low_supply_alert !== false,
-      // If user is actively setting a remaining qty via the badge, they want decrement tracking.
-      // Fixes older items that were added before auto_decrement defaulted to true.
-      ...(typeof resolvedRemaining === "number" ? { auto_decrement: true } : {}),
-      ...(resupply_ordered !== undefined ? { resupply_ordered: !!resupply_ordered } : {}),
-    })
+    .update(updatePayload)
     .eq("id", item_id)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select("quantity_remaining, quantity_total")
+    .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ message: "updated" });
+  if (error) {
+    console.error("inventory POST error:", error.message, error.details);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    message: "updated",
+    quantity_remaining: data?.quantity_remaining ?? resolvedRemaining,
+    quantity_total: data?.quantity_total ?? null,
+  });
 }
 
 export async function DELETE(req: NextRequest) {
