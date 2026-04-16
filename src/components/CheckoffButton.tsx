@@ -40,6 +40,19 @@ export default function CheckoffButton({ stackItemId, isChecked: initialChecked,
       } else {
         if (optimistic) setTakenAt(now.toISOString());
         else setTakenAt(null);
+        // Broadcast new inventory qty so QuantityAdjuster updates without waiting on router.refresh()
+        try {
+          const body = await res.json();
+          if (typeof body?.quantity_remaining === "number") {
+            window.dispatchEvent(
+              new CustomEvent("sr:inventory-updated", {
+                detail: { itemId: stackItemId, quantityRemaining: body.quantity_remaining },
+              }),
+            );
+          }
+        } catch {
+          // response body parse failed — non-fatal
+        }
         router.refresh();
       }
     } catch {

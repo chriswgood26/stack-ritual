@@ -46,15 +46,17 @@ export async function POST(req: NextRequest) {
     }
 
     // Auto-decrement quantity if enabled
+    let newQuantityRemaining: number | null = null;
     if (stackItem?.auto_decrement && stackItem?.quantity_remaining !== null && stackItem?.quantity_remaining !== undefined) {
       const dosesPerServing = stackItem.doses_per_serving || 1;
-      const newQty = Math.max(0, stackItem.quantity_remaining - dosesPerServing);
+      newQuantityRemaining = Math.max(0, stackItem.quantity_remaining - dosesPerServing);
       await supabaseAdmin
         .from("user_stacks")
-        .update({ quantity_remaining: newQty, quantity_updated_at: new Date().toISOString() })
+        .update({ quantity_remaining: newQuantityRemaining, quantity_updated_at: new Date().toISOString() })
         .eq("id", stack_item_id)
         .eq("user_id", userId);
     }
+    return NextResponse.json({ message: "ok", quantity_remaining: newQuantityRemaining });
   } else {
     await supabaseAdmin
       .from("daily_logs")
@@ -65,15 +67,16 @@ export async function POST(req: NextRequest) {
       .eq("dose_index", dose_index);
 
     // Re-increment if unchecking
+    let newQuantityRemaining: number | null = null;
     if (stackItem?.auto_decrement && stackItem?.quantity_remaining !== null && stackItem?.quantity_remaining !== undefined) {
       const dosesPerServing = stackItem.doses_per_serving || 1;
+      newQuantityRemaining = stackItem.quantity_remaining + dosesPerServing;
       await supabaseAdmin
         .from("user_stacks")
-        .update({ quantity_remaining: stackItem.quantity_remaining + dosesPerServing, quantity_updated_at: new Date().toISOString() })
+        .update({ quantity_remaining: newQuantityRemaining, quantity_updated_at: new Date().toISOString() })
         .eq("id", stack_item_id)
         .eq("user_id", userId);
     }
+    return NextResponse.json({ message: "ok", quantity_remaining: newQuantityRemaining });
   }
-
-  return NextResponse.json({ message: "ok" });
 }

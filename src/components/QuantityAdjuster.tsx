@@ -28,6 +28,22 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
   useEffect(() => { setDisplayRemaining(currentRemaining); }, [currentRemaining]);
   useEffect(() => { setLocalResupplyOrdered(!!resupplyOrdered); }, [resupplyOrdered]);
 
+  // Listen for inventory changes triggered elsewhere (e.g. CheckoffButton auto-decrement).
+  // router.refresh() from other components doesn't reliably propagate the new prop here,
+  // so we broadcast the authoritative server value via a window event.
+  useEffect(() => {
+    function handleInventoryUpdate(e: Event) {
+      const detail = (e as CustomEvent<{ itemId: string; quantityRemaining: number | null }>).detail;
+      if (!detail || detail.itemId !== itemId) return;
+      if (typeof detail.quantityRemaining === "number") {
+        setDisplayRemaining(detail.quantityRemaining);
+        setQty(detail.quantityRemaining.toString());
+      }
+    }
+    window.addEventListener("sr:inventory-updated", handleInventoryUpdate);
+    return () => window.removeEventListener("sr:inventory-updated", handleInventoryUpdate);
+  }, [itemId]);
+
   const unitLabel = unit || "capsules";
 
   async function handleSave() {
