@@ -18,7 +18,6 @@ export default function EmailSettings({ isPlusOrPro }: { isPlusOrPro: boolean })
     email_marketing: false,
   });
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -35,8 +34,8 @@ export default function EmailSettings({ isPlusOrPro }: { isPlusOrPro: boolean })
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(prefs),
     });
-    if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
     setSaving(false);
+    if (res.ok) setOpen(false);
   }
 
   const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) => (
@@ -134,7 +133,7 @@ export default function EmailSettings({ isPlusOrPro }: { isPlusOrPro: boolean })
               </button>
               <button onClick={handleSave} disabled={saving}
                 className="flex-1 bg-emerald-700 text-white py-3 rounded-xl font-semibold text-sm hover:bg-emerald-800 transition-colors disabled:opacity-60">
-                {saving ? "Saving..." : saved ? "✓ Saved!" : "Save preferences"}
+                {saving ? "Saving..." : "Save preferences"}
               </button>
             </div>
           </div>

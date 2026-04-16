@@ -160,6 +160,21 @@ function MoodReportContent() {
                 </tbody>
               </table>
 
+              {/* Calendar link */}
+              <Link
+                href="/dashboard/history"
+                className="flex items-center justify-between bg-stone-50 border border-stone-100 rounded-xl px-4 py-3 hover:border-emerald-300 transition-colors print:hidden"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">📅</span>
+                  <div>
+                    <div className="font-semibold text-stone-900 text-sm">Calendar</div>
+                    <div className="text-xs text-stone-500">View your daily check-ins and streaks</div>
+                  </div>
+                </div>
+                <span className="text-stone-300">›</span>
+              </Link>
+
               {/* Disclaimer */}
               <div className="pt-4 border-t border-stone-200">
                 <p className="text-xs text-stone-400 leading-relaxed">
