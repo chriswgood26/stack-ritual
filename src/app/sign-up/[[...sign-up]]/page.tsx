@@ -11,7 +11,7 @@ export default function SignUpPage() {
         </div>
         <p className="text-stone-500 text-sm">Join thousands optimizing their health ritual.</p>
       </div>
-      <SignUp fallbackRedirectUrl="/dashboard" forceRedirectUrl="/dashboard" />
+      <SignUp fallbackRedirectUrl="/sign-up-complete" forceRedirectUrl="/sign-up-complete" />
       {/* Referral code entry — for users arriving from a physical postcard
           or other offline source with no cookie set. Sets the affiliate_ref
           cookie before they finish signing up so attribution is preserved. */}
