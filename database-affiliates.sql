@@ -55,6 +55,16 @@ create table if not exists affiliate_interest (
   created_at timestamptz default now()
 );
 
+-- Store-applicant fields (added 2026-04-22 for /affiliate, where we ship a
+-- physical counter card to approved stores). Optional for creator applicants
+-- arriving via /affiliate-program.
+alter table affiliate_interest add column if not exists store_name text;
+alter table affiliate_interest add column if not exists street_address text;
+alter table affiliate_interest add column if not exists street_address_2 text;
+alter table affiliate_interest add column if not exists city text;
+alter table affiliate_interest add column if not exists state text;
+alter table affiliate_interest add column if not exists zip text;
+
 create index if not exists idx_affiliates_code on affiliates(code);
 create index if not exists idx_affiliates_status on affiliates(status);
 create index if not exists idx_affiliate_payouts_affiliate on affiliate_payouts(affiliate_id);

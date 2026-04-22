@@ -21,7 +21,20 @@ interface InterestItem {
   name: string;
   email: string;
   message: string | null;
+  store_name: string | null;
+  street_address: string | null;
+  street_address_2: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
   created_at: string;
+}
+
+function formatAddress(p: InterestItem): string | null {
+  if (!p.street_address) return null;
+  const line2 = p.street_address_2 ? `, ${p.street_address_2}` : "";
+  const cityStateZip = [p.city, p.state, p.zip].filter(Boolean).join(", ");
+  return `${p.street_address}${line2} · ${cityStateZip}`;
 }
 
 const INPUT_CLASS =
@@ -192,11 +205,25 @@ export default function AffiliatesPage() {
             <span className="text-xs bg-amber-900 text-amber-300 px-2 py-0.5 rounded-full">{pending.length}</span>
           </div>
           <div className="divide-y divide-stone-700/50">
-            {pending.map((p) => (
+            {pending.map((p) => {
+              const address = formatAddress(p);
+              return (
               <div key={p.id} className="px-4 py-3 flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="text-white font-medium text-sm">{p.name}</div>
-                  <div className="text-stone-400 text-xs">{p.email}</div>
+                  {p.store_name && (
+                    <div className="text-white font-semibold text-sm">{p.store_name}</div>
+                  )}
+                  <div className={p.store_name ? "text-stone-300 text-xs" : "text-white font-medium text-sm"}>
+                    {p.name}
+                    <span className="text-stone-500"> · </span>
+                    <a href={`mailto:${p.email}`} className="text-stone-400 hover:text-emerald-400">{p.email}</a>
+                  </div>
+                  {address && (
+                    <div className="text-emerald-400/90 text-xs mt-1 flex items-start gap-1">
+                      <span>📍</span>
+                      <span className="break-all">{address}</span>
+                    </div>
+                  )}
                   {p.message && <div className="text-stone-500 text-xs mt-1 italic">&ldquo;{p.message}&rdquo;</div>}
                   <div className="text-stone-600 text-[10px] mt-1">Applied {new Date(p.created_at).toLocaleDateString()}</div>
                 </div>
@@ -217,7 +244,8 @@ export default function AffiliatesPage() {
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

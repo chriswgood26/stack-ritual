@@ -206,6 +206,120 @@ export async function sendWelcomeEmail(to: string, firstName: string) {
   });
 }
 
+// Admin notification — sent when someone submits the affiliate interest form.
+// Includes mailing address when the applicant is a store (for shipping the
+// counter-display packet).
+export async function sendAffiliateInterestAdminEmail(
+  to: string,
+  record: {
+    name: string;
+    email: string;
+    message?: string | null;
+    store_name?: string | null;
+    street_address?: string | null;
+    street_address_2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zip?: string | null;
+  },
+) {
+  const escape = (s: string) =>
+    s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]!));
+
+  const subject = record.store_name
+    ? `New affiliate application: ${record.store_name}`
+    : `New affiliate application: ${record.name}`;
+
+  const addressBlock = record.street_address
+    ? `
+        <div style="margin: 18px 0; padding: 12px 14px; background: #f0fdf4; border-radius: 10px;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #065f46; margin-bottom: 6px;">Mailing address</div>
+          <div style="color: #1c1917; line-height: 1.5; font-size: 14px;">
+            ${escape(record.street_address)}<br>
+            ${record.street_address_2 ? escape(record.street_address_2) + "<br>" : ""}
+            ${[record.city, record.state, record.zip].filter(Boolean).map((v) => escape(v!)).join(", ")}
+          </div>
+        </div>`
+    : "";
+
+  const messageBlock = record.message
+    ? `
+        <div style="margin: 18px 0;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #065f46; margin-bottom: 6px;">Message</div>
+          <div style="color: #44403c; line-height: 1.5; font-size: 14px; white-space: pre-wrap;">${escape(record.message)}</div>
+        </div>`
+    : "";
+
+  return resend.emails.send({
+    from: getFromEmail(),
+    to,
+    subject,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
+        <div style="max-width: 560px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
+          <div style="background: #065f46; padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 18px;">🌿 New Affiliate Application</h1>
+          </div>
+          <div style="padding: 24px;">
+            ${record.store_name ? `<h2 style="color: #1c1917; margin: 0 0 4px; font-size: 20px;">${escape(record.store_name)}</h2>` : ""}
+            <div style="color: #44403c; line-height: 1.6; font-size: 14px;">
+              <strong>${escape(record.name)}</strong><br>
+              <a href="mailto:${escape(record.email)}" style="color: #065f46;">${escape(record.email)}</a>
+            </div>
+            ${addressBlock}
+            ${messageBlock}
+            <a href="https://stackritual.com/admin/affiliates" style="display: inline-block; background: #065f46; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 8px;">
+              Review in admin →
+            </a>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
+// Confirmation email — sent to the affiliate applicant after they submit.
+// Branches copy based on whether they applied as a store (physical counter
+// display will be shipped) or a creator (purely digital program).
+export async function sendAffiliateInterestConfirmationEmail(
+  to: string,
+  firstName: string,
+  isStore: boolean,
+) {
+  const nextStep = isStore
+    ? `We'll review your store and reach out within a couple business days. If approved, we'll mail your custom counter card and affiliate details to the address you provided.`
+    : `We'll review your application and reach out within a couple business days with your unique referral link and program details.`;
+
+  return resend.emails.send({
+    from: getFromEmail(),
+    to,
+    subject: "🌿 We got your Stack Ritual affiliate application",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
+        <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
+          <div style="background: #065f46; padding: 24px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px;">🌿 Stack Ritual</h1>
+          </div>
+          <div style="padding: 24px;">
+            <h2 style="color: #1c1917; margin-top: 0;">Thanks, ${firstName}!</h2>
+            <p style="color: #44403c; line-height: 1.6;">${nextStep}</p>
+            <p style="color: #44403c; line-height: 1.6;">Questions? Just reply to this email.</p>
+          </div>
+          <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
+            <p style="color: #a8a29e; font-size: 11px; margin: 0;">stackritual.com</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
 // Referral invite — sent when a paying Pro emails their referral link to a friend
 export async function sendReferralInviteEmail(
   to: string,
