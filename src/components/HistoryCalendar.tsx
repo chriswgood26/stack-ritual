@@ -57,6 +57,7 @@ interface Props {
   totalStack: number;
   today: string;
   moodByDate?: Record<string, number>;
+  historyFloor?: string; // YYYY-MM-DD — earliest date available in this fetch
 }
 
 function getCompletionColor(pct: number): string {
@@ -158,8 +159,10 @@ interface DayDetail {
   mood: { mood_score: number; notes: string | null } | null;
 }
 
-export default function HistoryCalendar({ logsByDate, totalStack, today, moodByDate = {} }: Props) {
-  const [showAll, setShowAll] = useState(false);
+export default function HistoryCalendar({ logsByDate, totalStack, today, moodByDate = {}, historyFloor }: Props) {
+  const now = new Date();
+  const [viewYear, setViewYear] = useState(now.getFullYear());
+  const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<DayDetail | null>(null);
   const [loadingDay, setLoadingDay] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -167,7 +170,6 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
   const [loadingEdit, setLoadingEdit] = useState(false);
   const [savingItem, setSavingItem] = useState<string | null>(null);
   const [editTimes, setEditTimes] = useState<Record<string, string>>({}); // stack_item_id -> HH:MM
-  const now = new Date();
 
   const refreshDayData = useCallback(async (dateStr: string) => {
     const res = await fetch(`/api/history/day?date=${dateStr}`);
@@ -274,22 +276,32 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
     setEditTimes({});
   }, []);
 
-  // Current month
-  const currentMonth = {
-    year: now.getFullYear(),
-    month: now.getMonth(),
-    label: now.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
-  };
+  const viewLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
 
-  // Previous 11 months
-  const previousMonths = Array.from({ length: 11 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - (i + 1), 1);
-    return {
-      year: d.getFullYear(),
-      month: d.getMonth(),
-      label: d.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
-    };
-  });
+  // Prev arrow stops at the fetched history floor (12 months back).
+  const floorDate = historyFloor ? new Date(historyFloor + "T00:00:00") : null;
+  const prevMonthDate = new Date(viewYear, viewMonth - 1, 1);
+  const atFloor = floorDate
+    ? prevMonthDate.getFullYear() < floorDate.getFullYear() ||
+      (prevMonthDate.getFullYear() === floorDate.getFullYear() && prevMonthDate.getMonth() < floorDate.getMonth())
+    : false;
+
+  const goPrev = () => {
+    if (atFloor) return;
+    setViewYear(prevMonthDate.getFullYear());
+    setViewMonth(prevMonthDate.getMonth());
+  };
+  const goNext = () => {
+    if (isCurrentMonth) return;
+    const d = new Date(viewYear, viewMonth + 1, 1);
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth());
+  };
+  const goToday = () => {
+    setViewYear(now.getFullYear());
+    setViewMonth(now.getMonth());
+  };
 
   // Legend
   const legend = (
@@ -307,30 +319,48 @@ export default function HistoryCalendar({ logsByDate, totalStack, today, moodByD
     <div className="space-y-4">
       {legend}
 
-      {/* Current month — always shown */}
-      <MonthCalendar {...currentMonth} logsByDate={logsByDate} totalStack={totalStack} today={today} moodByDate={moodByDate} onDayClick={handleDayClick} loadingDay={loadingDay} />
-
-      {/* Previous months — behind toggle */}
-      {!showAll ? (
+      {/* Month navigator */}
+      <div className="flex items-center justify-between bg-white rounded-2xl border border-stone-100 shadow-sm px-3 py-2">
         <button
-          onClick={() => setShowAll(true)}
-          className="w-full bg-white border border-stone-200 rounded-2xl py-4 text-sm font-medium text-stone-600 hover:border-emerald-300 hover:text-emerald-700 transition-colors"
+          onClick={goPrev}
+          disabled={atFloor}
+          aria-label="Previous month"
+          className="text-stone-500 hover:text-emerald-700 disabled:text-stone-200 disabled:hover:text-stone-200 px-3 py-1 text-lg transition-colors"
         >
-          📅 View full history ({previousMonths.length} more months)
+          ‹
         </button>
-      ) : (
-        <>
-          {previousMonths.map(m => (
-            <MonthCalendar key={`${m.year}-${m.month}`} {...m} logsByDate={logsByDate} totalStack={totalStack} today={today} moodByDate={moodByDate} onDayClick={handleDayClick} loadingDay={loadingDay} />
-          ))}
-          <button
-            onClick={() => setShowAll(false)}
-            className="w-full bg-white border border-stone-200 rounded-2xl py-3 text-sm font-medium text-stone-500 hover:bg-stone-50 transition-colors"
-          >
-            ↑ Show less
-          </button>
-        </>
-      )}
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold text-stone-900 text-sm">{viewLabel}</h2>
+          {!isCurrentMonth && (
+            <button
+              onClick={goToday}
+              className="text-xs font-medium text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200 transition-colors"
+            >
+              Today
+            </button>
+          )}
+        </div>
+        <button
+          onClick={goNext}
+          disabled={isCurrentMonth}
+          aria-label="Next month"
+          className="text-stone-500 hover:text-emerald-700 disabled:text-stone-200 disabled:hover:text-stone-200 px-3 py-1 text-lg transition-colors"
+        >
+          ›
+        </button>
+      </div>
+
+      <MonthCalendar
+        year={viewYear}
+        month={viewMonth}
+        label={viewLabel}
+        logsByDate={logsByDate}
+        totalStack={totalStack}
+        today={today}
+        moodByDate={moodByDate}
+        onDayClick={handleDayClick}
+        loadingDay={loadingDay}
+      />
     </div>
 
     {/* Day detail modal */}

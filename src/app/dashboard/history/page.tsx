@@ -13,17 +13,29 @@ export default async function HistoryPage() {
   const user = await currentUser();
   if (!user) return null;
 
+  // Bound the fetch to the last 13 months so this scales as users accumulate
+  // years of history. The calendar only navigates within this window; the
+  // summary stats reflect the same window.
+  const historyFloor = (() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 12);
+    d.setDate(1);
+    return d.toISOString().slice(0, 10);
+  })();
+
   const { data: logs } = await supabaseAdmin
     .from("daily_logs")
     .select("logged_date, stack_item_id, dose_index")
     .eq("user_id", user.id)
+    .gte("logged_date", historyFloor)
     .order("logged_date", { ascending: true });
 
   // Fetch mood scores
   const { data: moodLogs } = await supabaseAdmin
     .from("daily_mood")
     .select("logged_date, mood_score, notes")
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .gte("logged_date", historyFloor);
 
   const { count: stackSize } = await supabaseAdmin
     .from("user_stacks")
@@ -88,6 +100,7 @@ export default async function HistoryPage() {
           totalStack={totalStack}
           today={today}
           moodByDate={Object.fromEntries((moodLogs || []).map(m => [m.logged_date, m.mood_score]))}
+          historyFloor={historyFloor}
         />
 
         <Link

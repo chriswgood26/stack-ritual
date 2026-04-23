@@ -1,6 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import RoadmapManager from "@/components/RoadmapManager";
 import CutReleaseButton from "@/components/CutReleaseButton";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -29,7 +28,8 @@ export default async function ReleasesPage() {
     supabaseAdmin
       .from("releases")
       .select("version, released_at, label, label_color")
-      .order("released_at", { ascending: false }),
+      .order("released_at", { ascending: false })
+      .order("version", { ascending: false }),
     supabaseAdmin
       .from("release_features")
       .select("release_version, feature, sort_order")
@@ -46,19 +46,17 @@ export default async function ReleasesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">Releases &amp; Roadmap</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">Releases</h1>
 
       <div className="max-w-3xl space-y-6">
-        <RoadmapManager />
-
-        <div className="flex items-center justify-between pt-4">
+        <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-stone-300">Release Notes</h2>
           <CutReleaseButton />
         </div>
 
         {releases.length === 0 && (
           <div className="bg-stone-800 border border-stone-700 rounded-2xl px-6 py-8 text-center text-stone-500 text-sm">
-            No releases yet. Mark roadmap items as ✅ Done, then click &ldquo;Cut Release&rdquo; to publish them.
+            No releases yet. Click &ldquo;Cut Release&rdquo; to publish one.
           </div>
         )}
 
