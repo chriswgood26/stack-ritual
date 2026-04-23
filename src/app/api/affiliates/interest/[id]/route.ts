@@ -48,16 +48,33 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       code = generateCode(interest.name);
     }
 
+    // For store applicants (store_name present), use the store name as the
+    // affiliate display name and preserve the contact person in notes.
+    // Creator applicants (no store_name) use their personal name directly.
+    const street = [interest.street_address, interest.street_address_2]
+      .filter(Boolean)
+      .join(", ") || null;
+
+    const notesParts = [
+      interest.store_name ? `Contact: ${interest.name}` : null,
+      interest.message,
+    ].filter(Boolean);
+
     const { data: affiliate, error: createErr } = await supabaseAdmin
       .from("affiliates")
       .insert({
-        name: interest.name,
+        name: interest.store_name || interest.name,
         email: interest.email,
         code,
         first_month_percentage: 50,
         recurring_percentage: 10,
         status: "active",
-        notes: interest.message || null,
+        street,
+        city: interest.city || null,
+        state: interest.state || null,
+        zip: interest.zip || null,
+        country: street ? "US" : null,
+        notes: notesParts.length ? notesParts.join("\n\n") : null,
       })
       .select()
       .single();

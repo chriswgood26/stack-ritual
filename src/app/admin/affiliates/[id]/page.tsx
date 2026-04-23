@@ -263,6 +263,15 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                 {affiliate.email && <span>📧 {affiliate.email}</span>}
                 {affiliate.phone && <span>📞 {affiliate.phone}</span>}
               </div>
+              {(affiliate.street || affiliate.city || affiliate.state || affiliate.zip) && (
+                <div className="text-xs text-stone-400 mb-2 flex gap-2 items-start">
+                  <span className="flex-shrink-0">📮</span>
+                  <span>
+                    {affiliate.street && <>{affiliate.street}<br /></>}
+                    {[affiliate.city, affiliate.state, affiliate.zip].filter(Boolean).join(", ")}
+                  </span>
+                </div>
+              )}
               <div className="text-xs text-stone-400">
                 💰 <strong>{affiliate.first_month_percentage}%</strong> first month · <strong>{affiliate.recurring_percentage}%</strong> recurring
               </div>
