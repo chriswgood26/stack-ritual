@@ -59,8 +59,39 @@ export async function POST(req: NextRequest) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.stackritual.com";
 
-  // Capture referral attribution — if user has a referral_code cookie, create a pending referral row
   const cookieStore = await cookies();
+
+  // Capture affiliate attribution — if user has an affiliate_ref cookie, create
+  // a pending affiliate_referrals row. Applies to any plan (Plus/Pro, monthly/annual).
+  // The webhook flips subscription_active + sets first_payment_at on first paid invoice.
+  const affiliateRef = cookieStore.get("affiliate_ref")?.value;
+  if (affiliateRef) {
+    const { data: affiliateRow } = await supabaseAdmin
+      .from("affiliates")
+      .select("id, code, status")
+      .ilike("code", affiliateRef)
+      .maybeSingle();
+
+    if (affiliateRow && affiliateRow.status === "active") {
+      const { data: existingAttr } = await supabaseAdmin
+        .from("affiliate_referrals")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!existingAttr) {
+        await supabaseAdmin.from("affiliate_referrals").insert({
+          affiliate_id: affiliateRow.id,
+          affiliate_code: affiliateRow.code,
+          user_id: userId,
+          email: email || null,
+          subscription_active: false,
+        });
+      }
+    }
+  }
+
+  // Capture referral attribution — if user has a referral_code cookie, create a pending referral row
   const referralCode = cookieStore.get("referral_code")?.value;
   if (referralCode && (priceKey === "pro_monthly" || priceKey === "pro_yearly")) {
     // Look up the referrer by code

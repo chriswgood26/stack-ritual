@@ -11,10 +11,27 @@ interface Affiliate {
   phone: string | null;
   first_month_percentage: number;
   recurring_percentage: number;
+  tier?: "affiliate" | "super_affiliate";
   status: string;
   total_paid?: number;
   referral_count?: number;
+  earned_cents?: number;
+  owed_cents?: number;
 }
+
+interface Referrer {
+  referrer_user_id: string;
+  referral_code: string;
+  name: string;
+  email: string | null;
+  total_shared: number;
+  credited: number;
+  pending: number;
+  expired: number;
+  credit_cents: number;
+}
+
+type Tab = "all" | "super" | "affiliate" | "refer";
 
 interface InterestItem {
   id: string;
@@ -55,8 +72,10 @@ function formatCurrency(amount: number) {
 
 export default function AffiliatesPage() {
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
+  const [referrers, setReferrers] = useState<Referrer[]>([]);
   const [pending, setPending] = useState<InterestItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<Tab>("all");
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -73,8 +92,19 @@ export default function AffiliatesPage() {
     Promise.all([
       fetch("/api/affiliates", { credentials: "include" }).then((r) => r.json()).then((d) => setAffiliates(d.affiliates || [])),
       fetch("/api/affiliates/interest", { credentials: "include" }).then((r) => r.json()).then((d) => setPending(d.items || [])),
+      fetch("/api/admin/referrers", { credentials: "include" }).then((r) => r.json()).then((d) => setReferrers(d.referrers || [])),
     ]).finally(() => setLoading(false));
   }, []);
+
+  const superAffiliates = affiliates.filter((a) => a.tier === "super_affiliate");
+  const plainAffiliates = affiliates.filter((a) => a.tier !== "super_affiliate");
+  const visibleAffiliates =
+    tab === "super" ? superAffiliates :
+    tab === "affiliate" ? plainAffiliates :
+    tab === "all" ? affiliates :
+    [];
+  const showRefer = tab === "all" || tab === "refer";
+  const showAffiliates = tab !== "refer";
 
   async function handleInterest(id: string, action: "approve" | "reject") {
     if (action === "reject" && !confirm("Reject this application?")) return;
@@ -250,32 +280,120 @@ export default function AffiliatesPage() {
         </div>
       )}
 
-      <div className="bg-stone-800 border border-stone-700 rounded-lg overflow-hidden">
-        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr_80px] px-4 py-2 border-b border-stone-700 text-xs text-stone-300 uppercase tracking-wider">
-          <div>Name</div>
-          <div>Code</div>
-          <div>First Mo.</div>
-          <div>Recurring</div>
-          <div>Referrals</div>
-          <div>Total Paid</div>
-          <div></div>
-        </div>
-        {affiliates.length === 0 ? (
-          <div className="px-4 py-8 text-center text-stone-500 text-sm">No affiliates yet.</div>
-        ) : (
-          affiliates.map((a) => (
-            <div key={a.id} className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr_80px] px-4 py-3 border-b border-stone-700/50 text-sm items-center">
-              <Link href={`/admin/affiliates/${a.id}`} className="text-white font-medium hover:text-emerald-400">{a.name}</Link>
-              <div className="text-emerald-400 font-mono text-xs">{a.code}</div>
-              <div className="text-stone-300">{a.first_month_percentage}%</div>
-              <div className="text-stone-300">{a.recurring_percentage}%</div>
-              <div className="text-stone-300">{a.referral_count ?? 0}</div>
-              <div className="text-white">{formatCurrency(a.total_paid ?? 0)}</div>
-              <Link href={`/admin/affiliates/${a.id}`} className="text-stone-500 text-xs hover:text-white text-right">View →</Link>
-            </div>
-          ))
-        )}
+      {/* Tab nav */}
+      <div className="flex gap-1 bg-stone-800 border border-stone-700 rounded-lg p-1 mb-4 w-fit">
+        {([
+          { key: "all", label: "All", count: affiliates.length + referrers.length },
+          { key: "super", label: "🏪 Super Affiliates", count: superAffiliates.length },
+          { key: "affiliate", label: "👤 Affiliates", count: plainAffiliates.length },
+          { key: "refer", label: "🤝 Refer & Earn", count: referrers.length },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+              tab === t.key ? "bg-emerald-600 text-white" : "text-stone-400 hover:text-white"
+            }`}
+          >
+            {t.label} <span className="opacity-70">({t.count})</span>
+          </button>
+        ))}
       </div>
+
+      {showAffiliates && (
+        <div className="bg-stone-800 border border-stone-700 rounded-lg overflow-hidden mb-4">
+          <div className="grid grid-cols-[1.5fr_110px_110px_70px_70px_80px_100px_100px_70px] px-4 py-2 border-b border-stone-700 text-xs text-stone-300 uppercase tracking-wider">
+            <div>Name</div>
+            <div>Tier</div>
+            <div>Code</div>
+            <div>1st Mo.</div>
+            <div>Recur</div>
+            <div>Refs</div>
+            <div>Total Paid</div>
+            <div>Owed</div>
+            <div></div>
+          </div>
+          {visibleAffiliates.length === 0 ? (
+            <div className="px-4 py-8 text-center text-stone-500 text-sm">
+              {tab === "super" ? "No super affiliates yet." : tab === "affiliate" ? "No affiliates yet." : "No affiliates yet."}
+            </div>
+          ) : (
+            visibleAffiliates.map((a) => {
+              const owed = (a.owed_cents ?? 0) / 100;
+              return (
+                <div key={a.id} className="grid grid-cols-[1.5fr_110px_110px_70px_70px_80px_100px_100px_70px] px-4 py-3 border-b border-stone-700/50 text-sm items-center">
+                  <Link href={`/admin/affiliates/${a.id}`} className="text-white font-medium hover:text-emerald-400 truncate">{a.name}</Link>
+                  <div>
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                      a.tier === "super_affiliate"
+                        ? "bg-amber-500/10 text-amber-400"
+                        : "bg-blue-500/10 text-blue-400"
+                    }`}>
+                      {a.tier === "super_affiliate" ? "🏪 Super" : "👤 Affiliate"}
+                    </span>
+                  </div>
+                  <div className="text-emerald-400 font-mono text-xs truncate">{a.code}</div>
+                  <div className="text-stone-300">{a.first_month_percentage}%</div>
+                  <div className="text-stone-300">{a.recurring_percentage}%</div>
+                  <div className="text-stone-300">{a.referral_count ?? 0}</div>
+                  <div className="text-white">{formatCurrency(a.total_paid ?? 0)}</div>
+                  <div className={owed > 0 ? "text-emerald-400 font-semibold" : "text-stone-500"}>{formatCurrency(owed)}</div>
+                  <Link href={`/admin/affiliates/${a.id}`} className="text-stone-500 text-xs hover:text-white text-right">View →</Link>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {showRefer && (
+        <div className="bg-stone-800 border border-stone-700 rounded-lg overflow-hidden">
+          <div className="px-4 py-2 border-b border-stone-700 flex items-center justify-between">
+            <span className="text-sm font-semibold text-stone-300">🤝 Refer & Earn Participants</span>
+            <span className="text-xs text-stone-500">Pro users who share their referral code. Promote top referrers to Affiliate.</span>
+          </div>
+          <div className="grid grid-cols-[1.5fr_120px_1fr_80px_90px_80px_1fr] px-4 py-2 border-b border-stone-700 text-xs text-stone-300 uppercase tracking-wider">
+            <div>Name</div>
+            <div>Tier</div>
+            <div>Code</div>
+            <div>Shared</div>
+            <div>Credited</div>
+            <div>Pending</div>
+            <div>Status</div>
+          </div>
+          {referrers.length === 0 ? (
+            <div className="px-4 py-8 text-center text-stone-500 text-sm">No referrers yet.</div>
+          ) : (
+            referrers.map((r) => {
+              const atCap = r.credited >= 6;
+              return (
+                <div key={r.referrer_user_id} className="grid grid-cols-[1.5fr_120px_1fr_80px_90px_80px_1fr] px-4 py-3 border-b border-stone-700/50 text-sm items-center">
+                  <div className="min-w-0">
+                    <div className="text-white font-medium truncate">{r.name}</div>
+                    {r.email && <div className="text-stone-500 text-xs truncate">{r.email}</div>}
+                  </div>
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400">
+                      🤝 Refer
+                    </span>
+                  </div>
+                  <div className="text-emerald-400 font-mono text-xs">{r.referral_code}</div>
+                  <div className="text-stone-300">{r.total_shared}</div>
+                  <div className={`font-semibold ${atCap ? "text-amber-400" : "text-stone-100"}`}>{r.credited} / 6</div>
+                  <div className="text-stone-400">{r.pending}</div>
+                  <div>
+                    {atCap && (
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400">
+                        ⭐ At cap — promote?
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
     </div>
   );
 }

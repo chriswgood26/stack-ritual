@@ -13,10 +13,11 @@ async function checkAdmin() {
 export async function GET() {
   if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const [affiliatesR, payoutsR, referralsR] = await Promise.all([
+  const [affiliatesR, payoutsR, referralsR, commissionsR] = await Promise.all([
     supabaseAdmin.from("affiliates").select("*").order("created_at", { ascending: false }),
     supabaseAdmin.from("affiliate_payouts").select("affiliate_id, amount"),
     supabaseAdmin.from("affiliate_referrals").select("affiliate_id"),
+    supabaseAdmin.from("affiliate_commissions").select("affiliate_id, commission_cents"),
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,12 +26,24 @@ export async function GET() {
   const payouts = (payoutsR.data as any[]) || [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const referrals = (referralsR.data as any[]) || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const commissions = (commissionsR.data as any[]) || [];
 
   const enriched = affiliates.map((a) => {
     const affPayouts = payouts.filter((p) => p.affiliate_id === a.id);
     const totalPaid = affPayouts.reduce((sum, p) => sum + Number(p.amount), 0);
     const referralCount = referrals.filter((r) => r.affiliate_id === a.id).length;
-    return { ...a, total_paid: totalPaid, referral_count: referralCount };
+    const earnedCents = commissions
+      .filter((c) => c.affiliate_id === a.id)
+      .reduce((sum, c) => sum + Number(c.commission_cents), 0);
+    const owedCents = Math.max(0, earnedCents - Math.round(totalPaid * 100));
+    return {
+      ...a,
+      total_paid: totalPaid,
+      referral_count: referralCount,
+      earned_cents: earnedCents,
+      owed_cents: owedCents,
+    };
   });
 
   return NextResponse.json({ affiliates: enriched });
@@ -50,8 +63,9 @@ export async function POST(req: NextRequest) {
     first_month_percentage: body.first_month_percentage ?? 50,
     recurring_percentage: body.recurring_percentage ?? 10,
     status: body.status || "active",
+    tier: body.tier === "super_affiliate" ? "super_affiliate" : "affiliate",
   };
-  for (const field of ["email", "phone", "street", "city", "state", "zip", "country", "payout_method", "payout_details", "notes"]) {
+  for (const field of ["email", "phone", "street", "city", "state", "zip", "country", "payout_method", "payout_details", "notes", "annual_flat_plus", "annual_flat_pro"]) {
     if (body[field] !== undefined) insert[field] = body[field] || null;
   }
 

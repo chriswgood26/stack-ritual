@@ -17,13 +17,19 @@ interface Affiliate {
   country?: string | null;
   first_month_percentage: number;
   recurring_percentage: number;
+  annual_flat_plus?: number;
+  annual_flat_pro?: number;
+  tier?: "affiliate" | "super_affiliate";
   payout_method?: string | null;
   payout_details?: string | null;
   status: string;
   notes?: string | null;
   offers_annual_perk?: boolean;
+  last_welcome_email_sent_at?: string | null;
   total_paid?: number;
   referral_count?: number;
+  earned_cents?: number;
+  owed_cents?: number;
 }
 
 interface Payout {
@@ -152,8 +158,13 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
     setSendingEmail(true);
     try {
       const res = await fetch(`/api/affiliates/${id}/welcome-email`, { method: "POST" });
-      if (res.ok) alert("Welcome email sent!");
-      else {
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data.last_welcome_email_sent_at) {
+          setAffiliate(prev => prev ? { ...prev, last_welcome_email_sent_at: data.last_welcome_email_sent_at } : prev);
+        }
+        alert("Welcome email sent!");
+      } else {
         const data = await res.json();
         alert(data.error || "Failed to send");
       }
@@ -182,6 +193,14 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                 <input value={form.code || ""} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} className={INPUT_CLASS} />
               </div>
             </div>
+            <div>
+              <label className="text-xs text-stone-300 uppercase tracking-wider mb-1 block">Tier</label>
+              <select value={form.tier || "affiliate"} onChange={(e) => setForm((f) => ({ ...f, tier: e.target.value as "affiliate" | "super_affiliate" }))}
+                className={INPUT_CLASS + " !w-64"}>
+                <option value="affiliate">👤 Affiliate (monthly commissions)</option>
+                <option value="super_affiliate">🏪 Super Affiliate (monthly + annual payouts, offers discount)</option>
+              </select>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-stone-300 uppercase tracking-wider mb-1 block">First Month %</label>
@@ -194,6 +213,20 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                   onChange={(e) => setForm((f) => ({ ...f, recurring_percentage: parseFloat(e.target.value) }))} className={INPUT_CLASS} />
               </div>
             </div>
+            {form.tier === "super_affiliate" && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-stone-300 uppercase tracking-wider mb-1 block">Annual Flat — Plus ($)</label>
+                  <input type="number" step="0.01" value={form.annual_flat_plus ?? 16}
+                    onChange={(e) => setForm((f) => ({ ...f, annual_flat_plus: parseFloat(e.target.value) }))} className={INPUT_CLASS} />
+                </div>
+                <div>
+                  <label className="text-xs text-stone-300 uppercase tracking-wider mb-1 block">Annual Flat — Pro ($)</label>
+                  <input type="number" step="0.01" value={form.annual_flat_pro ?? 24}
+                    onChange={(e) => setForm((f) => ({ ...f, annual_flat_pro: parseFloat(e.target.value) }))} className={INPUT_CLASS} />
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-stone-300 uppercase tracking-wider mb-1 block">Email</label>
@@ -202,6 +235,31 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
               <div>
                 <label className="text-xs text-stone-300 uppercase tracking-wider mb-1 block">Phone</label>
                 <input value={form.phone || ""} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className={INPUT_CLASS} />
+              </div>
+            </div>
+            <div className="border-t border-stone-700/50 pt-3 space-y-3">
+              <div className="text-xs text-stone-300 uppercase tracking-wider font-semibold">📮 Mailing Address</div>
+              <div>
+                <label className="text-xs text-stone-400 mb-1 block">Street</label>
+                <input value={form.street || ""} onChange={(e) => setForm((f) => ({ ...f, street: e.target.value }))} placeholder="123 Main St" className={INPUT_CLASS} />
+              </div>
+              <div className="grid grid-cols-[2fr_1fr_1fr] gap-3">
+                <div>
+                  <label className="text-xs text-stone-400 mb-1 block">City</label>
+                  <input value={form.city || ""} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} className={INPUT_CLASS} />
+                </div>
+                <div>
+                  <label className="text-xs text-stone-400 mb-1 block">State</label>
+                  <input value={form.state || ""} onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))} className={INPUT_CLASS} />
+                </div>
+                <div>
+                  <label className="text-xs text-stone-400 mb-1 block">ZIP</label>
+                  <input value={form.zip || ""} onChange={(e) => setForm((f) => ({ ...f, zip: e.target.value }))} className={INPUT_CLASS} />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-stone-400 mb-1 block">Country</label>
+                <input value={form.country || ""} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} placeholder="US" className={INPUT_CLASS + " !w-32"} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -250,7 +308,7 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
         ) : (
           <div className="flex justify-between items-start">
             <div>
-              <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center gap-3 mb-1 flex-wrap">
                 <h1 className="text-xl font-bold text-white">{affiliate.name}</h1>
                 <span className="text-emerald-400 font-mono text-sm">{affiliate.code}</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
@@ -258,6 +316,13 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                   affiliate.status === "pending" ? "bg-amber-500/10 text-amber-400" :
                   "bg-stone-500/10 text-stone-400"
                 }`}>{affiliate.status}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                  affiliate.tier === "super_affiliate"
+                    ? "bg-amber-500/10 text-amber-400"
+                    : "bg-blue-500/10 text-blue-400"
+                }`}>
+                  {affiliate.tier === "super_affiliate" ? "🏪 Super Affiliate" : "👤 Affiliate"}
+                </span>
               </div>
               <div className="flex gap-4 text-xs text-stone-400 mb-2">
                 {affiliate.email && <span>📧 {affiliate.email}</span>}
@@ -284,20 +349,27 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
                 Referral link: <span className="text-emerald-400 font-mono">https://stackritual.com/?ref={affiliate.code}</span>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={sendWelcomeEmail} disabled={sendingEmail || !affiliate.email}
-                className="text-emerald-400 text-xs hover:text-emerald-300 disabled:opacity-50">
-                {sendingEmail ? "Sending..." : "📧 Welcome Email"}
-              </button>
-              <button onClick={startEdit} className="text-stone-400 text-xs hover:text-white">Edit</button>
-              <button onClick={deleteAffiliate} className="text-red-400 text-xs hover:text-red-300">Delete</button>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex gap-2">
+                <button onClick={sendWelcomeEmail} disabled={sendingEmail || !affiliate.email}
+                  className="text-emerald-400 text-xs hover:text-emerald-300 disabled:opacity-50">
+                  {sendingEmail ? "Sending..." : "📧 Welcome Email"}
+                </button>
+                <button onClick={startEdit} className="text-stone-400 text-xs hover:text-white">Edit</button>
+                <button onClick={deleteAffiliate} className="text-red-400 text-xs hover:text-red-300">Delete</button>
+              </div>
+              <div className="text-[10px] text-stone-500">
+                {affiliate.last_welcome_email_sent_at
+                  ? `Last sent ${new Date(affiliate.last_welcome_email_sent_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                  : "Never sent"}
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-3 mb-6">
         <div className="bg-stone-800 border border-stone-700 rounded-lg p-4 text-center">
           <div className="text-stone-300 text-xs uppercase tracking-wider">Referrals</div>
           <div className="text-white text-2xl font-bold mt-1">{referrals.length}</div>
@@ -309,6 +381,12 @@ export default function AffiliateDetailPage({ params }: { params: Promise<{ id: 
         <div className="bg-stone-800 border border-stone-700 rounded-lg p-4 text-center">
           <div className="text-stone-300 text-xs uppercase tracking-wider">Total Paid</div>
           <div className="text-white text-2xl font-bold mt-1">{formatCurrency(affiliate.total_paid ?? 0)}</div>
+        </div>
+        <div className="bg-stone-800 border border-emerald-700/40 rounded-lg p-4 text-center">
+          <div className="text-emerald-400 text-xs uppercase tracking-wider">Owed</div>
+          <div className={`text-2xl font-bold mt-1 ${(affiliate.owed_cents ?? 0) > 0 ? "text-emerald-400" : "text-stone-500"}`}>
+            {formatCurrency((affiliate.owed_cents ?? 0) / 100)}
+          </div>
         </div>
       </div>
 

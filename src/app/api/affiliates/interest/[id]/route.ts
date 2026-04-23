@@ -60,6 +60,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       interest.message,
     ].filter(Boolean);
 
+    const resolvedSource: "store" | "personal" =
+      interest.source === "store" || interest.source === "personal"
+        ? interest.source
+        : (interest.store_name || interest.street_address ? "store" : "personal");
+    const tier = resolvedSource === "store" ? "super_affiliate" : "affiliate";
+
     const { data: affiliate, error: createErr } = await supabaseAdmin
       .from("affiliates")
       .insert({
@@ -69,6 +75,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         first_month_percentage: 50,
         recurring_percentage: 10,
         status: "active",
+        tier,
         street,
         city: interest.city || null,
         state: interest.state || null,

@@ -39,11 +39,17 @@ export async function POST(req: NextRequest) {
     city,
     state,
     zip,
+    source,
   } = await req.json();
 
   if (!name || !email) {
     return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
   }
+
+  const resolvedSource: "store" | "personal" =
+    source === "store" || source === "personal"
+      ? source
+      : (store_name || street_address ? "store" : "personal");
 
   const record = {
     name,
@@ -55,6 +61,7 @@ export async function POST(req: NextRequest) {
     city: city || null,
     state: state || null,
     zip: zip || null,
+    source: resolvedSource,
     status: "pending" as const,
   };
 

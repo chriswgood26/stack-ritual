@@ -89,5 +89,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  const sentAt = new Date().toISOString();
+  await supabaseAdmin
+    .from("affiliates")
+    .update({ last_welcome_email_sent_at: sentAt, updated_at: sentAt })
+    .eq("id", id);
+
+  return NextResponse.json({ ok: true, last_welcome_email_sent_at: sentAt });
 }

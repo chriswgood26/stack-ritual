@@ -14,10 +14,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
 
-  const [affiliateR, payoutsR, referralsR] = await Promise.all([
+  const [affiliateR, payoutsR, referralsR, commissionsR] = await Promise.all([
     supabaseAdmin.from("affiliates").select("*").eq("id", id).single(),
     supabaseAdmin.from("affiliate_payouts").select("*").eq("affiliate_id", id).order("paid_date", { ascending: false }),
     supabaseAdmin.from("affiliate_referrals").select("*").eq("affiliate_id", id).order("created_at", { ascending: false }),
+    supabaseAdmin.from("affiliate_commissions").select("*").eq("affiliate_id", id).order("occurred_at", { ascending: false }),
   ]);
 
   if (affiliateR.error || !affiliateR.data) {
@@ -26,12 +27,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const payouts = (payoutsR.data as any[]) || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const commissions = (commissionsR.data as any[]) || [];
   const totalPaid = payouts.reduce((sum, p) => sum + Number(p.amount), 0);
+  const earnedCents = commissions.reduce((sum, c) => sum + Number(c.commission_cents), 0);
+  const owedCents = Math.max(0, earnedCents - Math.round(totalPaid * 100));
 
   return NextResponse.json({
-    affiliate: { ...affiliateR.data, total_paid: totalPaid, referral_count: referralsR.data?.length ?? 0 },
+    affiliate: {
+      ...affiliateR.data,
+      total_paid: totalPaid,
+      referral_count: referralsR.data?.length ?? 0,
+      earned_cents: earnedCents,
+      owed_cents: owedCents,
+    },
     payouts,
     referrals: referralsR.data || [],
+    commissions,
   });
 }
 

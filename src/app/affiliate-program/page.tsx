@@ -14,7 +14,7 @@ export default function AffiliateProgramPage() {
       const res = await fetch("/api/affiliates/interest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, source: "personal" }),
       });
       if (res.ok) {
         setStatus("sent");

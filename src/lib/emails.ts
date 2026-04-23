@@ -320,6 +320,57 @@ export async function sendAffiliateInterestConfirmationEmail(
   });
 }
 
+// Referral credited — sent when a referred friend upgrades to Pro and the
+// referrer earns a free Pro month (Stripe balance credit applied).
+export async function sendReferralCreditedEmail(
+  to: string,
+  referrerFirstName: string | null,
+  creditsEarned: number,
+  creditsRemaining: number,
+) {
+  const greeting = referrerFirstName ? `Hi ${referrerFirstName},` : "Hi there,";
+  const remainingLine = creditsRemaining > 0
+    ? `<p style="color: #44403c; line-height: 1.6; font-size: 14px; margin: 8px 0;">You can earn up to <strong>${creditsRemaining} more free ${creditsRemaining === 1 ? "month" : "months"}</strong> through referrals.</p>`
+    : `<p style="color: #44403c; line-height: 1.6; font-size: 14px; margin: 8px 0;">You've hit the lifetime cap of 6 free months — thanks for helping spread the word!</p>`;
+
+  return resend.emails.send({
+    from: getFromEmail(),
+    to,
+    subject: "🎉 You just earned a free month of Stack Ritual Pro",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
+        <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
+          <div style="background: #065f46; padding: 24px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px;">🌿 Stack Ritual</h1>
+          </div>
+          <div style="padding: 24px;">
+            <h2 style="color: #1c1917; margin-top: 0; font-size: 18px;">🎉 You earned a free month!</h2>
+            <p style="color: #44403c; line-height: 1.6; font-size: 14px;">${greeting}</p>
+            <p style="color: #44403c; line-height: 1.6; font-size: 14px;">
+              A friend just subscribed to Stack Ritual Pro using your referral link. Your next Pro invoice will be <strong>$9.99 off</strong> — the credit is already on your account, no action needed.
+            </p>
+            <div style="background: #f0fdf4; border-left: 3px solid #10b981; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+              <p style="color: #065f46; font-size: 14px; margin: 0;"><strong>Credits earned:</strong> ${creditsEarned} of 6</p>
+            </div>
+            ${remainingLine}
+            <a href="https://www.stackritual.com/dashboard/profile" style="display: block; background: #065f46; color: white; text-align: center; padding: 14px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 16px;">
+              View your referrals →
+            </a>
+          </div>
+          <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
+            <p style="color: #a8a29e; font-size: 11px; margin: 0;">
+              stackritual.com
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
 // Referral invite — sent when a paying Pro emails their referral link to a friend
 export async function sendReferralInviteEmail(
   to: string,
