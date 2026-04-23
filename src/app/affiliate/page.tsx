@@ -49,7 +49,7 @@ export default function AffiliatePage() {
       const res = await fetch("/api/affiliates/interest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, source: "store" }),
       });
       if (res.ok) {
         setStatus("sent");
@@ -85,7 +85,7 @@ export default function AffiliatePage() {
 
       <main className="max-w-3xl mx-auto px-6 py-16">
         <div className="inline-block bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
-          For supplement store owners
+          For Supplement Store Owners and Influencers
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-stone-900 leading-tight mb-4">
           Your customers are already building their supplement routine.

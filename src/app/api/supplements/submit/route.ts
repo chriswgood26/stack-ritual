@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { name, category, icon, tagline, dose, timing, brand, purchased_from, quantity_total, quantity_remaining, quantity_unit, doses_per_serving } = body;
+  const { name, category, icon, tagline, dose, timing, brand, purchased_from, quantity_total, quantity_remaining, quantity_unit, doses_per_serving, start_date } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: "Name required" }, { status: 400 });
@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
     quantity_unit: quantity_unit || (totalNum !== null ? "capsules" : null),
     doses_per_serving: doses_per_serving ? Math.max(1, Number(doses_per_serving) || 1) : 1,
     auto_decrement: remainingNum !== null,
+    start_date: start_date || null,
     is_active: true,
   });
 

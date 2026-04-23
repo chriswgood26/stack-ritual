@@ -77,6 +77,7 @@ export default function CutReleaseButton() {
       return;
     }
     setOpen(false);
+    window.dispatchEvent(new CustomEvent("sr:roadmap-updated"));
     router.refresh();
   }
 

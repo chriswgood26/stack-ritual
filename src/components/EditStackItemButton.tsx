@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
 import { parseServingCount } from "@/lib/serving";
+import { isLessThanDaily } from "@/lib/next-due";
 
 interface Props {
   itemId: string;
@@ -20,8 +21,14 @@ interface Props {
   currentQuantityUnit?: string | null;
   currentAutoDecrement?: boolean | null;
   currentDosesPerServing?: number | null;
+  currentPaused?: boolean | null;
+  currentStartDate?: string | null;
   asLabel?: boolean;
   labelClassName?: string;
+}
+
+function todayLocalYmd(): string {
+  return new Date().toLocaleDateString("en-CA");
 }
 
 const timingOptions = [
@@ -51,7 +58,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, currentDosesPerServing, asLabel = false, labelClassName }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, currentDosesPerServing, currentPaused, currentStartDate, asLabel = false, labelClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -65,8 +72,13 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     quantity_unit: currentQuantityUnit || "capsules",
     doses_per_serving: (currentDosesPerServing ?? 1).toString(),
     auto_decrement: currentAutoDecrement !== false,
+    is_paused: !!currentPaused,
+    start_date: currentStartDate || "",
   });
+  const scheduleResetFromTiming = form.timing !== (currentTiming || "") && isLessThanDaily(form.timing);
   const [scanError, setScanError] = useState("");
+  const [confirmStopTracking, setConfirmStopTracking] = useState(false);
+  const [stopping, setStopping] = useState(false);
   const router = useRouter();
 
   function handleScanComplete(data: ScanResult) {
@@ -88,13 +100,41 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
     const res = await fetch("/api/stack/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit, auto_decrement: form.auto_decrement, doses_per_serving: form.doses_per_serving }),
+      body: JSON.stringify({ item_id: itemId, dose: form.dose, timing: form.timing, brand: form.brand, notes: form.notes, frequency_type: form.frequency_type, quantity_total: form.quantity_total, quantity_remaining: form.quantity_remaining, quantity_unit: form.quantity_unit, auto_decrement: form.auto_decrement, doses_per_serving: form.doses_per_serving, start_date: form.start_date }),
     });
     if (res.ok) {
       setOpen(false);
       router.refresh();
     }
     setLoading(false);
+  }
+
+  async function handleTogglePause() {
+    const next = !form.is_paused;
+    const res = await fetch("/api/stack/pause", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item_id: itemId, paused: next }),
+    });
+    if (res.ok) {
+      setForm(f => ({ ...f, is_paused: next }));
+      router.refresh();
+    }
+  }
+
+  async function handleStopTracking() {
+    setStopping(true);
+    const res = await fetch("/api/stack/inventory", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item_id: itemId }),
+    });
+    if (res.ok) {
+      setForm(f => ({ ...f, quantity_total: "", quantity_remaining: "", auto_decrement: false }));
+      setConfirmStopTracking(false);
+      router.refresh();
+    }
+    setStopping(false);
   }
 
   return (
@@ -122,6 +162,25 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
               {scanError && <span className="text-xs text-red-500">{scanError}</span>}
             </div>
 
+            <div className="flex items-center justify-between gap-3 bg-stone-50 rounded-xl px-4 py-3 border border-stone-100">
+              <div>
+                <div className="text-sm font-semibold text-stone-900">{form.is_paused ? "⏸ Paused" : "Active"}</div>
+                <div className="text-xs text-stone-500">{form.is_paused ? "Hidden from Today and reminders. Resume any time." : "Showing on Today and reminders."}</div>
+              </div>
+              <button
+                type="button"
+                onClick={handleTogglePause}
+                title={form.is_paused ? "Resume — show on Today again" : "Pause — keep in stack but hide from Today"}
+                className={
+                  form.is_paused
+                    ? "text-xs font-medium text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors flex-shrink-0"
+                    : "text-amber-500 transition-colors text-xl p-1 flex-shrink-0"
+                }
+              >
+                {form.is_paused ? "▶ Resume" : "⏸"}
+              </button>
+            </div>
+
             <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
               <div>
                 <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Dose</label>
@@ -147,7 +206,17 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
             <div>
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">When to take</label>
               <select value={form.timing}
-                onChange={e => setForm(f => ({ ...f, timing: e.target.value }))}
+                onChange={e => {
+                  const newTiming = e.target.value;
+                  setForm(f => {
+                    const timingChanged = newTiming !== (currentTiming || "");
+                    let nextStart = f.start_date;
+                    if (timingChanged) {
+                      nextStart = isLessThanDaily(newTiming) ? todayLocalYmd() : "";
+                    }
+                    return { ...f, timing: newTiming, start_date: nextStart };
+                  });
+                }}
                 className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                 <option value="">Select timing...</option>
                 {timingOptions.map(g => (
@@ -157,6 +226,23 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 ))}
               </select>
             </div>
+
+            {isLessThanDaily(form.timing) && (
+              <div>
+                <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Start date</label>
+                <input
+                  type="date"
+                  value={form.start_date}
+                  onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
+                  className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                />
+                <p className="text-[11px] text-stone-400 mt-1">
+                  {scheduleResetFromTiming
+                    ? "Schedule will restart from today — adjust the date if you want a different anchor."
+                    : "Sets when this schedule begins. Leave blank to use the last time you took it."}
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand (optional)</label>
@@ -230,6 +316,41 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 </div>
               </div>
               <p className="text-xs text-stone-400 mt-1.5">We'll alert you when you're running low (~2 weeks left)</p>
+
+              {(currentQuantityRemaining !== null && currentQuantityRemaining !== undefined) && (
+                <div className="mt-3">
+                  {!confirmStopTracking ? (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmStopTracking(true)}
+                      className="text-xs font-medium text-emerald-600 hover:text-red-500 transition-colors"
+                    >
+                      Stop tracking inventory
+                    </button>
+                  ) : (
+                    <div className="bg-stone-50 border border-stone-200 rounded-xl p-3 space-y-2">
+                      <p className="text-xs text-stone-600">Remove inventory tracking for <strong>{name}</strong>?</p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmStopTracking(false)}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleStopTracking}
+                          disabled={stopping}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                        >
+                          {stopping ? "..." : "Stop tracking"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 pt-2">

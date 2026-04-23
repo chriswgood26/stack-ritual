@@ -43,3 +43,6 @@ next-env.d.ts
 # Waitlist data
 data/
 .env.local
+
+# Design/marketing source assets (QR codes, mockups, etc.) — kept local-only
+design-assets/

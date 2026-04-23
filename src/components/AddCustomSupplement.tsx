@@ -8,6 +8,7 @@ import ScanResultsModal from "./ScanResultsModal";
 import type { ScanResult } from "./ScanLabelButton";
 import { getStackQuery } from "@/lib/stackSearchQuery";
 import { parseServingCount } from "@/lib/serving";
+import { isLessThanDaily } from "@/lib/next-due";
 
 interface SearchResult {
   id: string;
@@ -81,6 +82,7 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
     quantityUnit: "capsules",
     dosesPerServing: "1",
     isRitual: false,
+    startDate: "",
   };
   const [form, setForm] = useState(initialForm);
 
@@ -108,6 +110,7 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
         quantity_remaining: form.quantityRemaining,
         quantity_unit: form.quantityUnit,
         doses_per_serving: form.dosesPerServing,
+        start_date: isLessThanDaily(form.timing) ? (form.startDate || null) : null,
       }),
     });
     const data = await res.json();
@@ -385,6 +388,19 @@ export default function AddCustomSupplement({ initialName = "", asLink = false }
               ))}
             </select>
           </div>
+
+          {isLessThanDaily(form.timing) && (
+            <div>
+              <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Start date (optional)</label>
+              <input
+                type="date"
+                value={form.startDate}
+                onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
+                className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+              />
+              <p className="text-[11px] text-stone-400 mt-1">Pick when this schedule begins — leave blank to start today.</p>
+            </div>
+          )}
 
           {!form.isRitual && (
             <div>

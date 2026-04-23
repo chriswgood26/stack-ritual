@@ -39,7 +39,7 @@ export default function PauseStackItemButton({ itemId, paused }: { itemId: strin
       onClick={toggle}
       disabled={loading}
       title="Pause — keep in stack but hide from Today"
-      className="text-stone-300 hover:text-amber-500 transition-colors text-lg p-1 disabled:opacity-50"
+      className="text-amber-500 transition-colors text-lg p-1 disabled:opacity-50"
     >
       {loading ? "…" : "⏸"}
     </button>

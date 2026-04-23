@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
+import { isLessThanDaily } from "@/lib/next-due";
 
 export default function AddCustomSupplementQuick({ name }: { name: string }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
+    name,
     category: "other",
     icon: "💊",
     dose: "",
@@ -19,6 +21,7 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
     quantityRemaining: "",
     quantityUnit: "capsules",
     isRitual: false,
+    startDate: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [scanError, setScanError] = useState("");
@@ -43,12 +46,12 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name,
         ...form,
         purchased_from: form.purchasedFrom,
         quantity_total: form.quantityTotal,
         quantity_remaining: form.quantityRemaining,
         quantity_unit: form.quantityUnit,
+        start_date: isLessThanDaily(form.timing) ? (form.startDate || null) : null,
       }),
     });
     const data = await res.json();
@@ -64,7 +67,7 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
     return (
       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center">
         <div className="text-3xl mb-2">🎉</div>
-        <p className="font-semibold text-emerald-800">"{name}" added to your stack!</p>
+        <p className="font-semibold text-emerald-800">"{form.name}" added to your stack!</p>
         <p className="text-emerald-700 text-sm mt-1">It's been submitted for review and added to <Link href="/dashboard/stack" className="font-semibold underline hover:text-emerald-900">your stack</Link>.</p>
       </div>
     );
@@ -105,8 +108,15 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
   return (
     <div className="bg-white rounded-2xl border border-emerald-200 shadow-sm p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-stone-900">Add "{name}"</h3>
+        <h3 className="font-bold text-stone-900">Add "{form.name || name}"</h3>
         <button onClick={() => setOpen(false)} className="text-stone-400 text-xl">✕</button>
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Name</label>
+        <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+          placeholder={form.isRitual ? "e.g. Cold Plunge" : "e.g. Turmeric"}
+          className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
       </div>
 
       <div className="flex gap-2">
@@ -151,6 +161,19 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
           ))}
         </select>
       </div>
+
+      {isLessThanDaily(form.timing) && (
+        <div>
+          <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Start date (optional)</label>
+          <input
+            type="date"
+            value={form.startDate}
+            onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
+            className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+          />
+          <p className="text-[11px] text-stone-400 mt-1">Pick when this schedule begins — leave blank to start today.</p>
+        </div>
+      )}
 
       {!form.isRitual && (
         <>
@@ -208,9 +231,9 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
 
       {status === "error" && <p className="text-red-500 text-xs text-center">Something went wrong. Try again.</p>}
 
-      <button onClick={handleSubmit} disabled={status === "loading"}
+      <button onClick={handleSubmit} disabled={status === "loading" || !form.name.trim()}
         className="w-full bg-emerald-700 text-white py-3.5 rounded-2xl font-semibold hover:bg-emerald-800 transition-colors disabled:opacity-60">
-        {status === "loading" ? "Adding..." : `Add "${name}" to my stack`}
+        {status === "loading" ? "Adding..." : `Add "${form.name.trim() || name}" to my stack`}
       </button>
     </div>
   );

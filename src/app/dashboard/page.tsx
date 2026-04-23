@@ -14,6 +14,7 @@ import MarkSlotDoneButton from "@/components/MarkSlotDoneButton";
 import QuantityAdjuster from "@/components/QuantityAdjuster";
 import MoodSlider from "@/components/MoodSlider";
 import ReferralCard from "@/components/ReferralCard";
+import { isLessThanDaily, nextDueLabel } from "@/lib/next-due";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,26 @@ export default async function Dashboard() {
   // Build set of "itemId_doseIndex" keys and taken_at map
   const checkedIds = new Set((todayLogs || []).map((l: { stack_item_id: string; dose_index: number }) => `${l.stack_item_id}_${l.dose_index}`));
   const takenAtMap = Object.fromEntries((todayLogs || []).map((l: { stack_item_id: string; dose_index: number; taken_at: string }) => [`${l.stack_item_id}_${l.dose_index}`, l.taken_at]));
+
+  // Fetch recent history (last 100 days) for less-than-daily next-due calc
+  const historyStart = (() => {
+    const d = new Date(`${today}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - 100);
+    return d.toISOString().slice(0, 10);
+  })();
+  const { data: recentLogs } = await supabaseAdmin
+    .from("daily_logs")
+    .select("stack_item_id, logged_date")
+    .eq("user_id", userId)
+    .gte("logged_date", historyStart)
+    .order("logged_date", { ascending: false });
+
+  const logsByItem = new Map<string, string[]>();
+  for (const log of (recentLogs || []) as { stack_item_id: string; logged_date: string }[]) {
+    const arr = logsByItem.get(log.stack_item_id) || [];
+    arr.push(log.logged_date);
+    logsByItem.set(log.stack_item_id, arr);
+  }
 
   // Fetch user's subscription plan
   const { data: subData } = await supabaseAdmin
@@ -143,7 +164,6 @@ export default async function Dashboard() {
   const dailyScheduledItems = scheduledItems.filter(i => !LESS_THAN_DAILY_TIMINGS.has(i.timing || ""));
 
   const totalItems = scheduledItems.length;
-  const checkedCount = scheduledItems.filter(i => checkedIds.has(i.checkoffId || i.id)).length;
   const supplements = scheduledItems.filter(i => i.category === "supplement").length;
   const rituals = scheduledItems.filter(i => i.category === "ritual").length;
 
@@ -195,22 +215,22 @@ export default async function Dashboard() {
                 <div className="text-xs text-stone-500 leading-tight">Rituals</div>
               </Link>
               <Link href="/dashboard/mood-report?range=30" className="bg-white rounded-xl p-3 border border-stone-100 shadow-sm text-center hover:border-emerald-300 transition-colors">
-                <div className={`text-base font-bold ${checkedCount === totalItems ? "text-emerald-600" : "text-stone-900"}`}>
-                  {checkedCount}/{totalItems}
+                <div className={`text-base font-bold ${allDailyDone ? "text-emerald-600" : "text-stone-900"}`}>
+                  {dailyCheckedCount}/{dailyScheduledItems.length}
                 </div>
                 <div className="text-xs text-stone-500 leading-tight">Done</div>
               </Link>
             </div>
 
             {/* Progress bar */}
-            {totalItems > 0 && (
+            {dailyScheduledItems.length > 0 && (
               <div className="mb-5">
                 <div className="flex items-center justify-between mb-1.5">
                   <Link href="/dashboard/history" className="text-xs text-stone-500 hover:text-emerald-600 transition-colors flex items-center gap-1">
                     📅 Today&apos;s progress
                   </Link>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-stone-500">{Math.round((checkedCount / totalItems) * 100)}%</span>
+                    <span className="text-xs text-stone-500">{Math.round((dailyCheckedCount / dailyScheduledItems.length) * 100)}%</span>
                     <MarkAllDoneButton
                       stackItems={dailyScheduledItems.map(i => ({ id: i.id, doseIndex: i.doseIndex ?? 0 }))}
                       date={today}
@@ -221,7 +241,7 @@ export default async function Dashboard() {
                 <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                    style={{ width: `${(checkedCount / totalItems) * 100}%` }}
+                    style={{ width: `${(dailyCheckedCount / dailyScheduledItems.length) * 100}%` }}
                   />
                 </div>
               </div>
@@ -285,12 +305,27 @@ export default async function Dashboard() {
                                 currentQuantityUnit={item.quantity_unit}
                                 currentAutoDecrement={item.auto_decrement}
                                 currentDosesPerServing={item.doses_per_serving}
+                                currentPaused={item.is_paused}
+                                currentStartDate={item.start_date}
                                 asLabel
                                 labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
                               />
                               <div className="text-xs text-stone-400 truncate">
                                 {item.doseLabel ? item.doseLabel : item.dose ? item.dose.split(".")[0] : ""}
                               </div>
+                              {isLessThanDaily(item.timing) && (() => {
+                                const itemLogs = logsByItem.get(item.id) || [];
+                                const lastTaken = itemLogs[0] || null;
+                                const label = nextDueLabel(item.timing, lastTaken, today, itemLogs, item.start_date);
+                                if (!label) return null;
+                                const overdue = label.startsWith("Overdue");
+                                const dueToday = label === "Due today";
+                                return (
+                                  <div className={`text-[11px] mt-0.5 font-medium ${overdue ? "text-red-500" : dueToday ? "text-emerald-600" : "text-stone-500"}`}>
+                                    {label}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-0.5 ml-2 flex-shrink-0 min-w-fit">
@@ -365,7 +400,9 @@ export default async function Dashboard() {
                           currentQuantityRemaining={item.quantity_remaining}
                           currentQuantityUnit={item.quantity_unit}
                           currentAutoDecrement={item.auto_decrement}
-                                currentDosesPerServing={item.doses_per_serving}
+                          currentDosesPerServing={item.doses_per_serving}
+                          currentPaused={item.is_paused}
+                          currentStartDate={item.start_date}
                           asLabel
                           labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
                         />

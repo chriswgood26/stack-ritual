@@ -49,6 +49,12 @@ export default function RoadmapManager() {
 
   useEffect(() => { load(); }, []);
 
+  useEffect(() => {
+    function handleRoadmapUpdate() { load(); }
+    window.addEventListener("sr:roadmap-updated", handleRoadmapUpdate);
+    return () => window.removeEventListener("sr:roadmap-updated", handleRoadmapUpdate);
+  }, []);
+
   async function add() {
     if (!title.trim()) return;
     setAdding(true);

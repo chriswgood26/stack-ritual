@@ -15,9 +15,13 @@ import { getRitualIcon } from "@/lib/ritual-icons";
 
 export const dynamic = "force-dynamic";
 
-export default async function MyStackPage() {
+export default async function MyStackPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const user = await currentUser();
   if (!user) return null;
+
+  const viewParam = (await searchParams).view;
+  const view: "active" | "inactive" | "all" =
+    viewParam === "active" || viewParam === "inactive" ? viewParam : "all";
 
   const { data: stackItems } = await supabaseAdmin
     .from("user_stacks")
@@ -79,6 +83,27 @@ export default async function MyStackPage() {
 
         <AddCustomSupplement asLink />
 
+        {(total > 0 || pausedItems.length > 0) && (
+          <div className="grid grid-cols-3 gap-1 bg-stone-100 rounded-xl p-1">
+            {([
+              { key: "all", label: "All" },
+              { key: "active", label: `Active${total ? ` (${total})` : ""}` },
+              { key: "inactive", label: `Inactive${pausedItems.length ? ` (${pausedItems.length})` : ""}` },
+            ] as const).map(opt => {
+              const active = view === opt.key;
+              const href = opt.key === "all" ? "/dashboard/stack" : `/dashboard/stack?view=${opt.key}`;
+              return (
+                <Link key={opt.key} href={href}
+                  className={`text-center text-xs font-semibold py-2 rounded-lg transition-colors ${
+                    active ? "bg-white text-emerald-700 shadow-sm" : "text-stone-500 hover:text-stone-700"
+                  }`}>
+                  {opt.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
         {total === 0 && pausedItems.length === 0 ? (
           <div className="bg-white rounded-2xl border border-stone-100 p-8 text-center">
             <div className="text-4xl mb-3">🌿</div>
@@ -92,7 +117,7 @@ export default async function MyStackPage() {
         ) : (
           <>
             {/* Supplements */}
-            {supplements.length > 0 && (
+            {view !== "inactive" && supplements.length > 0 && (
               <div data-stack-section="supplements">
                 <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
                   💊 Supplements ({supplements.length})
@@ -137,6 +162,8 @@ export default async function MyStackPage() {
                             currentQuantityRemaining={item.quantity_remaining}
                             currentQuantityUnit={item.quantity_unit}
                             currentDosesPerServing={item.doses_per_serving}
+                            currentPaused={item.is_paused}
+                            currentStartDate={item.start_date}
                           />
                           <PauseStackItemButton itemId={item.id} paused={false} />
                           <DeleteStackItemButton itemId={item.id} />
@@ -149,7 +176,7 @@ export default async function MyStackPage() {
             )}
 
             {/* Rituals */}
-            {rituals.length > 0 && (
+            {view !== "inactive" && rituals.length > 0 && (
               <div data-stack-section="rituals">
                 <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
                   🧘 Rituals ({rituals.length})
@@ -177,6 +204,8 @@ export default async function MyStackPage() {
                             currentTiming={item.timing}
                             currentNotes={item.notes}
                             currentFrequency={item.frequency_type}
+                            currentPaused={item.is_paused}
+                            currentStartDate={item.start_date}
                           />
                           <PauseStackItemButton itemId={item.id} paused={false} />
                           <DeleteStackItemButton itemId={item.id} />
@@ -189,7 +218,7 @@ export default async function MyStackPage() {
             )}
 
             {/* Inactive (paused) */}
-            {pausedItems.length > 0 && (
+            {view !== "active" && pausedItems.length > 0 && (
               <div data-stack-section="inactive">
                 <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">
                   ⏸ Inactive ({pausedItems.length})
@@ -222,6 +251,18 @@ export default async function MyStackPage() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {view === "active" && total === 0 && (
+              <div className="bg-white rounded-2xl border border-stone-100 p-6 text-center text-sm text-stone-500">
+                No active items. Everything is paused — switch to <Link href="/dashboard/stack?view=inactive" className="text-emerald-700 font-medium">Inactive</Link> to resume.
+              </div>
+            )}
+
+            {view === "inactive" && pausedItems.length === 0 && (
+              <div className="bg-white rounded-2xl border border-stone-100 p-6 text-center text-sm text-stone-500">
+                Nothing paused. Items you pause will show up here.
               </div>
             )}
           </>

@@ -37,6 +37,15 @@ export async function POST(req: NextRequest) {
   });
   if (relErr) return NextResponse.json({ error: relErr.message }, { status: 500 });
 
+  // "Latest" is exclusive — demote any prior release that still holds the label
+  if (label === "Latest") {
+    await supabaseAdmin
+      .from("releases")
+      .update({ label: null, label_color: null })
+      .eq("label", "Latest")
+      .neq("version", version);
+  }
+
   // Pull the selected items in their current order
   const { data: items, error: itemsErr } = await supabaseAdmin
     .from("roadmap_items")

@@ -242,7 +242,7 @@ export default function QuantityAdjuster({ itemId, currentRemaining, currentTota
               {!confirmStop ? (
                 <button
                   onClick={() => setConfirmStop(true)}
-                  className="w-full text-xs text-stone-400 hover:text-red-500 transition-colors py-1"
+                  className="w-full text-xs font-medium text-emerald-600 hover:text-red-500 transition-colors py-1"
                 >
                   Stop tracking inventory
                 </button>

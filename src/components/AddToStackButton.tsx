@@ -7,6 +7,7 @@ import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
 import EditStackItemButton from "./EditStackItemButton";
 import { parseServingCount } from "@/lib/serving";
+import { isLessThanDaily } from "@/lib/next-due";
 
 interface ExistingItem {
   id: string;
@@ -41,6 +42,7 @@ export default function AddToStackButton({ supplementId, supplementName, default
   const [quantityRemaining, setQuantityRemaining] = useState("");
   const [quantityUnit, setQuantityUnit] = useState("capsules");
   const [dosesPerServing, setDosesPerServing] = useState("1");
+  const [startDate, setStartDate] = useState("");
   const [scanError, setScanError] = useState("");
   const router = useRouter();
 
@@ -73,6 +75,7 @@ export default function AddToStackButton({ supplementId, supplementName, default
           quantity_remaining: quantityRemaining,
           quantity_unit: quantityUnit,
           doses_per_serving: dosesPerServing,
+          start_date: isLessThanDaily(timing) ? (startDate || null) : null,
         }),
       });
       const data = await res.json();
@@ -204,6 +207,19 @@ export default function AddToStackButton({ supplementId, supplementName, default
             </optgroup>
           </select>
         </div>
+
+        {isLessThanDaily(timing) && (
+          <div>
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Start date (optional)</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+            />
+            <p className="text-[11px] text-stone-400 mt-1">Pick when this schedule begins — leave blank to start today.</p>
+          </div>
+        )}
 
         <div>
           <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide block mb-1.5">Brand (optional)</label>

@@ -41,11 +41,13 @@ export default async function ProfilePage() {
   const [
     { data: myExperiences },
     { data: subscription },
-    { data: stackItems }
+    { data: stackItems },
+    { data: latestRelease }
   ] = await Promise.all([
     supabaseAdmin.from("experiences").select("id, rating, title, body, created_at, supplement:supplement_id(name, icon, slug)").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
     supabaseAdmin.from("subscriptions").select("plan, status, current_period_end, stripe_customer_id").eq("user_id", userId).single(),
     supabaseAdmin.from("user_stacks").select("id, custom_name, supplement:supplement_id(name, icon), timing, dose").eq("user_id", userId).eq("is_active", true).order("created_at", { ascending: false }).limit(5),
+    supabaseAdmin.from("releases").select("version").order("released_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
   const plan = subscription?.plan || "free";
@@ -292,7 +294,7 @@ export default async function ProfilePage() {
             {plan !== "free" && <ManageBillingButton />}
             <div className="flex items-center justify-between px-4 py-4">
               <span className="text-sm text-stone-600">Version</span>
-              <span className="text-sm text-stone-400">v1.3</span>
+              <span className="text-sm text-stone-400">{latestRelease?.version || "—"}</span>
             </div>
             <Link href="/help" className="flex items-center justify-between px-4 py-4 hover:bg-stone-50 transition-colors">
               <div className="flex items-center gap-3">
