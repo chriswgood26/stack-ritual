@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { SMS_CONSENT_TEXT } from "@/lib/sms";
 
 interface Settings {
   phone_number: string | null;
@@ -14,11 +15,7 @@ interface Settings {
   sms_consent_at: string | null;
 }
 
-const SMS_LIVE = process.env.NEXT_PUBLIC_SMS_ENABLED === "true";
-
-const CONSENT_TEXT = "I agree to receive recurring automated text message reminders from Stack Ritual at the phone number above. Consent is not a condition of purchase. Message frequency varies by my reminder settings. Msg & data rates may apply. Reply STOP to unsubscribe, HELP for help.";
-
-export default function SMSSettings({ isPro }: { isPro: boolean }) {
+export default function SMSSettings({ isPro, smsLive }: { isPro: boolean; smsLive: boolean }) {
   const [open, setOpen] = useState(false);
   const [settings, setSettings] = useState<Settings>({
     phone_number: "",
@@ -124,7 +121,7 @@ export default function SMSSettings({ isPro }: { isPro: boolean }) {
                 <p className="font-semibold text-stone-900 text-sm mb-1">Pro Feature</p>
                 <p className="text-stone-500 text-sm">Upgrade to Pro to get SMS reminders with click-to-mark-done links.</p>
               </div>
-            ) : !SMS_LIVE ? (
+            ) : !smsLive ? (
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center space-y-3">
                 <div className="text-4xl">📱</div>
                 <div>
@@ -182,7 +179,7 @@ export default function SMSSettings({ isPro }: { isPro: boolean }) {
                       className="mt-0.5 w-4 h-4 accent-emerald-600 flex-shrink-0"
                     />
                     <span className="text-xs text-stone-600 leading-relaxed">
-                      {CONSENT_TEXT} See our{" "}
+                      {SMS_CONSENT_TEXT} See our{" "}
                       <a href="/terms" target="_blank" className="text-emerald-700 underline">Terms</a> and{" "}
                       <a href="/privacy" target="_blank" className="text-emerald-700 underline">Privacy Policy</a>.
                     </span>

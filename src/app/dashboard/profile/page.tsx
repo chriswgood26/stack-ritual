@@ -14,6 +14,7 @@ import SMSSettings from "@/components/SMSSettings";
 import EmailSettings from "@/components/EmailSettings";
 import ReferralCodeInput from "@/components/ReferralCodeInput";
 import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
+import { isSmsReviewer } from "@/lib/sms";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,10 @@ export default async function ProfilePage() {
 
   const plan = subscription?.plan || "free";
   const isPayingPro = plan === "pro" && !!subscription?.stripe_customer_id;
+  // Twilio A2P 10DLC isn't approved yet, so SMS is gated globally — but we
+  // bypass the gate for allowlisted reviewer accounts so Twilio can verify
+  // the live opt-in form during CTA review.
+  const smsLive = process.env.NEXT_PUBLIC_SMS_ENABLED === "true" || isSmsReviewer(email);
 
   const memberSince = new Date(user.createdAt || Date.now()).toLocaleDateString("en-US", {
     month: "long", year: "numeric"
@@ -288,7 +293,7 @@ export default async function ProfilePage() {
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="divide-y divide-stone-50">
             <EmailSettings isPlusOrPro={plan === "plus" || plan === "pro"} />
-            <SMSSettings isPro={plan === "pro"} />
+            <SMSSettings isPro={plan === "pro"} smsLive={smsLive} />
             <ShareModalButton isPayingPro={isPayingPro} />
             <FeedbackButton />
             {plan !== "free" && <ManageBillingButton />}

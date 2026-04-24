@@ -2,10 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendSMS } from "@/lib/twilio";
-
-// The exact text the user must agree to — version-tracked so we can prove
-// which disclosure they accepted if there's ever a TCPA complaint.
-export const SMS_CONSENT_TEXT = "By enabling SMS reminders, I agree to receive recurring automated text messages from Stack Ritual at the phone number provided, including reminders for my chosen stack times. Consent is not a condition of purchase. Message frequency varies by my reminder settings. Msg & data rates may apply. Reply STOP to unsubscribe, HELP for help. See stackritual.com/terms and stackritual.com/privacy.";
+import { SMS_CONSENT_TEXT } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();

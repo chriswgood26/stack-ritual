@@ -12,7 +12,7 @@ export default function PrivacyPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-10 pb-20">
         <h1 className="text-3xl font-bold text-stone-900 mb-2">Privacy Policy</h1>
-        <p className="text-stone-500 text-sm mb-8">Last updated: March 2026 · Version 1.0</p>
+        <p className="text-stone-500 text-sm mb-8">Last updated: April 2026 · Version 1.1</p>
 
         <div className="space-y-8 text-stone-700 text-sm leading-relaxed">
 
@@ -95,15 +95,16 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold text-stone-900 mb-3">7. SMS / Text Messaging</h2>
             <p className="mb-3">If you opt in to SMS reminders, the following terms apply:</p>
             <ul className="list-disc pl-5 space-y-1.5">
+              <li><strong>No sharing of opt-in data:</strong> Mobile information, including phone numbers and SMS opt-in consent data, will <strong>not be shared with third parties or affiliates for marketing or promotional purposes</strong>. Information sharing for the limited purpose of delivering messages you have requested is described below under &ldquo;Service providers.&rdquo;</li>
               <li><strong>Consent is not a condition of purchase.</strong> You can use Stack Ritual fully without receiving any text messages.</li>
               <li><strong>Message types:</strong> Transactional reminders based on your configured stack times, plus confirmation and service messages (e.g., double opt-in).</li>
               <li><strong>Message frequency:</strong> Varies based on your reminder settings — typically 0–4 messages per day.</li>
               <li><strong>Carriers:</strong> Messages are sent via Twilio, a licensed US messaging provider. Carriers are not liable for delayed or undelivered messages.</li>
               <li><strong>Rates:</strong> Message and data rates may apply depending on your mobile plan.</li>
-              <li><strong>Opt-out:</strong> Reply <strong>STOP</strong> to any SMS to unsubscribe immediately. You&rsquo;ll receive a final confirmation and no further messages.</li>
+              <li><strong>Opt-out:</strong> Reply <strong>STOP</strong>, <strong>UNSUBSCRIBE</strong>, <strong>QUIT</strong>, or <strong>CANCEL</strong> to any SMS to unsubscribe immediately. You&rsquo;ll receive a final confirmation and no further messages. To re-subscribe, reply <strong>START</strong> or re-enable SMS in your account profile.</li>
               <li><strong>Help:</strong> Reply <strong>HELP</strong> for help, or email <a href="mailto:hello@stackritual.com" className="text-emerald-600 underline">hello@stackritual.com</a>.</li>
-              <li><strong>Phone number sharing:</strong> Your phone number is only shared with Twilio for the purpose of delivering messages you&rsquo;ve opted into. It is never sold or shared with marketers.</li>
-              <li><strong>Proof of consent:</strong> We record when and how you opted in (timestamp, IP address, exact consent language shown) to comply with TCPA requirements.</li>
+              <li><strong>Service providers:</strong> Your phone number is shared only with Twilio (our messaging carrier) for the sole purpose of delivering the reminders you have opted into. It is never sold, rented, or disclosed to advertisers, marketers, data brokers, or affiliates for any marketing purpose.</li>
+              <li><strong>Proof of consent:</strong> We record when and how you opted in (timestamp, IP address, and the exact consent language you agreed to) to comply with TCPA and CTIA requirements.</li>
             </ul>
           </section>
 
