@@ -9,7 +9,7 @@ Add an AI-powered analysis feature for Plus and Pro users that reads the user's 
 
 ## Tier gating
 
-- **Free:** entry-point card on `/dashboard/stack` shows a locked state with an upgrade prompt. The API rejects with `402 plan_required, plan: 'plus'`.
+- **Free:** entry-point card on `/dashboard/stack` shows a locked state with an upgrade prompt. The API rejects with `403 plan_required, plan: 'plus'` (matching the existing `/api/supplements/scan` pattern).
 - **Plus and Pro:** full access. This feature finally fulfills the existing Plus-tier "interactions checker" promise.
 
 ## Trigger model
@@ -181,11 +181,13 @@ Response 200:
 ```
 
 Error responses:
-- `402 plan_required` `{ plan: 'plus' }` — free user
+- `403 plan_required` `{ plan: 'plus' }` — free user
 - `403 disclaimer_required` `{ current_version: 1 }`
 - `409 empty_stack`
 - `429 rate_limited` `{ retry_after: ISO-string }`
 - `500 analysis_failed`
+
+(Both 403 codes share the status; the JSON `error` field discriminates.)
 
 Types:
 ```ts
