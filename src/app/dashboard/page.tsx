@@ -307,6 +307,7 @@ export default async function Dashboard() {
                                 currentDosesPerServing={item.doses_per_serving}
                                 currentPaused={item.is_paused}
                                 currentStartDate={item.start_date}
+                                isRitual={item.category === "ritual"}
                                 asLabel
                                 labelClassName={`font-medium text-sm truncate block ${isChecked ? "text-stone-400 line-through" : "text-stone-900 hover:text-emerald-700 transition-colors cursor-pointer"}`}
                               />

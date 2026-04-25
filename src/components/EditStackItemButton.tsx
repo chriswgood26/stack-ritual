@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
+import BuyLinks from "./BuyLinks";
 import { parseServingCount } from "@/lib/serving";
 import { isLessThanDaily } from "@/lib/next-due";
 
@@ -23,6 +24,7 @@ interface Props {
   currentDosesPerServing?: number | null;
   currentPaused?: boolean | null;
   currentStartDate?: string | null;
+  isRitual?: boolean;
   asLabel?: boolean;
   labelClassName?: string;
 }
@@ -58,7 +60,7 @@ const timingOptions = [
   ]},
 ];
 
-export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, currentDosesPerServing, currentPaused, currentStartDate, asLabel = false, labelClassName }: Props) {
+export default function EditStackItemButton({ itemId, currentDose, currentTiming, currentBrand, currentNotes, currentFrequency, name, displayName, currentQuantityTotal, currentQuantityRemaining, currentQuantityUnit, currentAutoDecrement, currentDosesPerServing, currentPaused, currentStartDate, isRitual = false, asLabel = false, labelClassName }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -352,6 +354,15 @@ export default function EditStackItemButton({ itemId, currentDose, currentTiming
                 </div>
               )}
             </div>
+
+            {!isRitual ? (
+              <div className="rounded-xl border border-stone-200 bg-white p-4">
+                <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">
+                  Need a refill?
+                </p>
+                <BuyLinks name={name} />
+              </div>
+            ) : null}
 
             <div className="flex gap-3 pt-2">
               <button onClick={() => setOpen(false)}

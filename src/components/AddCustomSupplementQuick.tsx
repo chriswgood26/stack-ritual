@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ScanLabelButton from "./ScanLabelButton";
 import type { ScanResult } from "./ScanLabelButton";
+import BuyLinks from "./BuyLinks";
 import { isLessThanDaily } from "@/lib/next-due";
 
 export default function AddCustomSupplementQuick({ name }: { name: string }) {
@@ -230,6 +231,15 @@ export default function AddCustomSupplementQuick({ name }: { name: string }) {
       )}
 
       {status === "error" && <p className="text-red-500 text-xs text-center">Something went wrong. Try again.</p>}
+
+      {!form.isRitual ? (
+        <div className="rounded-xl border border-stone-200 bg-white p-4">
+          <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">
+            Don&rsquo;t have it yet?
+          </p>
+          <BuyLinks name={form.name || name} />
+        </div>
+      ) : null}
 
       <button onClick={handleSubmit} disabled={status === "loading" || !form.name.trim()}
         className="w-full bg-emerald-700 text-white py-3.5 rounded-2xl font-semibold hover:bg-emerald-800 transition-colors disabled:opacity-60">

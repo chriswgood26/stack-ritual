@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
 
 const faqs = [
   {
@@ -28,7 +29,7 @@ const faqs = [
     questions: [
       {
         q: "What's the difference between Free, Plus, and Pro?",
-        a: "Free includes up to 5 supplements, basic research, and the print summary. Plus ($4.99/mo) adds unlimited supplements, the full research library, email reminders, and weekly summaries. Pro ($9.99/mo) adds everything in Plus plus SMS text reminders with click-to-mark-done links (coming soon)."
+        a: "Free includes up to 5 supplements, basic research, and the print summary. Plus ($4.99/mo) adds unlimited supplements, the full research library, email reminders, weekly summaries, and AI stack analysis. Pro ($9.99/mo) adds everything in Plus plus SMS text reminders with click-to-mark-done links (coming soon)."
       },
       {
         q: "What happens if I cancel my subscription?",
@@ -83,6 +84,18 @@ const faqs = [
       {
         q: "Can I see how my mood correlates with my supplement routine?",
         a: "Yes! The Mood & Wellness Report (accessible from the History page or your Profile) shows your average daily mood, trends over time, and — most valuably — how your mood compares on days you complete your stack vs. days you don't."
+      },
+      {
+        q: "Can AI analyze my supplement stack?",
+        a: "Yes! Plus and Pro members can use AI Stack Analysis to get an at-a-glance breakdown of your current stack across five sections: Synergies (what works well together), Interactions (what may reduce absorption or shouldn't be taken together), Timing (when to move things to a different time of day for better effect), Redundancies (multiple items doing the same thing), and Recommended additions (gaps worth considering). Tap the ✨ Analyze my stack card on the My Stack page to run it. The first time you use it, you'll be asked to acknowledge that the analysis is informational, not medical advice."
+      },
+      {
+        q: "How often can I re-run the AI stack analysis?",
+        a: "When you change your stack — adding, removing, or editing a supplement — your next analysis is free and refreshes automatically. If your stack hasn't changed and you just want a fresh look, you can manually re-run the analysis up to 3 times per day. The card on the My Stack page tells you when you last analyzed and whether anything has changed since."
+      },
+      {
+        q: "Is the AI analysis medical advice?",
+        a: "No. The AI Stack Analysis is informational only and is intentionally written to hedge — it points out interactions, synergies, and timing tweaks that are well-supported by research, but it can't replace a conversation with your doctor or pharmacist. Always talk to a qualified healthcare provider before adding, removing, or changing a supplement based on the analysis."
       },
       {
         q: "Can I scan a supplement label to add it to my stack?",
@@ -159,14 +172,23 @@ function FAQItem({ q, a, isSpecial }: { q: string; a: string | null; isSpecial?:
   );
 }
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const user = await currentUser();
+  const isSignedIn = !!user;
+  const homeHref = isSignedIn ? "/dashboard" : "/";
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
-      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center gap-3">
-        <Link href="/" className="flex items-center gap-2">
+      <nav className="bg-white border-b border-stone-200 px-4 py-3.5 flex items-center justify-between gap-3">
+        <Link href={homeHref} className="flex items-center gap-2">
           <span className="text-lg">🌿</span>
           <span className="font-bold text-stone-900">Stack Ritual</span>
         </Link>
+        {isSignedIn ? (
+          <Link href={homeHref} className="text-sm text-stone-600 hover:text-emerald-700">
+            ← Back to app
+          </Link>
+        ) : null}
       </nav>
 
       <div className="max-w-3xl mx-auto px-4 py-10 pb-20">
@@ -199,7 +221,9 @@ export default function FAQPage() {
           <Link href="/help" className="text-emerald-600 hover:underline">📘 User Guide</Link>
           <Link href="/terms" className="text-emerald-600 hover:underline">Terms & Conditions</Link>
           <Link href="/privacy" className="text-emerald-600 hover:underline">Privacy Policy</Link>
-          <Link href="/" className="text-stone-500 hover:text-stone-700">← Home</Link>
+          <Link href={homeHref} className="text-stone-500 hover:text-stone-700">
+            {isSignedIn ? "← Back to app" : "← Home"}
+          </Link>
         </div>
       </div>
     </div>

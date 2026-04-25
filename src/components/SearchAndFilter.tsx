@@ -1,7 +1,7 @@
 "use client";
 import EvidenceBadge from "@/components/EvidenceBadge";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 
 interface Supplement {
@@ -32,9 +32,16 @@ const evidenceColor: Record<string, string> = {
   limited: "bg-stone-100 text-stone-500",
 };
 
-export default function SearchAndFilter({ supplements, onQueryChange, onResultsChange }: { supplements: Supplement[]; onQueryChange?: (q: string) => void; onResultsChange?: (hasResults: boolean) => void }) {
-  const [query, setQuery] = useState("");
+export default function SearchAndFilter({ supplements, onQueryChange, onResultsChange, initialQuery = "" }: { supplements: Supplement[]; onQueryChange?: (q: string) => void; onResultsChange?: (hasResults: boolean) => void; initialQuery?: string }) {
+  const [query, setQuery] = useState(initialQuery);
   const updateQuery = (q: string) => { setQuery(q); onQueryChange?.(q); };
+
+  // Sync parent with the initial query from a deep link (e.g. ?q=creatine)
+  useEffect(() => {
+    if (initialQuery) onQueryChange?.(initialQuery);
+    // run once on mount only — initialQuery is the deep-link source of truth
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   // Notify parent of results
   const prevHasResults = typeof window !== "undefined" ? true : true;

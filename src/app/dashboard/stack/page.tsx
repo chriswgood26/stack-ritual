@@ -12,6 +12,7 @@ import StackSearchBar from "@/components/StackSearchBar";
 import StackSearch from "@/components/StackSearch";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getRitualIcon } from "@/lib/ritual-icons";
+import StackAnalysisCard from "@/components/StackAnalysisCard";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,8 @@ export default async function MyStackPage({ searchParams }: { searchParams: Prom
             </Link>
           </div>
         </div>
+
+        <StackAnalysisCard />
 
         <StackSearchBar />
 
@@ -164,6 +167,7 @@ export default async function MyStackPage({ searchParams }: { searchParams: Prom
                             currentDosesPerServing={item.doses_per_serving}
                             currentPaused={item.is_paused}
                             currentStartDate={item.start_date}
+                            isRitual={item.category === "ritual"}
                           />
                           <PauseStackItemButton itemId={item.id} paused={false} />
                           <DeleteStackItemButton itemId={item.id} />
@@ -206,6 +210,7 @@ export default async function MyStackPage({ searchParams }: { searchParams: Prom
                             currentFrequency={item.frequency_type}
                             currentPaused={item.is_paused}
                             currentStartDate={item.start_date}
+                            isRitual={item.category === "ritual"}
                           />
                           <PauseStackItemButton itemId={item.id} paused={false} />
                           <DeleteStackItemButton itemId={item.id} />

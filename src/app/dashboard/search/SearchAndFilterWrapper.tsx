@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import SearchAndFilter from "@/components/SearchAndFilter";
 import AddCustomSupplement from "@/components/AddCustomSupplement";
 import AddCustomSupplementQuick from "@/components/AddCustomSupplementQuick";
@@ -16,13 +17,16 @@ interface Supplement {
 }
 
 export default function SearchAndFilterWrapper({ supplements }: { supplements: Supplement[] }) {
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
+  const [query, setQuery] = useState(initialQuery);
   const [hasResults, setHasResults] = useState(true);
 
   return (
     <>
       <SearchAndFilter
         supplements={supplements}
+        initialQuery={initialQuery}
         onQueryChange={setQuery}
         onResultsChange={setHasResults}
       />

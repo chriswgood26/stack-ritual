@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { currentUser } from "@clerk/nextjs/server";
 
 export const metadata: Metadata = {
   title: "User Guide — Stack Ritual",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 const SECTIONS = [
   { id: "getting-started", title: "Getting Started" },
   { id: "your-stack", title: "Your Stack" },
+  { id: "stack-analysis", title: "AI Stack Analysis" },
   { id: "today-page", title: "The Today Page" },
   { id: "reminders", title: "Reminders (Email & SMS)" },
   { id: "inventory", title: "Inventory Tracking" },
@@ -38,18 +40,24 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
-export default function HelpPage() {
+export default async function HelpPage() {
+  const user = await currentUser();
+  const isSignedIn = !!user;
+  const homeHref = isSignedIn ? "/dashboard" : "/";
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
       <nav className="bg-white border-b border-stone-200 px-4 py-4 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-stone-900 font-bold">
+          <Link href={homeHref} className="flex items-center gap-2 text-stone-900 font-bold">
             <span className="text-2xl">🌿</span>
             <span>Stack Ritual</span>
           </Link>
           <div className="flex gap-4 text-sm text-stone-600">
             <Link href="/faq" className="hover:text-emerald-700">FAQ</Link>
-            <Link href="/dashboard" className="hover:text-emerald-700">Open app</Link>
+            <Link href={homeHref} className="hover:text-emerald-700">
+              {isSignedIn ? "← Back to app" : "Open app"}
+            </Link>
           </div>
         </div>
       </nav>
@@ -99,6 +107,21 @@ export default function HelpPage() {
             </ul>
             <p><strong>Pausing items:</strong> tap the ⏸ button on any item to temporarily hide it from the Today page and stop it from triggering reminders, without losing your settings. Paused items appear in an &ldquo;Inactive&rdquo; section at the bottom of My Stack, and you can resume them any time.</p>
             <p><strong>Editing:</strong> tap the ✏️ icon or the supplement name to edit dose, timing, brand, notes, quantity tracking, and per-serving count.</p>
+          </Section>
+
+          <Section id="stack-analysis" title="AI Stack Analysis">
+            <p>Plus and Pro members can run an AI analysis of their current stack to surface synergies, interactions, timing tweaks, redundancies, and recommended additions. Open <strong>My Stack</strong> and tap the <strong>✨ Analyze my stack</strong> card near the top.</p>
+            <p><strong>What you get:</strong> the analysis page is broken into five collapsible sections.</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Synergies</strong> — pairs or groups in your stack that work well together (e.g., magnesium + B6 absorption).</li>
+              <li><strong>Interactions</strong> — items that may reduce each other&rsquo;s effectiveness, compete for absorption, or shouldn&rsquo;t be co-administered. Each one carries an info / caution / warning severity.</li>
+              <li><strong>Timing</strong> — concrete suggestions to move items to a different time of day for better effect.</li>
+              <li><strong>Redundancies</strong> — multiple items targeting the same mechanism, in case you&rsquo;d prefer to consolidate.</li>
+              <li><strong>Recommended additions</strong> — supplements worth considering, with a one-tap <strong>Add to stack</strong> button if the recommendation matches an item in our research library, or <strong>Search to add</strong> if it doesn&rsquo;t.</li>
+            </ul>
+            <p><strong>First-run safety check.</strong> The first time you analyze your stack, you&rsquo;ll be asked to confirm you understand the analysis is informational, not medical advice. Always talk to your doctor before adding, removing, or changing a supplement.</p>
+            <p><strong>Re-running.</strong> When your stack changes — you add, remove, or edit something — the next analysis is free and the card on My Stack will tell you how many items have changed since your last run. If nothing has changed and you just want a fresh look, you can manually re-run up to <strong>3 times per day</strong>.</p>
+            <p><strong>What&rsquo;s included.</strong> Only items that are <em>active</em> and <em>not paused</em> are sent to the AI. Paused items are deliberately excluded so the analysis focuses on what you&rsquo;re actually taking right now.</p>
           </Section>
 
           <Section id="today-page" title="The Today Page">
