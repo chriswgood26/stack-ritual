@@ -17,6 +17,7 @@ export default function AnalysisPage() {
   const [error, setError] = useState<string | null>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showDemoBanner, setShowDemoBanner] = useState(false);
+  const [plan, setPlan] = useState<"free" | "plus" | "pro" | null>(null);
   const autoRunOnNextLoad = useRef(false);
 
   const load = useCallback(async () => {
@@ -52,6 +53,15 @@ export default function AnalysisPage() {
         } catch {
           // best-effort; banner just won't render
         }
+      }
+      try {
+        const planRes = await fetch("/api/me/plan", { credentials: "include" });
+        if (planRes.ok) {
+          const j = await planRes.json() as { plan: "free" | "plus" | "pro" };
+          setPlan(j.plan);
+        }
+      } catch {
+        // best-effort
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
@@ -153,6 +163,19 @@ export default function AnalysisPage() {
 
   const a = latest?.analysis ?? null;
 
+  const followups = latest?.followups ?? [];
+  const followupCount = followups.length;
+  const capReached = followupCount >= 20;
+  const isPro = plan === "pro";
+  const planLocked = plan !== "pro";
+
+  function followupsFor(
+    sectionName: "synergies" | "interactions" | "timing" | "redundancies" | "recommendations",
+    idx: number,
+  ) {
+    return followups.filter(f => f.section === sectionName && f.finding_index === idx);
+  }
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
       <TopNav />
@@ -229,6 +252,12 @@ export default function AnalysisPage() {
         </div>
       ) : null}
 
+      {a && isPro ? (
+        <p className="mt-3 text-xs text-stone-500">
+          {followupCount}/20 follow-ups used on this analysis.
+        </p>
+      ) : null}
+
       <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 text-xs text-stone-600">
         Informational only. Talk to your doctor before changing what you take.
       </div>
@@ -241,7 +270,19 @@ export default function AnalysisPage() {
             emptyMessage="No synergies flagged in your current stack."
           >
             {a.analysis.synergies.map((f, i) => (
-              <AnalysisFindingCard key={i} finding={f} />
+              <AnalysisFindingCard
+                key={i}
+                finding={f}
+                section="synergies"
+                findingIndex={i}
+                analysisId={a.id}
+                followups={followupsFor("synergies", i)}
+                isPro={isPro}
+                planLocked={planLocked}
+                capReached={capReached}
+                reanalyzing={running}
+                onFollowupCreated={load}
+              />
             ))}
           </AnalysisSection>
 
@@ -251,7 +292,19 @@ export default function AnalysisPage() {
             emptyMessage="No interactions flagged in your current stack."
           >
             {a.analysis.interactions.map((f, i) => (
-              <AnalysisFindingCard key={i} finding={f} />
+              <AnalysisFindingCard
+                key={i}
+                finding={f}
+                section="interactions"
+                findingIndex={i}
+                analysisId={a.id}
+                followups={followupsFor("interactions", i)}
+                isPro={isPro}
+                planLocked={planLocked}
+                capReached={capReached}
+                reanalyzing={running}
+                onFollowupCreated={load}
+              />
             ))}
           </AnalysisSection>
 
@@ -261,7 +314,19 @@ export default function AnalysisPage() {
             emptyMessage="No timing changes suggested."
           >
             {a.analysis.timing.map((f, i) => (
-              <AnalysisFindingCard key={i} finding={f} />
+              <AnalysisFindingCard
+                key={i}
+                finding={f}
+                section="timing"
+                findingIndex={i}
+                analysisId={a.id}
+                followups={followupsFor("timing", i)}
+                isPro={isPro}
+                planLocked={planLocked}
+                capReached={capReached}
+                reanalyzing={running}
+                onFollowupCreated={load}
+              />
             ))}
           </AnalysisSection>
 
@@ -271,7 +336,19 @@ export default function AnalysisPage() {
             emptyMessage="No redundancies flagged."
           >
             {a.analysis.redundancies.map((f, i) => (
-              <AnalysisFindingCard key={i} finding={f} />
+              <AnalysisFindingCard
+                key={i}
+                finding={f}
+                section="redundancies"
+                findingIndex={i}
+                analysisId={a.id}
+                followups={followupsFor("redundancies", i)}
+                isPro={isPro}
+                planLocked={planLocked}
+                capReached={capReached}
+                reanalyzing={running}
+                onFollowupCreated={load}
+              />
             ))}
           </AnalysisSection>
 
@@ -281,7 +358,18 @@ export default function AnalysisPage() {
             emptyMessage="No recommendations at this time."
           >
             {a.analysis.recommendations.map((rec, i) => (
-              <AnalysisRecommendationCard key={i} rec={rec} />
+              <AnalysisRecommendationCard
+                key={i}
+                rec={rec}
+                findingIndex={i}
+                analysisId={a.id}
+                followups={followupsFor("recommendations", i)}
+                isPro={isPro}
+                planLocked={planLocked}
+                capReached={capReached}
+                reanalyzing={running}
+                onFollowupCreated={load}
+              />
             ))}
           </AnalysisSection>
         </div>
