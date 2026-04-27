@@ -131,11 +131,26 @@ export default async function AdminDashboard() {
       <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4 mb-6">
         <Link href="/admin/users" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">👤</div>
           <div className="text-2xl font-bold text-white">{usersR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Total Users</div>
+        </Link>
+        <Link href="/admin/users" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
+          <div className="text-2xl mb-1">🆕</div>
+          <div className="text-2xl font-bold text-white">{signupsToday}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Signups Today</div>
+        </Link>
+        <Link href="/admin/users" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
+          <div className="text-2xl mb-1">📅</div>
+          <div className="text-2xl font-bold text-white">{signupsWeek}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Signups This Week</div>
+        </Link>
+        <Link href="/admin/users" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
+          <div className="text-2xl mb-1">🗓️</div>
+          <div className="text-2xl font-bold text-white">{signupsMonth}</div>
+          <div className="text-xs text-stone-400 mt-0.5">Signups This Month</div>
         </Link>
         <Link href="/admin/supplements" className="bg-stone-800 border border-stone-700 rounded-xl p-4 hover:border-emerald-500/40 hover:bg-stone-800/70 transition-colors">
           <div className="text-2xl mb-1">🧱</div>
@@ -162,28 +177,6 @@ export default async function AdminDashboard() {
           <div className="text-2xl font-bold text-white">{affiliatesR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Affiliates</div>
         </Link>
-      </div>
-
-      {/* Recent Sign Ups */}
-      <div className="bg-stone-800 rounded-2xl border border-stone-700 p-5 mb-6">
-        <h2 className="font-bold text-white mb-4">Recent Sign Ups</h2>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-stone-900 rounded-xl p-4">
-            <div className="text-xs text-stone-400 uppercase tracking-wider">Today</div>
-            <div className="text-white text-2xl font-bold mt-1">{signupsToday}</div>
-            <div className="text-stone-500 text-xs mt-1">new users</div>
-          </div>
-          <div className="bg-stone-900 rounded-xl p-4">
-            <div className="text-xs text-stone-400 uppercase tracking-wider">This Week</div>
-            <div className="text-white text-2xl font-bold mt-1">{signupsWeek}</div>
-            <div className="text-stone-500 text-xs mt-1">new users</div>
-          </div>
-          <div className="bg-stone-900 rounded-xl p-4">
-            <div className="text-xs text-stone-400 uppercase tracking-wider">This Month</div>
-            <div className="text-white text-2xl font-bold mt-1">{signupsMonth}</div>
-            <div className="text-stone-500 text-xs mt-1">new users</div>
-          </div>
-        </div>
       </div>
 
       {/* Website Traffic */}
