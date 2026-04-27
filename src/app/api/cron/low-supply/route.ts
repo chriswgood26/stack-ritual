@@ -4,6 +4,7 @@ import { resend, getFromEmail } from "@/lib/resend";
 import { clerkClient } from "@clerk/nextjs/server";
 
 const CRON_SECRET = process.env.CRON_SECRET;
+const COOLDOWN_DAYS = 14;
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -11,8 +12,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Find all items with low supply (≤ 14 days remaining)
-  // Low supply = quantity_remaining ≤ (doses_per_day * 14)
+  // Items eligible for a low-supply alert:
+  // - active, not paused, alerts opted-in for the item
+  // - quantity_remaining <= 14
+  // - never alerted OR last alert was > 14 days ago
+  const cooldownCutoff = new Date();
+  cooldownCutoff.setDate(cooldownCutoff.getDate() - COOLDOWN_DAYS);
+
   const { data: lowItems } = await supabaseAdmin
     .from("user_stacks")
     .select("id, user_id, custom_name, dose, quantity_remaining, quantity_total, quantity_unit, doses_per_serving, supplement:supplement_id(name, slug)")
@@ -20,7 +26,8 @@ export async function GET(req: NextRequest) {
     .or("is_paused.is.null,is_paused.eq.false")
     .eq("low_supply_alert", true)
     .not("quantity_remaining", "is", null)
-    .lte("quantity_remaining", 14); // rough threshold — ≤14 doses left
+    .lte("quantity_remaining", 14)
+    .or(`last_low_supply_alert_sent_at.is.null,last_low_supply_alert_sent_at.lt.${cooldownCutoff.toISOString()}`);
 
   if (!lowItems || lowItems.length === 0) {
     return NextResponse.json({ message: "No low supply items", sent: 0 });
@@ -50,11 +57,12 @@ export async function GET(req: NextRequest) {
       // Check email preferences
       const { data: profile } = await supabaseAdmin
         .from("user_profiles")
-        .select("email_reminders_enabled")
+        .select("email_reminders_enabled, email_unsubscribed_all")
         .eq("user_id", userId)
         .single();
 
-      if (!profile?.email_reminders_enabled) continue;
+      if (!profile || profile.email_unsubscribed_all) continue;
+      if (!profile.email_reminders_enabled) continue;
 
       // Get user email from Clerk
       const users = await client.users.getUser(userId);
@@ -115,6 +123,16 @@ export async function GET(req: NextRequest) {
           </html>
         `,
       });
+
+      // Stamp the cooldown timestamp on every item included in this user's email
+      const itemIds = items.map(i => i.id);
+      const { error: updateErr } = await supabaseAdmin
+        .from("user_stacks")
+        .update({ last_low_supply_alert_sent_at: new Date().toISOString() })
+        .in("id", itemIds);
+      if (updateErr) {
+        console.error(`[cron/low-supply] cooldown stamp failed for user ${userId}:`, updateErr);
+      }
 
       sent++;
     } catch (e) {
