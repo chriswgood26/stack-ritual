@@ -68,7 +68,7 @@ export default function PersonalSettings({ initial }: Props) {
         <select
           value={sex}
           onChange={e => setSex(e.target.value as "" | "male" | "female")}
-          className="mt-1 block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
+          className="mt-1 block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900"
         >
           <option value="">Prefer not to say</option>
           <option value="male">Male</option>
@@ -87,7 +87,7 @@ export default function PersonalSettings({ initial }: Props) {
             aria-label="Month"
             value={birthMonth}
             onChange={e => setBirthMonth(e.target.value)}
-            className="rounded-lg border border-stone-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400"
           />
           <input
             type="number"
@@ -97,7 +97,7 @@ export default function PersonalSettings({ initial }: Props) {
             aria-label="Day"
             value={birthDay}
             onChange={e => setBirthDay(e.target.value)}
-            className="rounded-lg border border-stone-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400"
           />
           <input
             type="number"
@@ -107,7 +107,7 @@ export default function PersonalSettings({ initial }: Props) {
             aria-label="Year"
             value={birthYear}
             onChange={e => setBirthYear(e.target.value)}
-            className="rounded-lg border border-stone-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400"
           />
         </div>
         <p className="mt-1 text-xs text-stone-500">
