@@ -93,6 +93,15 @@ export async function GET() {
       )
     : { added: 0, removed: 0, modified: 0 };
 
+  // Followups for the latest analysis (if any)
+  const { data: followupRows } = latest
+    ? await supabaseAdmin
+        .from("analysis_followups")
+        .select("id, section, finding_index, question, answer, created_at")
+        .eq("analysis_id", latest.id)
+        .order("created_at", { ascending: true })
+    : { data: [] as Array<{ id: string; section: string; finding_index: number; question: string; answer: string; created_at: string }> };
+
   const body: LatestAnalysisResponse = {
     analysis: latest
       ? {
@@ -107,7 +116,7 @@ export async function GET() {
       ? changesSummaryHasChanges(changes)
       : false,
     changes_summary: changes,
-    followups: [], // TODO(Task 7): populate from analysis_followups table
+    followups: (followupRows ?? []) as LatestAnalysisResponse["followups"],
     disclaimer: {
       accepted: disclaimerAccepted,
       version: disclaimerVersion,
