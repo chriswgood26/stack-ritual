@@ -15,6 +15,7 @@ import QuantityAdjuster from "@/components/QuantityAdjuster";
 import MoodSlider from "@/components/MoodSlider";
 import ReferralCard from "@/components/ReferralCard";
 import { isLessThanDaily, nextDueLabel } from "@/lib/next-due";
+import { isUserBirthdayToday } from "@/lib/birthday";
 
 export const dynamic = "force-dynamic";
 
@@ -101,6 +102,13 @@ export default async function Dashboard() {
     .eq("logged_date", today)
     .single();
 
+  // Fetch birthday profile for Today page banner
+  const { data: bdayProfile } = await supabaseAdmin
+    .from("user_profiles")
+    .select("birth_month, birth_day, timezone")
+    .eq("user_id", userId)
+    .maybeSingle();
+
   // Expand multi-dose items into multiple entries
   type StackItem = NonNullable<typeof stackItems>[0] & { doseLabel?: string; doseIndex?: number; checkoffId?: string };
   const expandedItems: StackItem[] = [];
@@ -178,6 +186,18 @@ export default async function Dashboard() {
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
       <TopNav />
+
+      {bdayProfile && isUserBirthdayToday({
+        birth_month: bdayProfile.birth_month ?? null,
+        birth_day: bdayProfile.birth_day ?? null,
+        timezone: bdayProfile.timezone ?? null,
+      }) ? (
+        <div className="max-w-lg mx-auto px-4 pt-4">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            🎉 Happy birthday{firstName ? `, ${firstName}` : ""}! Wishing you a great year ahead.
+          </div>
+        </div>
+      ) : null}
 
       <div className="max-w-lg mx-auto px-4 py-6 pb-28">
 
