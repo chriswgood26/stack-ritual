@@ -252,7 +252,7 @@ export default function AnalysisPage() {
         </div>
       ) : null}
 
-      {a && isPro ? (
+      {a && isPro && followupCount > 0 ? (
         <p className="mt-3 text-xs text-stone-500">
           {followupCount}/20 follow-ups used on this analysis.
         </p>
