@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
   const { token } = await req.json();
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { data: sub } = await supabaseAdmin
     .from("newsletter_subscribers")
-    .select("id")
+    .select("id, email")
     .eq("unsubscribe_token", token)
     .maybeSingle();
 
@@ -26,6 +27,26 @@ export async function POST(req: NextRequest) {
     .update({ status: "stopped" })
     .eq("subscriber_id", sub.id)
     .eq("status", "active");
+
+  // Reverse sync: if a matching SR user exists, flip their email_marketing
+  // toggle to false so the in-app UI reflects the unsubscribe.
+  try {
+    const subEmail = sub.email?.toLowerCase().trim();
+    if (subEmail) {
+      const client = await clerkClient();
+      const userList = await client.users.getUserList({ emailAddress: [subEmail], limit: 1 });
+      const userData = userList.data ?? userList;
+      const matchedUserId = (Array.isArray(userData) ? userData[0]?.id : undefined) as string | undefined;
+      if (matchedUserId) {
+        await supabaseAdmin
+          .from("user_profiles")
+          .update({ email_marketing: false })
+          .eq("user_id", matchedUserId);
+      }
+    }
+  } catch (e) {
+    console.warn("[newsletter/unsubscribe] reverse sync failed", e);
+  }
 
   return NextResponse.json({ message: "unsubscribed" });
 }

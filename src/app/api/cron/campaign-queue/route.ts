@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { resend } from "@/lib/resend";
+import { clerkClient } from "@clerk/nextjs/server";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://stackritual.com";
@@ -75,6 +76,33 @@ export async function GET(req: NextRequest) {
         await supabaseAdmin.from("campaign_enrollments").update({ status: "stopped" }).eq("id", enr.id);
         continue;
       }
+
+      // Defensive read: if a matching SR user has email_marketing=false or
+      // email_unsubscribed_all=true, skip. Two-way sync at write time should
+      // make unsubscribed_at reflect this already, but the double-check keeps
+      // a single source of truth for sending decisions.
+      const subscriberEmail = enr.subscriber.email.toLowerCase();
+      const client = await clerkClient();
+      type ProfileFlags = { email_marketing: boolean | null; email_unsubscribed_all: boolean };
+      let matchingProfile: ProfileFlags | null = null;
+      try {
+        const userList = await client.users.getUserList({ emailAddress: [subscriberEmail], limit: 1 });
+        const userData = userList.data ?? userList;
+        const matchedUserId = (Array.isArray(userData) ? userData[0]?.id : undefined) as string | undefined;
+        if (matchedUserId) {
+          const { data: profile } = await supabaseAdmin
+            .from("user_profiles")
+            .select("email_marketing, email_unsubscribed_all")
+            .eq("user_id", matchedUserId)
+            .maybeSingle();
+          matchingProfile = profile as ProfileFlags | null;
+        }
+      } catch (e) {
+        // Clerk lookup failure is non-fatal; fall back to subscriber-table-only gating.
+        console.warn("[cron/campaign-queue] Clerk lookup failed for", subscriberEmail, e);
+      }
+      if (matchingProfile?.email_unsubscribed_all === true) continue;
+      if (matchingProfile?.email_marketing === false) continue;
 
       // Templates for this campaign
       const { data: templates } = await supabaseAdmin
