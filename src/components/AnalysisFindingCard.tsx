@@ -135,7 +135,7 @@ export default function AnalysisFindingCard({
               onChange={e => setQuestion(e.target.value.slice(0, 500))}
               placeholder="What do you want to know about this finding?"
               rows={2}
-              className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400"
               disabled={submitting || reanalyzing}
               aria-label="Follow-up question"
             />
