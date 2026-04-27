@@ -84,6 +84,7 @@ export default function PersonalSettings({ initial }: Props) {
             min={1}
             max={12}
             placeholder="MM"
+            aria-label="Month"
             value={birthMonth}
             onChange={e => setBirthMonth(e.target.value)}
             className="rounded-lg border border-stone-300 px-3 py-2 text-sm"
@@ -93,6 +94,7 @@ export default function PersonalSettings({ initial }: Props) {
             min={1}
             max={31}
             placeholder="DD"
+            aria-label="Day"
             value={birthDay}
             onChange={e => setBirthDay(e.target.value)}
             className="rounded-lg border border-stone-300 px-3 py-2 text-sm"
@@ -102,6 +104,7 @@ export default function PersonalSettings({ initial }: Props) {
             min={1900}
             max={2026}
             placeholder="YYYY"
+            aria-label="Year"
             value={birthYear}
             onChange={e => setBirthYear(e.target.value)}
             className="rounded-lg border border-stone-300 px-3 py-2 text-sm"
