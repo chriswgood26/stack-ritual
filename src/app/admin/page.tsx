@@ -41,6 +41,17 @@ export default async function AdminDashboard() {
   const startOfLastYear = new Date(yr - 1, 0, 1).toISOString();
   const endOfLastYear = new Date(yr, 0, 1).toISOString();
 
+  // Sign-up counts
+  const [signupsTodayR, signupsWeekR, signupsMonthR] = await Promise.all([
+    supabaseAdmin.from("user_profiles").select("*", { count: "exact", head: true }).gte("created_at", startOfToday),
+    supabaseAdmin.from("user_profiles").select("*", { count: "exact", head: true }).gte("created_at", startOfWeek),
+    supabaseAdmin.from("user_profiles").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth),
+  ]);
+
+  const signupsToday = signupsTodayR.count ?? 0;
+  const signupsWeek = signupsWeekR.count ?? 0;
+  const signupsMonth = signupsMonthR.count ?? 0;
+
   const [viewsTodayR, viewsYesterdayR, viewsWeekR, viewsLastWeekR, viewsMonthR, viewsLastMonthR, viewsTotalR, viewsLastYearR, sourcesR] = await Promise.all([
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfToday),
     supabaseAdmin.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", startOfYesterday).lt("created_at", endOfYesterday),
@@ -151,6 +162,28 @@ export default async function AdminDashboard() {
           <div className="text-2xl font-bold text-white">{affiliatesR.count ?? 0}</div>
           <div className="text-xs text-stone-400 mt-0.5">Affiliates</div>
         </Link>
+      </div>
+
+      {/* Recent Sign Ups */}
+      <div className="bg-stone-800 rounded-2xl border border-stone-700 p-5 mb-6">
+        <h2 className="font-bold text-white mb-4">Recent Sign Ups</h2>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">Today</div>
+            <div className="text-white text-2xl font-bold mt-1">{signupsToday}</div>
+            <div className="text-stone-500 text-xs mt-1">new users</div>
+          </div>
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">This Week</div>
+            <div className="text-white text-2xl font-bold mt-1">{signupsWeek}</div>
+            <div className="text-stone-500 text-xs mt-1">new users</div>
+          </div>
+          <div className="bg-stone-900 rounded-xl p-4">
+            <div className="text-xs text-stone-400 uppercase tracking-wider">This Month</div>
+            <div className="text-white text-2xl font-bold mt-1">{signupsMonth}</div>
+            <div className="text-stone-500 text-xs mt-1">new users</div>
+          </div>
+        </div>
       </div>
 
       {/* Website Traffic */}
