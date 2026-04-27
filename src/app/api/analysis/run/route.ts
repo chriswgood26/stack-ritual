@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import {
   CURRENT_DISCLAIMER_VERSION,
-  MANUAL_RERUN_DAILY_CAP,
   type AnalysisRunTrigger,
   type StackSnapshotItem,
 } from "@/lib/analysis-types";
@@ -106,26 +105,16 @@ export async function POST() {
       (latest.stack_snapshot as StackSnapshotItem[]) ?? [],
       stack,
     );
-    trigger = changesSummaryHasChanges(changes) ? "stack_changed" : "manual_rerun";
-  }
-
-  if (trigger === "manual_rerun") {
-    const startOfDayUtc = new Date();
-    startOfDayUtc.setUTCHours(0, 0, 0, 0);
-    const { count: usedToday } = await supabaseAdmin
-      .from("stack_analyses")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .eq("trigger", "manual_rerun")
-      .gte("created_at", startOfDayUtc.toISOString());
-    if ((usedToday ?? 0) >= MANUAL_RERUN_DAILY_CAP) {
-      const tomorrow = new Date();
-      tomorrow.setUTCHours(24, 0, 0, 0);
+    if (!changesSummaryHasChanges(changes)) {
+      // Stack hasn't changed since the last analysis. The UI hides the
+      // Re-analyze button in this state; this branch defends against direct
+      // API calls.
       return NextResponse.json(
-        { error: "rate_limited", retry_after: tomorrow.toISOString() },
-        { status: 429 },
+        { error: "nothing_to_analyze" },
+        { status: 409 },
       );
     }
+    trigger = "stack_changed";
   }
 
   // Load catalog (for grounding). Public read on `supplements` is fine.

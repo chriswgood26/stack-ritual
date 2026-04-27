@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import {
   CURRENT_DISCLAIMER_VERSION,
-  MANUAL_RERUN_DAILY_CAP,
   type LatestAnalysisResponse,
   type StackSnapshotItem,
 } from "@/lib/analysis-types";
@@ -87,16 +86,6 @@ export async function GET() {
     notes: r.notes ?? null,
   }));
 
-  // Manual re-runs used today (for the rate-limit display)
-  const startOfDayUtc = new Date();
-  startOfDayUtc.setUTCHours(0, 0, 0, 0);
-  const { count: manualRunsToday } = await supabaseAdmin
-    .from("stack_analyses")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("trigger", "manual_rerun")
-    .gte("created_at", startOfDayUtc.toISOString());
-
   const changes = latest
     ? diffSnapshot(
         (latest.stack_snapshot as StackSnapshotItem[]) ?? [],
@@ -118,10 +107,6 @@ export async function GET() {
       ? changesSummaryHasChanges(changes)
       : false,
     changes_summary: changes,
-    rate_limit: {
-      manual_runs_used_today: manualRunsToday ?? 0,
-      daily_cap: MANUAL_RERUN_DAILY_CAP,
-    },
     disclaimer: {
       accepted: disclaimerAccepted,
       version: disclaimerVersion,

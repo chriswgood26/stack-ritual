@@ -54,7 +54,6 @@ export type LatestAnalysisResponse = {
   analysis: AnalysisRow | null;
   stack_changed_since: boolean;
   changes_summary: ChangesSummary;
-  rate_limit: { manual_runs_used_today: number; daily_cap: number };
   disclaimer: {
     accepted: boolean;
     version: number | null;
@@ -65,4 +64,3 @@ export type LatestAnalysisResponse = {
 export const CURRENT_DISCLAIMER_VERSION = 1;
 export const PROMPT_VERSION = 1;
 export const ANALYSIS_MODEL = "claude-sonnet-4-6";
-export const MANUAL_RERUN_DAILY_CAP = 3;

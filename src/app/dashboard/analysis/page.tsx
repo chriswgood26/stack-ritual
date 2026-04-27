@@ -63,10 +63,6 @@ export default function AnalysisPage() {
           return;
         }
       }
-      if (res.status === 429) {
-        setError("rate_limited");
-        return;
-      }
       if (res.status === 409) {
         setError("empty_stack");
         return;
@@ -160,35 +156,25 @@ export default function AnalysisPage() {
         </p>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={handleRun}
-          disabled={running}
-          className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:bg-stone-300"
-        >
-          {running ? "Analyzing..." : a ? "Re-analyze" : "Analyze my stack"}
-        </button>
-        {latest ? (
-          <span className="text-xs text-stone-500">
-            {latest.rate_limit.manual_runs_used_today}/
-            {latest.rate_limit.daily_cap} manual re-runs used today
-          </span>
-        ) : null}
-      </div>
-
-      {error === "rate_limited" ? (
-        <p className="mt-3 text-sm text-amber-700">
-          You&apos;ve used today&apos;s manual re-runs. Stack changes refresh
-          free, or come back tomorrow.
-        </p>
+      {(!a || latest?.stack_changed_since) ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={handleRun}
+            disabled={running}
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:bg-stone-300"
+          >
+            {running ? "Analyzing..." : a ? "Re-analyze" : "Analyze my stack"}
+          </button>
+        </div>
       ) : null}
+
       {error === "empty_stack" ? (
         <p className="mt-3 text-sm text-amber-700">
           Add some supplements to your stack first.
         </p>
       ) : null}
-      {error && !["rate_limited", "empty_stack"].includes(error) ? (
+      {error && error !== "empty_stack" ? (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           <p className="font-medium">Couldn&apos;t run analysis right now.</p>
           <p className="mt-1 text-xs text-red-600 break-words">{error}</p>

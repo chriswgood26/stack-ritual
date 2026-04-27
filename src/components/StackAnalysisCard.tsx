@@ -70,10 +70,7 @@ export default function StackAnalysisCard() {
 
   if (!data) return null;
 
-  const { analysis, stack_changed_since, changes_summary, rate_limit } = data;
-  const capUsed =
-    rate_limit.manual_runs_used_today >= rate_limit.daily_cap &&
-    !stack_changed_since;
+  const { analysis, stack_changed_since, changes_summary } = data;
 
   if (!analysis) {
     return (
@@ -107,11 +104,6 @@ export default function StackAnalysisCard() {
           ? ` · ${totalChanges} item${totalChanges === 1 ? "" : "s"} changed since`
           : ""}
       </p>
-      {capUsed ? (
-        <p className="mt-2 text-xs text-amber-700">
-          Daily re-runs used. Stack changes refresh free, or come back tomorrow.
-        </p>
-      ) : null}
       <div className="mt-3 flex gap-2">
         <Link
           href="/dashboard/analysis"
