@@ -16,6 +16,7 @@ export default function AnalysisPage() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showDemoBanner, setShowDemoBanner] = useState(false);
   const autoRunOnNextLoad = useRef(false);
 
   const load = useCallback(async () => {
@@ -36,6 +37,22 @@ export default function AnalysisPage() {
       const data = (await res.json()) as LatestAnalysisResponse;
       setLatest(data);
       if (!data.disclaimer.accepted) setShowDisclaimer(true);
+      // Existing-user demographics nudge: disclaimer accepted but no
+      // demographics set yet AND user hasn't dismissed the banner before.
+      if (data.disclaimer.accepted) {
+        try {
+          const dismissed = typeof window !== "undefined" && window.localStorage.getItem("sr.demographics_banner_dismissed") === "1";
+          if (!dismissed) {
+            const profileRes = await fetch("/api/profile/demographics-status", { credentials: "include" });
+            if (profileRes.ok) {
+              const status = await profileRes.json() as { has_any_demographics: boolean };
+              setShowDemoBanner(!status.has_any_demographics);
+            }
+          }
+        } catch {
+          // best-effort; banner just won't render
+        }
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
@@ -150,6 +167,31 @@ export default function AnalysisPage() {
       <h1 className="mt-2 text-2xl font-semibold text-stone-900">
         Stack Analysis
       </h1>
+
+      {showDemoBanner ? (
+        <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <span>
+            💡 Personalize your analysis — add age & sex on your{" "}
+            <Link href="/dashboard/profile" className="underline font-medium">
+              profile
+            </Link>
+            .
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setShowDemoBanner(false);
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("sr.demographics_banner_dismissed", "1");
+              }
+            }}
+            className="text-amber-900 hover:text-amber-950"
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      ) : null}
 
       {a ? (
         <p className="mt-1 text-sm text-stone-600">

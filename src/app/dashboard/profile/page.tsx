@@ -13,6 +13,7 @@ import ManageBillingButton from "@/components/ManageBillingButton";
 import SMSSettings from "@/components/SMSSettings";
 import EmailSettings from "@/components/EmailSettings";
 import ReferralCodeInput from "@/components/ReferralCodeInput";
+import PersonalSettings from "@/components/PersonalSettings";
 import { visitorHasAnnualPerk } from "@/lib/affiliatePerks";
 import { isSmsReviewer } from "@/lib/sms";
 
@@ -43,12 +44,14 @@ export default async function ProfilePage() {
     { data: myExperiences },
     { data: subscription },
     { data: stackItems },
-    { data: latestRelease }
+    { data: latestRelease },
+    { data: profileRow },
   ] = await Promise.all([
     supabaseAdmin.from("experiences").select("id, rating, title, body, created_at, supplement:supplement_id(name, icon, slug)").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
     supabaseAdmin.from("subscriptions").select("plan, status, current_period_end, stripe_customer_id").eq("user_id", userId).single(),
     supabaseAdmin.from("user_stacks").select("id, custom_name, supplement:supplement_id(name, icon), timing, dose").eq("user_id", userId).eq("is_active", true).order("created_at", { ascending: false }).limit(5),
     supabaseAdmin.from("releases").select("version").order("released_at", { ascending: false }).order("version", { ascending: false }).limit(1).maybeSingle(),
+    supabaseAdmin.from("user_profiles").select("sex, birth_month, birth_day, birth_year").eq("user_id", userId).maybeSingle(),
   ]);
 
   const plan = subscription?.plan || "free";
@@ -86,6 +89,15 @@ export default async function ProfilePage() {
             <EditProfileButton inCard />
           </div>
         </div>
+
+        <PersonalSettings
+          initial={{
+            sex: (profileRow?.sex as "male" | "female" | null) ?? null,
+            birth_month: profileRow?.birth_month ?? null,
+            birth_day: profileRow?.birth_day ?? null,
+            birth_year: profileRow?.birth_year ?? null,
+          }}
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
