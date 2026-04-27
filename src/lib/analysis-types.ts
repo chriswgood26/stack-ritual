@@ -3,6 +3,27 @@
 
 export type FindingSeverity = "info" | "caution" | "warning";
 
+export type Sex = "male" | "female";
+
+export type Demographics = {
+  sex: Sex | null;
+  birth_month: number | null;
+  birth_day: number | null;
+  birth_year: number | null;
+};
+
+export type AnalysisUserContext = {
+  sex: Sex | null;
+  age_band:
+    | "18-24"
+    | "25-34"
+    | "35-44"
+    | "45-54"
+    | "55-64"
+    | "65+"
+    | null;
+};
+
 export type Finding = {
   title: string;
   body: string;
@@ -50,10 +71,20 @@ export type ChangesSummary = {
   modified: number;
 };
 
+export type Followup = {
+  id: string;
+  section: keyof AnalysisSections;
+  finding_index: number;
+  question: string;
+  answer: string;
+  created_at: string;
+};
+
 export type LatestAnalysisResponse = {
   analysis: AnalysisRow | null;
   stack_changed_since: boolean;
   changes_summary: ChangesSummary;
+  followups: Followup[];
   disclaimer: {
     accepted: boolean;
     version: number | null;
@@ -62,5 +93,7 @@ export type LatestAnalysisResponse = {
 };
 
 export const CURRENT_DISCLAIMER_VERSION = 1;
-export const PROMPT_VERSION = 1;
+export const PROMPT_VERSION = 2;
 export const ANALYSIS_MODEL = "claude-sonnet-4-6";
+export const FOLLOWUPS_PER_ANALYSIS_CAP = 20;
+export const FOLLOWUP_PROMPT_VERSION = 1;

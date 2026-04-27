@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { Tool } from "@anthropic-ai/sdk/resources/messages";
 import type {
   AnalysisSections,
+  AnalysisUserContext,
   Recommendation,
   StackSnapshotItem,
 } from "./analysis-types";
@@ -42,7 +43,9 @@ d) Identity. The "involves" array on each finding MUST list supplement names exa
 
 e) Empty / minimal stacks. If the stack has 0 or 1 items, return empty arrays for sections 1–4 and put a single guidance note in recommendations.
 
-f) Output channel. Output MUST be exactly one call to the submit_stack_analysis tool. No prose, preamble, or explanation outside the tool call.`;
+f) Output channel. Output MUST be exactly one call to the submit_stack_analysis tool. No prose, preamble, or explanation outside the tool call.
+
+g) Demographic personalization. If the request user message JSON includes a "user" object with "sex" and/or "age_band", weight findings and recommendations to that demographic where research supports it (e.g., iron needs for menstruating users; sarcopenia/protein for 55+; bone health for postmenopausal users). When the "user" object is absent, give general guidance with no demographic assumptions.`;
 
 const FINDING_SCHEMA = {
   type: "object",
@@ -106,6 +109,7 @@ export type AnalysisRunOutput = {
 export async function runStackAnalysis(
   stack: StackSnapshotItem[],
   catalog: CatalogEntry[],
+  user: AnalysisUserContext | null = null,
 ): Promise<AnalysisRunOutput> {
   if (!process.env.ANTHROPIC_API_KEY) {
     throw new Error("ANTHROPIC_API_KEY not configured");
@@ -114,6 +118,8 @@ export async function runStackAnalysis(
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const startedAt = Date.now();
 
+  const includeUser =
+    user !== null && (user.sex !== null || user.age_band !== null);
   const userMessage = JSON.stringify({
     stack: stack.map(s => ({
       name: s.name,
@@ -123,6 +129,7 @@ export async function runStackAnalysis(
       brand: s.brand,
       notes: s.notes,
     })),
+    ...(includeUser ? { user: { sex: user!.sex, age_band: user!.age_band } } : {}),
   });
 
   const response = await anthropic.messages.create({

@@ -107,6 +107,7 @@ export async function GET() {
       ? changesSummaryHasChanges(changes)
       : false,
     changes_summary: changes,
+    followups: [], // TODO(Task 7): populate from analysis_followups table
     disclaimer: {
       accepted: disclaimerAccepted,
       version: disclaimerVersion,
