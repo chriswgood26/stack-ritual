@@ -108,6 +108,7 @@ export default function AnalysisRecommendationCard({
         ) : (
           <div>
             <textarea
+              autoFocus
               value={question}
               onChange={e => setQuestion(e.target.value.slice(0, 500))}
               placeholder="What do you want to know about this recommendation?"
