@@ -371,40 +371,6 @@ export async function sendReferralCreditedEmail(
   });
 }
 
-// Birthday email — sent once per year on the user's birthday by
-// /api/cron/birthday-emails. Year stamp in user_profiles.last_birthday_email_year
-// guarantees one email per user per year.
-export async function sendBirthdayEmail(to: string, firstName: string) {
-  const greeting = firstName ? firstName : "friend";
-  return resend.emails.send({
-    from: getFromEmail(),
-    to,
-    subject: "🎉 Happy birthday from Stack Ritual",
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
-        <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
-          <div style="background: #065f46; padding: 24px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 20px;">🎉 Happy Birthday!</h1>
-          </div>
-          <div style="padding: 24px;">
-            <h2 style="color: #1c1917; margin-top: 0;">Hi ${greeting},</h2>
-            <p style="color: #44403c; line-height: 1.6;">Wishing you a happy birthday from everyone at Stack Ritual. Thanks for being part of the journey — here's to another year of feeling your best.</p>
-            <a href="https://stackritual.com/dashboard" style="display: inline-block; background: #065f46; color: white; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 12px;">
-              Open the app →
-            </a>
-          </div>
-          <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
-            <p style="color: #a8a29e; font-size: 11px; margin: 0;">stackritual.com</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-  });
-}
-
 // Referral invite — sent when a paying Pro emails their referral link to a friend
 export async function sendReferralInviteEmail(
   to: string,
@@ -446,6 +412,40 @@ export async function sendReferralInviteEmail(
               ⚕️ Nothing on Stack Ritual constitutes medical advice. Always consult your doctor.<br>
               stackritual.com
             </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
+
+// Birthday email — sent once per year on the user's birthday by
+// /api/cron/birthday-emails. Year stamp in user_profiles.last_birthday_email_year
+// guarantees one email per user per year.
+export async function sendBirthdayEmail(to: string, firstName: string) {
+  const greeting = firstName ? firstName : "friend";
+  return resend.emails.send({
+    from: getFromEmail(),
+    to,
+    subject: "🎉 Happy birthday from Stack Ritual",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, sans-serif; background: #fafaf9; padding: 20px;">
+        <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4;">
+          <div style="background: #065f46; padding: 24px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px;">🎉 Happy Birthday!</h1>
+          </div>
+          <div style="padding: 24px;">
+            <h2 style="color: #1c1917; margin-top: 0;">Hi ${greeting},</h2>
+            <p style="color: #44403c; line-height: 1.6;">Wishing you a happy birthday from everyone at Stack Ritual. Thanks for being part of the journey — here's to another year of feeling your best.</p>
+            <a href="https://stackritual.com/dashboard" style="display: inline-block; background: #065f46; color: white; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 12px;">
+              Open the app →
+            </a>
+          </div>
+          <div style="background: #fafaf9; padding: 16px; text-align: center; border-top: 1px solid #e7e5e4;">
+            <p style="color: #a8a29e; font-size: 11px; margin: 0;">stackritual.com</p>
           </div>
         </div>
       </body>
