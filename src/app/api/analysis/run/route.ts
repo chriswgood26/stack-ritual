@@ -4,8 +4,10 @@ import { supabase, supabaseAdmin } from "@/lib/supabase";
 import {
   CURRENT_DISCLAIMER_VERSION,
   type AnalysisRunTrigger,
+  type AnalysisUserContext,
   type StackSnapshotItem,
 } from "@/lib/analysis-types";
+import { birthYearToAgeBand } from "@/lib/age-band";
 import { changesSummaryHasChanges, diffSnapshot } from "@/lib/analysis-diff";
 import { runStackAnalysis } from "@/lib/analysis";
 import type { CatalogEntry } from "@/lib/analysis-grounding";
@@ -45,7 +47,7 @@ export async function POST() {
   // Disclaimer gate
   const { data: profile } = await supabaseAdmin
     .from("user_profiles")
-    .select("analysis_disclaimer_version")
+    .select("analysis_disclaimer_version, sex, birth_year")
     .eq("user_id", userId)
     .single();
   const disclaimerVersion = profile?.analysis_disclaimer_version ?? null;
@@ -123,10 +125,17 @@ export async function POST() {
     .select("id, name, slug");
   const catalog: CatalogEntry[] = catalogRows ?? [];
 
+  const userContext: AnalysisUserContext | null = profile
+    ? {
+        sex: (profile.sex as "male" | "female" | null) ?? null,
+        age_band: birthYearToAgeBand(profile.birth_year),
+      }
+    : null;
+
   // Call the model
   let result;
   try {
-    result = await runStackAnalysis(stack, catalog);
+    result = await runStackAnalysis(stack, catalog, userContext);
   } catch (e) {
     const detail =
       e instanceof Error ? `${e.name}: ${e.message}` : String(e);
