@@ -64,6 +64,12 @@ export default function AnalysisPage() {
         }
       }
       if (res.status === 409) {
+        const data = await res.json().catch(() => ({}));
+        if (data.error === "nothing_to_analyze") {
+          // Race: UI showed Re-analyze but server saw no changes. Refresh to sync.
+          await load();
+          return;
+        }
         setError("empty_stack");
         return;
       }
