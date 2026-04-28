@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import BottomNav from "@/components/BottomNav";
 import TopNav from "@/components/TopNav";
 import AnalysisDisclaimerModal from "@/components/AnalysisDisclaimerModal";
@@ -20,6 +21,17 @@ export default function AnalysisPage() {
   const [showDemoBanner, setShowDemoBanner] = useState(false);
   const [plan, setPlan] = useState<"free" | "plus" | "pro" | null>(null);
   const autoRunOnNextLoad = useRef(false);
+  const { user } = useUser();
+  const [printedDate] = useState(() => new Date().toLocaleDateString());
+  const printName = (() => {
+    const first = user?.firstName ?? "";
+    const last = user?.lastName ?? "";
+    const full = `${first} ${last}`.trim();
+    if (full) return full;
+    const email = user?.primaryEmailAddress?.emailAddress ?? "";
+    const local = email.split("@")[0] ?? "";
+    return local || "Stack Ritual user";
+  })();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -179,7 +191,7 @@ export default function AnalysisPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans pb-24">
-      <TopNav />
+      <div className="print:hidden"><TopNav /></div>
       <div className="mx-auto max-w-2xl px-4 py-6">
       <Link
         href="/dashboard/stack"
@@ -188,12 +200,18 @@ export default function AnalysisPage() {
         ← Back to Stack
       </Link>
 
+      <div className="hidden print:block mb-4 text-sm text-stone-700">
+        <div><span className="font-semibold">For:</span> {printName}</div>
+        <div><span className="font-semibold">Printed:</span> {printedDate}</div>
+        <hr className="my-2 border-stone-300" />
+      </div>
+
       <h1 className="mt-2 text-2xl font-semibold text-stone-900">
         Stack Analysis
       </h1>
 
       {showDemoBanner ? (
-        <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 print:hidden">
           <span>
             💡 Personalize your analysis — add age & sex on your{" "}
             <Link href="/dashboard/profile" className="underline font-medium">
@@ -229,7 +247,7 @@ export default function AnalysisPage() {
       )}
 
       {(!a || latest?.stack_changed_since) ? (
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3 print:hidden">
           <button
             type="button"
             onClick={() => {
@@ -247,20 +265,32 @@ export default function AnalysisPage() {
         </div>
       ) : null}
 
+      {a ? (
+        <div className="mt-2 print:hidden">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="text-xs text-stone-600 hover:text-emerald-700 hover:underline"
+          >
+            Print 🖨️
+          </button>
+        </div>
+      ) : null}
+
       {error === "empty_stack" ? (
-        <p className="mt-3 text-sm text-amber-700">
+        <p className="mt-3 text-sm text-amber-700 print:hidden">
           Add some supplements to your stack first.
         </p>
       ) : null}
       {error && error !== "empty_stack" ? (
-        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 print:hidden">
           <p className="font-medium">Couldn&apos;t run analysis right now.</p>
           <p className="mt-1 text-xs text-red-600 break-words">{error}</p>
         </div>
       ) : null}
 
       {a && isPro && followupCount > 0 ? (
-        <p className="mt-3 text-xs text-stone-500">
+        <p className="mt-3 text-xs text-stone-500 print:hidden">
           {followupCount}/20 follow-ups used on this analysis.
         </p>
       ) : null}
@@ -430,7 +460,7 @@ export default function AnalysisPage() {
         </div>
       ) : null}
       </div>
-      <BottomNav />
+      <div className="print:hidden"><BottomNav /></div>
     </div>
   );
 }

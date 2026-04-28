@@ -63,7 +63,7 @@ export default function AnalysisRecommendationCard({
   }
 
   return (
-    <div className="mb-3 rounded-xl border border-stone-200 bg-white p-4">
+    <div className="mb-3 rounded-xl border border-stone-200 bg-white p-4 break-inside-avoid">
       <h4 className="text-sm font-semibold text-stone-900">{rec.name}</h4>
       <p className="mt-2 text-sm text-stone-700">{rec.body}</p>
 
@@ -89,7 +89,7 @@ export default function AnalysisRecommendationCard({
       ) : null}
 
       {/* Ask UI */}
-      <div className="mt-3 border-t border-stone-200 pt-3">
+      <div className="mt-3 border-t border-stone-200 pt-3 print:hidden">
         {planLocked ? (
           <a href="/dashboard/profile" className="text-xs text-stone-500 hover:underline">
             🔒 Ask follow-ups — Pro feature

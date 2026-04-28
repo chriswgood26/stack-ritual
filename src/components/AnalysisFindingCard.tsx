@@ -83,7 +83,7 @@ export default function AnalysisFindingCard({
   }
 
   return (
-    <div className={`mb-3 rounded-xl border p-4 ${SEVERITY_STYLES[sev]}`}>
+    <div className={`mb-3 rounded-xl border p-4 break-inside-avoid ${SEVERITY_STYLES[sev]}`}>
       <div className="flex items-start justify-between gap-3">
         <h4 className="text-sm font-semibold text-stone-900">{finding.title}</h4>
         {finding.severity ? (
@@ -112,7 +112,7 @@ export default function AnalysisFindingCard({
       ) : null}
 
       {/* Ask UI */}
-      <div className="mt-3 border-t border-stone-200 pt-3">
+      <div className="mt-3 border-t border-stone-200 pt-3 print:hidden">
         {planLocked ? (
           <a href="/dashboard/profile" className="text-xs text-stone-500 hover:underline">
             🔒 Ask follow-ups — Pro feature
