@@ -16,6 +16,7 @@ export default function AnalysisPage() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showReanalyzeConfirm, setShowReanalyzeConfirm] = useState(false);
   const [showDemoBanner, setShowDemoBanner] = useState(false);
   const [plan, setPlan] = useState<"free" | "plus" | "pro" | null>(null);
   const autoRunOnNextLoad = useRef(false);
@@ -231,7 +232,13 @@ export default function AnalysisPage() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={handleRun}
+            onClick={() => {
+              if (a) {
+                setShowReanalyzeConfirm(true);
+              } else {
+                handleRun();
+              }
+            }}
             disabled={running}
             className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:bg-stone-300"
           >
@@ -386,6 +393,41 @@ export default function AnalysisPage() {
           }}
           onCancel={() => setShowDisclaimer(false)}
         />
+      ) : null}
+
+      {showReanalyzeConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-stone-900">
+              Re-analyze your stack?
+            </h2>
+            <p className="mt-3 text-sm text-stone-700">
+              Your current analysis and any follow-up questions you&apos;ve
+              asked will be replaced with a new analysis based on your
+              updated stack.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowReanalyzeConfirm(false)}
+                className="rounded-lg px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowReanalyzeConfirm(false);
+                  handleRun();
+                }}
+                disabled={running}
+                className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:bg-stone-300"
+              >
+                {running ? "Analyzing..." : "Re-analyze"}
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
       </div>
       <BottomNav />

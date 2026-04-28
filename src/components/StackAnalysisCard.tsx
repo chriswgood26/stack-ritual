@@ -109,7 +109,7 @@ export default function StackAnalysisCard() {
           href="/dashboard/analysis"
           className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white"
         >
-          {stack_changed_since ? "Re-analyze" : "View results"}
+          View analysis
         </Link>
       </div>
     </div>
