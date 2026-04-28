@@ -51,8 +51,9 @@ export async function GET(req: NextRequest) {
   // Get all users with email reminders enabled
   const { data: profiles } = await supabaseAdmin
     .from("user_profiles")
-    .select("user_id, email_reminders_enabled, email_consolidated_summary")
-    .eq("email_reminders_enabled", true);
+    .select("user_id, email_reminders_enabled, email_consolidated_summary, email_unsubscribed_all")
+    .eq("email_reminders_enabled", true)
+    .eq("email_unsubscribed_all", false);
 
   let sent = 0;
   let errors = 0;

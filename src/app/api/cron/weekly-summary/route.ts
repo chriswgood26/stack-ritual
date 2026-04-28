@@ -20,8 +20,9 @@ export async function GET(req: NextRequest) {
   // Get all users with terms accepted and weekly summary enabled
   const { data: profiles } = await supabaseAdmin
     .from("user_profiles")
-    .select("user_id, terms_accepted_at, email_weekly_summary")
-    .not("terms_accepted_at", "is", null);
+    .select("user_id, terms_accepted_at, email_weekly_summary, email_unsubscribed_all")
+    .not("terms_accepted_at", "is", null)
+    .eq("email_unsubscribed_all", false);
 
   let sent = 0;
   let errors = 0;

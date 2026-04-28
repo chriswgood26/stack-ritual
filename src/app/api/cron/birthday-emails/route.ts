@@ -32,10 +32,11 @@ export async function GET(req: NextRequest) {
   // Local-hour and local-date filtering happens per-row in JS (timezone math).
   const { data: rows, error } = await supabaseAdmin
     .from("user_profiles")
-    .select("user_id, birth_month, birth_day, timezone, last_birthday_email_year")
+    .select("user_id, birth_month, birth_day, timezone, last_birthday_email_year, email_unsubscribed_all")
     .not("birth_month", "is", null)
     .not("birth_day", "is", null)
     .not("timezone", "is", null)
+    .eq("email_unsubscribed_all", false)
     .or(`last_birthday_email_year.is.null,last_birthday_email_year.lt.${currentYear}`);
 
   if (error) {
